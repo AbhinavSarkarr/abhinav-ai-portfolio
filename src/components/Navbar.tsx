@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const navLinks = [
   { name: "Home", href: "#home" },
@@ -41,61 +42,134 @@ export function Navbar() {
       }`}
     >
       <div className="container flex items-center justify-between">
-        <a href="#home" className="text-2xl font-bold bg-gradient-tech bg-clip-text text-transparent">
+        <motion.a 
+          href="#home" 
+          className="text-2xl font-bold bg-gradient-tech bg-clip-text text-transparent"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
           Abhinav Sarkar
-        </a>
+        </motion.a>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
-            <a 
+            <motion.a 
               key={link.name} 
               href={link.href}
               className="relative font-medium text-sm hover:text-tech-accent transition-colors duration-300
               after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 
               after:bg-tech-accent after:transition-all after:duration-300 hover:after:w-full"
+              whileHover={{ y: -2 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               {link.name}
-            </a>
+            </motion.a>
           ))}
-          <Button className="tech-btn">Resume</Button>
+          <motion.a
+            href="https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            <Button className="tech-btn">Resume</Button>
+          </motion.a>
+          
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            <Link to="/admin/login">
+              <Button variant="ghost" size="icon" className="rounded-full border border-tech-accent/30 bg-tech-glass/50 hover:bg-tech-glass hover:border-tech-accent/70">
+                <Lock size={16} className="text-tech-accent" />
+                <span className="sr-only">Admin</span>
+              </Button>
+            </Link>
+          </motion.div>
         </nav>
 
         {/* Mobile Menu Button */}
-        <button 
+        <motion.button 
           className="md:hidden p-2 text-tech-accent" 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        </motion.button>
       </div>
 
       {/* Mobile Menu */}
-      <motion.div 
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ 
-          opacity: mobileMenuOpen ? 1 : 0,
-          height: mobileMenuOpen ? 'auto' : 0
-        }}
-        transition={{ duration: 0.3 }}
-        className="md:hidden overflow-hidden glass mx-4 mt-2 rounded-xl"
-      >
+      <AnimatePresence>
         {mobileMenuOpen && (
-          <div className="flex flex-col p-4 gap-2">
-            {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2 hover:bg-white/5 rounded-md transition-colors"
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden overflow-hidden glass mx-4 mt-2 rounded-xl"
+          >
+            <motion.div 
+              className="flex flex-col p-4 gap-2"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.05
+                  }
+                },
+                hidden: {}
+              }}
+            >
+              {navLinks.map((link) => (
+                <motion.a 
+                  key={link.name} 
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 hover:bg-white/5 rounded-md transition-colors"
+                  variants={{
+                    visible: { opacity: 1, x: 0 },
+                    hidden: { opacity: 0, x: -20 }
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  {link.name}
+                </motion.a>
+              ))}
+              <motion.a
+                href="https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
+                target="_blank"
+                rel="noopener noreferrer"
+                variants={{
+                  visible: { opacity: 1, x: 0 },
+                  hidden: { opacity: 0, x: -20 }
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                {link.name}
-              </a>
-            ))}
-            <Button className="mt-2 tech-btn">Resume</Button>
-          </div>
+                <Button className="mt-2 tech-btn w-full">Resume</Button>
+              </motion.a>
+              <motion.div
+                variants={{
+                  visible: { opacity: 1, x: 0 },
+                  hidden: { opacity: 0, x: -20 }
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                <Link to="/admin/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full mt-2 flex gap-2 items-center justify-center border-tech-accent/30 hover:bg-tech-glass hover:border-tech-accent/70">
+                    <Lock size={16} className="text-tech-accent" />
+                    <span>Admin Login</span>
+                  </Button>
+                </Link>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
     </motion.header>
   );
 }

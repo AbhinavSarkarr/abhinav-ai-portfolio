@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
@@ -73,12 +73,22 @@ export function HeroSection() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 glass px-4 py-2 rounded-full border border-tech-accent/30 shadow-md">
-                <Button variant="link" className="text-sm p-0 flex items-center gap-1.5" onClick={() => window.open("#", "_blank")}>
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="absolute -bottom-4 -right-4 glass px-4 py-2 rounded-full border border-tech-accent/30 shadow-md hover:border-tech-accent/70 hover:shadow-tech-neon/30 hover:shadow-md transition-all duration-300"
+              >
+                <Button 
+                  variant="link" 
+                  className="text-sm p-0 flex items-center gap-1.5 text-white hover:text-tech-accent transition-colors" 
+                  onClick={() => window.open("https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view", "_blank")}
+                >
                   <span className="text-xl">📄</span>
                   <span>Resume</span>
+                  <ExternalLink size={14} />
                 </Button>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>

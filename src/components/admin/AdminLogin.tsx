@@ -7,6 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Lock } from "lucide-react";
+
+const fadeInUpVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (custom: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: custom * 0.1,
+      ease: "easeOut"
+    }
+  })
+};
 
 export function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -51,16 +65,33 @@ export function AdminLogin() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <div className="mb-8 text-center">
+        <motion.div 
+          className="mb-8 text-center"
+          variants={fadeInUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+        >
+          <motion.div 
+            className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full glass border border-tech-accent/30 shadow-lg shadow-tech-neon/20"
+          >
+            <Lock className="w-8 h-8 text-tech-accent" />
+          </motion.div>
           <h1 className="text-3xl font-bold mb-2 bg-gradient-tech bg-clip-text text-transparent">
             Admin Access
           </h1>
           <p className="text-muted-foreground">
             Login to manage your portfolio content
           </p>
-        </div>
+        </motion.div>
         
-        <div className="glass border border-white/10 rounded-xl p-6 shadow-lg">
+        <motion.div 
+          className="glass border border-white/10 rounded-xl p-6 shadow-lg"
+          variants={fadeInUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={1}
+        >
           {error && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -76,7 +107,13 @@ export function AdminLogin() {
           )}
           
           <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
+            <motion.div 
+              className="space-y-2"
+              variants={fadeInUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+            >
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -87,9 +124,15 @@ export function AdminLogin() {
                 required
                 className="bg-background/50"
               />
-            </div>
+            </motion.div>
             
-            <div className="space-y-2">
+            <motion.div 
+              className="space-y-2"
+              variants={fadeInUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={3}
+            >
               <div className="flex justify-between items-center">
                 <Label htmlFor="password">Password</Label>
                 <Button variant="link" className="p-0 h-auto text-xs">
@@ -105,19 +148,40 @@ export function AdminLogin() {
                 required
                 className="bg-background/50"
               />
-            </div>
+            </motion.div>
             
-            <Button
-              type="submit"
-              className="tech-btn w-full"
-              disabled={isLoggingIn}
+            <motion.div
+              variants={fadeInUpVariants}
+              initial="hidden"
+              animate="visible"
+              custom={4}
+              whileTap={{ scale: 0.98 }}
             >
-              {isLoggingIn ? "Logging in..." : "Login"}
-            </Button>
+              <Button
+                type="submit"
+                className="tech-btn w-full"
+                disabled={isLoggingIn}
+              >
+                {isLoggingIn ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
+              </Button>
+            </motion.div>
           </form>
-        </div>
+        </motion.div>
         
-        <div className="mt-8 text-center text-sm text-muted-foreground">
+        <motion.div 
+          className="mt-8 text-center text-sm text-muted-foreground"
+          variants={fadeInUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={5}
+        >
           <p>
             Not an admin?{" "}
             <Button
@@ -128,7 +192,7 @@ export function AdminLogin() {
               Return to website
             </Button>
           </p>
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );
