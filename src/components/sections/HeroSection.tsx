@@ -54,8 +54,8 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <Button className="tech-btn">Get in touch</Button>
-              <Button variant="outline" className="border-tech-accent/30 hover:border-tech-accent/70 hover:bg-tech-glass">View Projects</Button>
+              <Button className="tech-btn" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Get in touch</Button>
+              <Button variant="outline" className="border-tech-accent/30 hover:border-tech-accent/70 hover:bg-tech-glass" onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}>View Projects</Button>
             </motion.div>
           </div>
           
@@ -73,9 +73,11 @@ export function HeroSection() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 glass px-4 py-2 rounded-full border border-tech-accent/30 shadow-md flex items-center gap-2.5">
-                <span className="text-xl">🤗</span>
-                <span className="font-medium text-sm">Hugging Face</span>
+              <div className="absolute -bottom-4 -right-4 glass px-4 py-2 rounded-full border border-tech-accent/30 shadow-md">
+                <Button variant="link" className="text-sm p-0 flex items-center gap-1.5" onClick={() => window.open("#", "_blank")}>
+                  <span className="text-xl">📄</span>
+                  <span>Resume</span>
+                </Button>
               </div>
             </div>
           </motion.div>
