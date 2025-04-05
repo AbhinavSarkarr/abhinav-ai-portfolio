@@ -3,50 +3,11 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Github, Globe, ArrowUpRight } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
-type Project = {
-  title: string;
-  description: string;
-  technologies: string[];
-  image: string;
-  github?: string;
-  liveUrl?: string;
-};
-
-const projects: Project[] = [
-  {
-    title: "AutoDraft",
-    description: "Chrome extension that automates email replies using Tavily AI, Crew AI, and Llama3-8B",
-    technologies: ["TypeScript", "Langchain", "Llama", "Tavily AI", "Chrome Extension API"],
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-    github: "#",
-    liveUrl: "#"
-  },
-  {
-    title: "TextTweak",
-    description: "Real-time text improvement tool using fine-tuned Google T5-base for grammar/spell check",
-    technologies: ["Python", "PyTorch", "T5", "Transformers", "FastAPI"],
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-    github: "#",
-    liveUrl: "#"
-  },
-  {
-    title: "RAG Pipeline Builder",
-    description: "End-to-end system for creating custom retrieval augmented generation pipelines",
-    technologies: ["Python", "Qdrant", "LangChain", "Llama", "React"],
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-    github: "#"
-  },
-  {
-    title: "Insurance Document Analyzer",
-    description: "AI system that extracts and cross-verifies services in insurance documents",
-    technologies: ["OCR", "NLP", "BERT", "FastAPI", "React"],
-    image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1",
-    github: "#"
-  }
-];
+import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function ProjectsSection() {
+  const { data } = useAdminData();
+  const { projects } = data;
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
@@ -73,7 +34,7 @@ export function ProjectsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {projects.map((project, index) => (
             <motion.div
-              key={index}
+              key={project.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}

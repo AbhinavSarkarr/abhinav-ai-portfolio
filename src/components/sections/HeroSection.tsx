@@ -2,8 +2,12 @@
 import { motion } from 'framer-motion';
 import { ArrowDown, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function HeroSection() {
+  const { data } = useAdminData();
+  const { hero } = data;
+
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       {/* Background elements */}
@@ -45,7 +49,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Specialized in NLP, RAG pipelines, and LLM fine-tuning. Creating solutions that leverage the power of artificial intelligence to solve real-world problems.
+              {hero.description}
             </motion.p>
             
             <motion.div 
@@ -68,8 +72,8 @@ export function HeroSection() {
             <div className="relative">
               <div className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-tech-accent/30 shadow-lg shadow-tech-neon/30 animate-float">
                 <img 
-                  src="/lovable-uploads/0f976acc-d38b-4ac7-96a7-02ccc53846b5.png" 
-                  alt="Abhinav Sarkar" 
+                  src={hero.image} 
+                  alt={hero.name || "Abhinav Sarkar"} 
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -82,7 +86,7 @@ export function HeroSection() {
                 <Button 
                   variant="link" 
                   className="text-sm p-0 flex items-center gap-1.5 text-white hover:text-tech-accent transition-colors" 
-                  onClick={() => window.open("https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view", "_blank")}
+                  onClick={() => window.open(hero.resumeLink || "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view", "_blank")}
                 >
                   <span className="text-xl">📄</span>
                   <span>Resume</span>

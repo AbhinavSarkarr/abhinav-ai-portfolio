@@ -33,9 +33,20 @@ export function AdminLogin() {
   
   // Check if already authenticated when component mounts
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (token) {
-      navigate("/admin", { replace: true });
+    try {
+      const authData = localStorage.getItem("adminAuth");
+      if (authData) {
+        const { expiresAt } = JSON.parse(authData);
+        if (new Date(expiresAt) > new Date()) {
+          navigate("/admin", { replace: true });
+        } else {
+          // Token expired, remove it
+          localStorage.removeItem("adminAuth");
+        }
+      }
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+      localStorage.removeItem("adminAuth");
     }
   }, [navigate]);
   
@@ -48,11 +59,21 @@ export function AdminLogin() {
       // This would be replaced with an actual API call
       // For demo purposes, we're using hardcoded credentials
       if (email === "admin@abhinav.ai" && password === "admin123") {
-        localStorage.setItem("adminToken", "mock-jwt-token");
+        // Create token with expiration (24 hours from now)
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+        
+        // Store auth data with expiration
+        localStorage.setItem("adminAuth", JSON.stringify({
+          token: "mock-jwt-token",
+          expiresAt: expiresAt.toISOString()
+        }));
+        
         toast({
           title: "Login successful",
           description: "Welcome to the admin panel.",
         });
+        
         console.log("Login successful, navigating to /admin");
         // Force navigation to admin panel
         setTimeout(() => {

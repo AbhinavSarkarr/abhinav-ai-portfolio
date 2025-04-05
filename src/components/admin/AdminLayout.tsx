@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Outlet, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -19,30 +20,62 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-// Auth hook to handle authentication state
+// Auth hook to handle authentication state with token expiration
 const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
   
-  // Check for token in localStorage
+  // Check for token in localStorage and validate expiration
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem("adminToken");
-      setIsAuthenticated(!!token);
+      try {
+        const authData = localStorage.getItem("adminAuth");
+        if (!authData) {
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        const { token, expiresAt } = JSON.parse(authData);
+        
+        if (expiresAt && new Date(expiresAt) > new Date()) {
+          // Token is still valid
+          setIsAuthenticated(true);
+        } else {
+          // Token has expired
+          localStorage.removeItem("adminAuth");
+          setIsAuthenticated(false);
+          toast({
+            title: "Session expired",
+            description: "Your login session has expired. Please log in again.",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+      }
+      
       setIsLoading(false);
     };
     
     checkAuth();
+    
     // Add event listener to detect changes in localStorage (for cross-tab synchronization)
     window.addEventListener("storage", checkAuth);
     
+    // Set up interval to check token expiration periodically
+    const intervalId = setInterval(checkAuth, 60000); // Check every minute
+    
     return () => {
       window.removeEventListener("storage", checkAuth);
+      clearInterval(intervalId);
     };
-  }, []);
+  }, [toast]);
   
   const logout = () => {
-    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminAuth");
     setIsAuthenticated(false);
   };
   

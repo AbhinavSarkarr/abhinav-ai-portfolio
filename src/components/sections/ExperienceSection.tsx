@@ -1,41 +1,12 @@
 
 import { motion } from 'framer-motion';
 import { Briefcase, Calendar } from 'lucide-react';
-
-type Experience = {
-  title: string;
-  company: string;
-  period: string;
-  current: boolean;
-  description: string[];
-};
-
-const experiences: Experience[] = [
-  {
-    title: "Artificial Intelligence Engineer",
-    company: "Jellyfish Technologies Pvt. Ltd.",
-    period: "Apr 2024 – Present",
-    current: true,
-    description: [
-      "Built SaaS platform for custom RAG-based chatbot creation using Qdrant and Llama3-70B",
-      "Developed system to cross-verify services in insurance documents",
-      "Created automated complaint registration system using Whisper v3 + fine-tuned GPT-4"
-    ]
-  },
-  {
-    title: "Deep Learning Intern",
-    company: "Bhramaand Pvt. Ltd.",
-    period: "Jun – Sep 2023",
-    current: false,
-    description: [
-      "Designed zero-shot classification system with bart-large-mnli",
-      "Built modules for real-time news story generation",
-      "Developed financial forecasting models using XGBoost"
-    ]
-  }
-];
+import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function ExperienceSection() {
+  const { data } = useAdminData();
+  const { experiences } = data;
+
   return (
     <section id="experience" className="relative py-24">
       <div className="container">
@@ -55,7 +26,7 @@ export function ExperienceSection() {
         <div className="max-w-4xl mx-auto">
           {experiences.map((exp, index) => (
             <motion.div
-              key={index}
+              key={exp.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}

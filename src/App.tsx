@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { AdminLogin } from "./components/admin/AdminLogin";
 import { AdminDashboard } from "./components/admin/AdminDashboard";
+import { AdminDataProvider } from "./contexts/AdminDataContext";
 
 // Admin section components will be added here as we build them
 import { AdminHero } from "./components/admin/sections/AdminHero";
@@ -24,28 +25,30 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="hero" element={<AdminHero />} />
-            <Route path="experience" element={<AdminExperience />} />
-            <Route path="projects" element={<AdminProjects />} />
-            <Route path="skills" element={<AdminSkills />} />
-            <Route path="certifications" element={<AdminCertifications />} />
-            <Route path="publications" element={<AdminPublications />} />
-            <Route path="social" element={<AdminSocial />} />
-          </Route>
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AdminDataProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="hero" element={<AdminHero />} />
+              <Route path="experience" element={<AdminExperience />} />
+              <Route path="projects" element={<AdminProjects />} />
+              <Route path="skills" element={<AdminSkills />} />
+              <Route path="certifications" element={<AdminCertifications />} />
+              <Route path="publications" element={<AdminPublications />} />
+              <Route path="social" element={<AdminSocial />} />
+            </Route>
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AdminDataProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
