@@ -1,5 +1,4 @@
-
-import { GitHub, Linkedin, Mail, ExternalLink } from 'lucide-react';
+import { Github, Linkedin, Mail, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function Footer() {
@@ -34,7 +33,7 @@ export function Footer() {
             <h3 className="text-xl font-bold mb-2">Connect</h3>
             <div className="flex items-center gap-4">
               <a href="https://github.com/AbhinavSarkarr" target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
-                <GitHub size={20} />
+                <Github size={20} />
                 <span className="sr-only">GitHub</span>
               </a>
               <a href="https://www.linkedin.com/in/abhinavsarkarrr/" target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
