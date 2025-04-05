@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -20,32 +19,34 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-// Mock auth for now - would be replaced with actual JWT auth
+// Auth hook to handle authentication state
 const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Check for token in localStorage
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    setIsAuthenticated(!!token);
+    const checkAuth = () => {
+      const token = localStorage.getItem("adminToken");
+      setIsAuthenticated(!!token);
+      setIsLoading(false);
+    };
+    
+    checkAuth();
+    // Add event listener to detect changes in localStorage (for cross-tab synchronization)
+    window.addEventListener("storage", checkAuth);
+    
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
   }, []);
-  
-  const login = (email: string, password: string) => {
-    // This would be replaced with an actual API call
-    if (email === "admin@abhinav.ai" && password === "admin123") {
-      localStorage.setItem("adminToken", "mock-jwt-token");
-      setIsAuthenticated(true);
-      return true;
-    }
-    return false;
-  };
   
   const logout = () => {
     localStorage.removeItem("adminToken");
     setIsAuthenticated(false);
   };
   
-  return { isAuthenticated, login, logout };
+  return { isAuthenticated, isLoading, logout };
 };
 
 interface SidebarItemProps {
@@ -101,13 +102,31 @@ const navigationItems = [
 ];
 
 export function AdminLayout() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center"
+        >
+          <div className="w-12 h-12 border-4 border-tech-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </motion.div>
+      </div>
+    );
+  }
+  
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
+    console.log("User not authenticated, redirecting to login");
     return <Navigate to="/admin/login" replace />;
   }
   

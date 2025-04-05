@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +31,14 @@ export function AdminLogin() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  // Check if already authenticated when component mounts
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      navigate("/admin", { replace: true });
+    }
+  }, [navigate]);
+  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
@@ -45,7 +53,11 @@ export function AdminLogin() {
           title: "Login successful",
           description: "Welcome to the admin panel.",
         });
-        navigate("/admin");
+        console.log("Login successful, navigating to /admin");
+        // Force navigation to admin panel
+        setTimeout(() => {
+          navigate("/admin", { replace: true });
+        }, 500);
       } else {
         setError("Invalid email or password.");
       }
