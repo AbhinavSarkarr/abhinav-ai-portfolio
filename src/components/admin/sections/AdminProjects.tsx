@@ -77,6 +77,7 @@ export function AdminProjects() {
   };
   
   const handleEdit = (project: any) => {
+    console.log("Edit project clicked:", project);
     setFormData({
       id: project.id,
       title: project.title,
@@ -89,8 +90,15 @@ export function AdminProjects() {
     setIsEditing(project.id);
   };
   
+  const handleDeleteClick = (id: string) => {
+    console.log("Delete project clicked:", id);
+    setProjectToDelete(id);
+    setOpenDialog(true);
+  };
+  
   const handleConfirmDelete = () => {
     if (projectToDelete) {
+      console.log("Confirming deletion of project:", projectToDelete);
       deleteProject(projectToDelete);
       setProjectToDelete(null);
       setOpenDialog(false);
@@ -111,10 +119,13 @@ export function AdminProjects() {
       
       if (isEditing === "new") {
         // Add new project
-        const { id, ...newProject } = formData;
         addProject({
-          ...newProject,
-          technologies: cleanedTechnologies
+          title: formData.title,
+          description: formData.description,
+          technologies: cleanedTechnologies,
+          image: formData.image,
+          github: formData.github,
+          liveUrl: formData.liveUrl
         });
         toast({
           title: "Added new project",
@@ -122,6 +133,7 @@ export function AdminProjects() {
         });
       } else {
         // Update existing project
+        console.log("Updating project:", formData);
         updateProject(formData.id, {
           title: formData.title,
           description: formData.description,
@@ -134,41 +146,6 @@ export function AdminProjects() {
           title: "Updated",
           description: `${formData.title} project has been updated.`
         });
-      }
-      
-      // Explicitly save to localStorage
-      const currentData = localStorage.getItem('adminData');
-      if (currentData) {
-        try {
-          const parsedData = JSON.parse(currentData);
-          
-          if (isEditing === "new") {
-            const newId = `proj${Date.now()}`;
-            parsedData.projects.push({
-              ...formData,
-              id: newId,
-              technologies: cleanedTechnologies
-            });
-          } else {
-            parsedData.projects = parsedData.projects.map((proj: any) => 
-              proj.id === formData.id 
-                ? { 
-                    ...proj, 
-                    title: formData.title,
-                    description: formData.description,
-                    technologies: cleanedTechnologies,
-                    image: formData.image,
-                    github: formData.github,
-                    liveUrl: formData.liveUrl
-                  } 
-                : proj
-            );
-          }
-          
-          localStorage.setItem('adminData', JSON.stringify(parsedData));
-        } catch (err) {
-          console.error("Error updating localStorage:", err);
-        }
       }
     } catch (error) {
       console.error("Error saving project:", error);
@@ -185,11 +162,6 @@ export function AdminProjects() {
   
   const handleCancel = () => {
     setIsEditing(null);
-  };
-  
-  const handleDeleteClick = (id: string) => {
-    setProjectToDelete(id);
-    setOpenDialog(true);
   };
   
   return (
@@ -344,7 +316,7 @@ export function AdminProjects() {
             key={project.id}
             className="glass border-white/10 hover:border-tech-accent/20 transition-colors overflow-hidden"
           >
-            <div className="h-40 overflow-hidden">
+            <div className="h-40 overflow-hidden relative">
               <img 
                 src={project.image} 
                 alt={project.title}
@@ -395,7 +367,7 @@ export function AdminProjects() {
               
               <div className="flex gap-2">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   className="text-muted-foreground hover:text-destructive"
                   onClick={() => handleDeleteClick(project.id)}
@@ -403,7 +375,7 @@ export function AdminProjects() {
                   <Trash2 size={16} />
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={() => handleEdit(project)}
                 >

@@ -260,9 +260,11 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
 
   // Save to localStorage whenever data changes
   useEffect(() => {
-    saveToLocalStorage(data);
+    if (!isLoading) {
+      saveToLocalStorage(data);
+    }
     setIsLoading(false);
-  }, [data]);
+  }, [data, isLoading]);
 
   // Data modification functions for each section
   const updateHero = (heroData: Partial<HeroData>) => {
@@ -322,6 +324,7 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   // Project functions
   const addProject = (item: Omit<ProjectItem, 'id'>) => {
     const newItem = { ...item, id: generateId() };
+    console.log("Adding new project:", newItem);
     setData(prev => {
       const updated = {
         ...prev,
@@ -334,6 +337,7 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateProject = (id: string, item: Partial<ProjectItem>) => {
+    console.log("Updating project with ID:", id, "New data:", item);
     setData(prev => {
       const updated = {
         ...prev,
@@ -348,6 +352,7 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteProject = (id: string) => {
+    console.log("Deleting project with ID:", id);
     setData(prev => {
       const updated = {
         ...prev,

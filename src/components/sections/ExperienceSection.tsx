@@ -1,5 +1,5 @@
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Briefcase, Calendar } from 'lucide-react';
 import { useAdminData } from '@/contexts/AdminDataContext';
@@ -14,12 +14,16 @@ export function ExperienceSection() {
     once: true,
     margin: "0px 0px -10% 0px" 
   });
+  
+  useEffect(() => {
+    console.log("Experiences in ExperienceSection:", experiences);
+  }, [experiences]);
 
   // Helper to ensure description is an array
   const getDescriptionItems = (description: string[] | string): string[] => {
     if (Array.isArray(description)) {
       return description;
-    } else if (typeof description === 'string') {
+    } else if (typeof description === 'string' && description.length > 0) {
       // Split by periods, newlines, or bullet points and filter out empty strings
       return description
         .split(/[•\n]|(?<=\.)\s+/)
@@ -45,7 +49,7 @@ export function ExperienceSection() {
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
-          {experiences.map((exp, index) => (
+          {experiences && experiences.map((exp, index) => (
             <motion.div
               key={exp.id}
               initial={{ opacity: 0, y: 30 }}
@@ -78,7 +82,7 @@ export function ExperienceSection() {
                 </div>
 
                 <ul className="space-y-2">
-                  {getDescriptionItems(exp.description).map((item, idx) => (
+                  {getDescriptionItems(exp.description as string[] | string).map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
                       <span className="text-muted-foreground">{item}</span>

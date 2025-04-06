@@ -10,37 +10,7 @@ import {
   Clock 
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const statCards = [
-  { 
-    title: "Total Projects", 
-    value: "4", 
-    description: "Portfolio projects", 
-    icon: FolderKanban,
-    color: "text-blue-400" 
-  },
-  { 
-    title: "Experience", 
-    value: "2", 
-    description: "Work positions", 
-    icon: Briefcase,
-    color: "text-green-400" 
-  },
-  { 
-    title: "Publications", 
-    value: "1", 
-    description: "Research papers", 
-    icon: Users,
-    color: "text-purple-400" 
-  },
-  { 
-    title: "Last Updated", 
-    value: "Today", 
-    description: "Portfolio content", 
-    icon: Clock,
-    color: "text-amber-400" 
-  },
-];
+import { useAdminData } from "@/contexts/AdminDataContext";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -59,6 +29,45 @@ const itemVariants = {
 
 export function AdminDashboard() {
   const navigate = useNavigate();
+  const { data } = useAdminData();
+  
+  // Get current date for "Last Updated"
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  
+  const statCards = [
+    { 
+      title: "Total Projects", 
+      value: data.projects.length.toString(), 
+      description: "Portfolio projects", 
+      icon: FolderKanban,
+      color: "text-blue-400" 
+    },
+    { 
+      title: "Experience", 
+      value: data.experiences.length.toString(), 
+      description: "Work positions", 
+      icon: Briefcase,
+      color: "text-green-400" 
+    },
+    { 
+      title: "Publications", 
+      value: data.publications.length.toString(), 
+      description: "Research papers", 
+      icon: Users,
+      color: "text-purple-400" 
+    },
+    { 
+      title: "Last Updated", 
+      value: currentDate, 
+      description: "Portfolio content", 
+      icon: Clock,
+      color: "text-amber-400" 
+    },
+  ];
   
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -137,8 +146,8 @@ export function AdminDashboard() {
                       <FolderKanban size={18} className="text-tech-accent" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-sm">Add Project</h3>
-                      <p className="text-xs text-muted-foreground">New portfolio item</p>
+                      <h3 className="font-medium text-sm">Manage Projects</h3>
+                      <p className="text-xs text-muted-foreground">Edit portfolio items</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -167,8 +176,8 @@ export function AdminDashboard() {
                       <MessageCircle size={18} className="text-tech-accent" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-sm">Messages</h3>
-                      <p className="text-xs text-muted-foreground">Check contact requests</p>
+                      <h3 className="font-medium text-sm">Social Links</h3>
+                      <p className="text-xs text-muted-foreground">Update social profiles</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -187,25 +196,25 @@ export function AdminDashboard() {
               <div className="flex items-center gap-3">
                 <div className="size-2 rounded-full bg-green-500"></div>
                 <p>Updated project descriptions</p>
-                <span className="ml-auto text-xs text-muted-foreground">2h ago</span>
+                <span className="ml-auto text-xs text-muted-foreground">Just now</span>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="size-2 rounded-full bg-blue-500"></div>
                 <p>Added new skill tags</p>
-                <span className="ml-auto text-xs text-muted-foreground">Yesterday</span>
+                <span className="ml-auto text-xs text-muted-foreground">Today</span>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="size-2 rounded-full bg-purple-500"></div>
                 <p>Updated profile image</p>
-                <span className="ml-auto text-xs text-muted-foreground">3 days ago</span>
+                <span className="ml-auto text-xs text-muted-foreground">Yesterday</span>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="size-2 rounded-full bg-amber-500"></div>
                 <p>Added new certification</p>
-                <span className="ml-auto text-xs text-muted-foreground">1 week ago</span>
+                <span className="ml-auto text-xs text-muted-foreground">3 days ago</span>
               </div>
             </CardContent>
           </Card>

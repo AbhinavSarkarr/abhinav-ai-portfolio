@@ -34,6 +34,10 @@ export function ProjectsSection() {
     }));
   };
 
+  useEffect(() => {
+    console.log("Projects in ProjectsSection:", projects);
+  }, [projects]);
+
   return (
     <section id="projects" className="relative py-24" ref={sectionRef}>
       {/* Background elements */}
@@ -55,7 +59,7 @@ export function ProjectsSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {projects.map((project, index) => (
+          {projects && projects.map((project, index) => (
             <motion.div
               key={project.id}
               variants={{
@@ -63,22 +67,15 @@ export function ProjectsSection() {
                 visible: { opacity: 1, y: 0 }
               }}
               initial="hidden"
-              animate={controls}
+              animate="visible"
               transition={{ 
-                duration: 0.4, 
+                duration: 0.4,
                 delay: index * 0.1,
                 ease: "easeOut"
               }}
-              viewport={{ once: true, amount: 0.2 }}
               className="h-full"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
-              onLoad={() => handleImageLoad(project.id)}
-              style={{ 
-                willChange: 'transform, opacity',
-                opacity: imagesLoaded[project.id] ? 1 : 0,
-                transition: 'opacity 0.5s ease'
-              }}
             >
               <Card className="h-full glass border-tech-neon/20 overflow-hidden group">
                 <div className="relative h-48 overflow-hidden bg-tech-glass/20">
@@ -118,7 +115,7 @@ export function ProjectsSection() {
                 
                 <CardContent>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {project.technologies.map((tech, i) => (
+                    {project.technologies && project.technologies.map((tech, i) => (
                       <span 
                         key={i} 
                         className="skill-badge"
