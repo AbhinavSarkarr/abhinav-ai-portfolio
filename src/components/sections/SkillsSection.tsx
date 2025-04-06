@@ -1,58 +1,44 @@
 
-import { motion } from 'framer-motion';
-
-type SkillCategory = {
-  category: string;
-  skills: string[];
-};
-
-const skillCategories: SkillCategory[] = [
-  {
-    category: "Libraries",
-    skills: ["Keras", "NLTK", "spaCy", "OpenCV", "Transformers", "XGBoost"]
-  },
-  {
-    category: "Frameworks",
-    skills: ["Pandas", "Numpy", "TensorFlow", "Langchain", "Scikit-learn", "FastAPI", "PyTorch"]
-  },
-  {
-    category: "Databases",
-    skills: ["MySQL", "Redis", "ChromaDB", "Qdrant", "Pinecone"]
-  },
-  {
-    category: "Tools",
-    skills: ["Docker", "RabbitMQ", "GitHub", "CI/CD"]
-  }
-];
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function SkillsSection() {
+  const { data } = useAdminData();
+  const { skills } = data;
+  
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { 
+    once: true,
+    margin: "0px 0px -10% 0px"
+  });
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
       transition: { 
-        staggerChildren: 0.1
+        staggerChildren: 0.05
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 10 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.3 }
     }
   };
 
   return (
-    <section id="skills" className="relative py-24">
+    <section id="skills" className="relative py-24" ref={sectionRef}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <h2 className="section-heading">Technical Skills</h2>
@@ -62,23 +48,21 @@ export function SkillsSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {skillCategories.map((category, index) => (
+          {skills.map((category, index) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
+              key={category.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               className="glass-card"
             >
-              <h3 className="text-xl font-bold mb-4">{category.category}</h3>
+              <h3 className="text-xl font-bold mb-4">{category.name}</h3>
               
               <motion.div 
                 className="grid grid-cols-2 gap-2"
                 variants={containerVariants}
                 initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
+                animate={isInView ? "visible" : "hidden"}
               >
                 {category.skills.map((skill, idx) => (
                   <motion.div
@@ -97,9 +81,8 @@ export function SkillsSection() {
         
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
+          animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-16 p-8 glass rounded-2xl max-w-3xl mx-auto text-center"
         >
           <h3 className="text-2xl font-bold mb-3">

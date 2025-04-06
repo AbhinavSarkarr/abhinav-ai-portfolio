@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Users, 
@@ -57,6 +58,12 @@ const itemVariants = {
 };
 
 export function AdminDashboard() {
+  const navigate = useNavigate();
+  
+  const handleNavigate = (path: string) => {
+    navigate(path);
+  };
+  
   return (
     <div className="space-y-8">
       <div>
@@ -106,7 +113,10 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <Card className="glass border-white/10 cursor-pointer hover:bg-white/5 transition">
+                <Card 
+                  className="glass border-white/10 cursor-pointer hover:bg-white/5 transition"
+                  onClick={() => handleNavigate('/admin/hero')}
+                >
                   <CardContent className="p-4 flex items-center gap-3">
                     <div className="bg-tech-accent/20 p-2 rounded-lg">
                       <LayoutDashboard size={18} className="text-tech-accent" />
@@ -118,7 +128,10 @@ export function AdminDashboard() {
                   </CardContent>
                 </Card>
                 
-                <Card className="glass border-white/10 cursor-pointer hover:bg-white/5 transition">
+                <Card 
+                  className="glass border-white/10 cursor-pointer hover:bg-white/5 transition"
+                  onClick={() => handleNavigate('/admin/projects')}
+                >
                   <CardContent className="p-4 flex items-center gap-3">
                     <div className="bg-tech-accent/20 p-2 rounded-lg">
                       <FolderKanban size={18} className="text-tech-accent" />
@@ -130,7 +143,10 @@ export function AdminDashboard() {
                   </CardContent>
                 </Card>
                 
-                <Card className="glass border-white/10 cursor-pointer hover:bg-white/5 transition">
+                <Card 
+                  className="glass border-white/10 cursor-pointer hover:bg-white/5 transition"
+                  onClick={() => handleNavigate('/admin/experience')}
+                >
                   <CardContent className="p-4 flex items-center gap-3">
                     <div className="bg-tech-accent/20 p-2 rounded-lg">
                       <Briefcase size={18} className="text-tech-accent" />
@@ -142,7 +158,10 @@ export function AdminDashboard() {
                   </CardContent>
                 </Card>
                 
-                <Card className="glass border-white/10 cursor-pointer hover:bg-white/5 transition">
+                <Card 
+                  className="glass border-white/10 cursor-pointer hover:bg-white/5 transition"
+                  onClick={() => handleNavigate('/admin/social')}
+                >
                   <CardContent className="p-4 flex items-center gap-3">
                     <div className="bg-tech-accent/20 p-2 rounded-lg">
                       <MessageCircle size={18} className="text-tech-accent" />

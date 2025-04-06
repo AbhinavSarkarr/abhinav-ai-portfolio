@@ -1,53 +1,27 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowUp, ArrowDown, PlusCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-
-interface Experience {
-  id: number;
-  role: string;
-  company: string;
-  duration: string;
-  description: string;
-  isActive: boolean;
-}
+import { useAdminData } from "@/contexts/AdminDataContext";
 
 export function AdminExperience() {
   const { toast } = useToast();
+  const { data, updateExperience, addExperience, deleteExperience } = useAdminData();
   
-  const [experiences, setExperiences] = useState<Experience[]>([
-    {
-      id: 1,
-      role: "Artificial Intelligence Engineer",
-      company: "Jellyfish Technologies Pvt. Ltd.",
-      duration: "Apr 2024 – Present",
-      description: "Built SaaS platform for custom RAG-based chatbot creation using Qdrant and Llama3-70B. Developed system to cross-verify services in insurance documents. Created automated complaint registration system using Whisper v3 + fine-tuned GPT-4.",
-      isActive: true
-    },
-    {
-      id: 2,
-      role: "Deep Learning Intern",
-      company: "Bhramaand Pvt. Ltd.",
-      duration: "Jun – Sep 2023",
-      description: "Designed zero-shot classification system with bart-large-mnli. Built modules for real-time news story generation. Developed financial forecasting models using XGBoost.",
-      isActive: false
-    }
-  ]);
-  
-  const [isEditing, setIsEditing] = useState<number | null>(null);
-  const [formData, setFormData] = useState<Experience>({
-    id: 0,
-    role: "",
+  const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    id: "",
+    title: "",
     company: "",
-    duration: "",
-    description: "",
-    isActive: false
+    period: "",
+    description: [""],
+    current: false
   });
   
   const [isSaving, setIsSaving] = useState(false);
@@ -62,71 +36,90 @@ export function AdminExperience() {
     setFormData(prev => ({ ...prev, [name]: checked }));
   };
   
-  const handleAdd = () => {
-    setFormData({
-      id: 0,
-      role: "",
-      company: "",
-      duration: "",
-      description: "",
-      isActive: false
+  // Handle bullet point descriptions
+  const handleDescriptionPointChange = (index: number, value: string) => {
+    setFormData(prev => {
+      const newDescription = [...prev.description];
+      newDescription[index] = value;
+      return { ...prev, description: newDescription };
     });
-    setIsEditing(0);
   };
   
-  const handleEdit = (experience: Experience) => {
-    setFormData(experience);
+  const addDescriptionPoint = () => {
+    setFormData(prev => ({
+      ...prev,
+      description: [...prev.description, ""]
+    }));
+  };
+  
+  const removeDescriptionPoint = (index: number) => {
+    if (formData.description.length === 1) return;
+    
+    setFormData(prev => {
+      const newDescription = [...prev.description];
+      newDescription.splice(index, 1);
+      return { ...prev, description: newDescription };
+    });
+  };
+  
+  const handleAdd = () => {
+    setFormData({
+      id: "",
+      title: "",
+      company: "",
+      period: "",
+      description: [""],
+      current: false
+    });
+    setIsEditing("new");
+  };
+  
+  const handleEdit = (experience: any) => {
+    // Make sure description is an array
+    const description = Array.isArray(experience.description) 
+      ? experience.description 
+      : [experience.description];
+    
+    setFormData({
+      id: experience.id,
+      title: experience.title,
+      company: experience.company,
+      period: experience.period,
+      description: description,
+      current: experience.current
+    });
     setIsEditing(experience.id);
   };
   
-  const handleDelete = (id: number) => {
-    setExperiences(prev => prev.filter(exp => exp.id !== id));
-    toast({
-      title: "Deleted",
-      description: "Experience entry has been removed."
-    });
-  };
-  
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    const updatedExperiences = [...experiences];
-    [updatedExperiences[index], updatedExperiences[index - 1]] = 
-      [updatedExperiences[index - 1], updatedExperiences[index]];
-    setExperiences(updatedExperiences);
-  };
-  
-  const handleMoveDown = (index: number) => {
-    if (index === experiences.length - 1) return;
-    const updatedExperiences = [...experiences];
-    [updatedExperiences[index], updatedExperiences[index + 1]] = 
-      [updatedExperiences[index + 1], updatedExperiences[index]];
-    setExperiences(updatedExperiences);
+  const handleDelete = (id: string) => {
+    deleteExperience(id);
   };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     
+    // Filter out empty bullet points
+    const cleanedDescription = formData.description.filter(point => point.trim() !== "");
+    
     setTimeout(() => {
-      if (isEditing === 0) {
+      if (isEditing === "new") {
         // Add new experience
-        const newExperience = {
-          ...formData,
-          id: Date.now()
-        };
-        setExperiences(prev => [newExperience, ...prev]);
-        toast({
-          title: "Added new experience",
-          description: `${formData.role} at ${formData.company} has been added.`
+        addExperience({
+          title: formData.title,
+          company: formData.company,
+          period: formData.period,
+          description: cleanedDescription,
+          current: formData.current
         });
       } else {
         // Update existing experience
-        setExperiences(prev => 
-          prev.map(exp => exp.id === isEditing ? formData : exp)
-        );
-        toast({
-          title: "Updated",
-          description: `${formData.role} experience has been updated.`
+        updateExperience(formData.id, {
+          title: formData.title,
+          company: formData.company,
+          period: formData.period,
+          description: cleanedDescription,
+          current: formData.current
         });
       }
       
@@ -168,18 +161,18 @@ export function AdminExperience() {
           <Card className="glass border-white/10 border-2 border-tech-accent/30">
             <CardHeader>
               <CardTitle>
-                {isEditing === 0 ? "Add New Experience" : "Edit Experience"}
+                {isEditing === "new" ? "Add New Experience" : "Edit Experience"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="role">Job Title</Label>
+                    <Label htmlFor="title">Job Title</Label>
                     <Input
-                      id="role"
-                      name="role"
-                      value={formData.role}
+                      id="title"
+                      name="title"
+                      value={formData.title}
                       onChange={handleInputChange}
                       className="bg-background/50"
                       required
@@ -201,12 +194,12 @@ export function AdminExperience() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="duration">Duration</Label>
+                    <Label htmlFor="period">Duration</Label>
                     <Input
-                      id="duration"
-                      name="duration"
+                      id="period"
+                      name="period"
                       placeholder="Apr 2024 – Present"
-                      value={formData.duration}
+                      value={formData.period}
                       onChange={handleInputChange}
                       className="bg-background/50"
                       required
@@ -215,27 +208,52 @@ export function AdminExperience() {
                   
                   <div className="flex items-center space-x-2">
                     <input
-                      id="isActive"
-                      name="isActive"
+                      id="current"
+                      name="current"
                       type="checkbox"
-                      checked={formData.isActive}
+                      checked={formData.current}
                       onChange={handleCheckboxChange}
                       className="rounded border-gray-400 h-4 w-4"
                     />
-                    <Label htmlFor="isActive">Current Position</Label>
+                    <Label htmlFor="current">Current Position</Label>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    className="bg-background/50 min-h-[120px]"
-                    required
-                  />
+                  <Label>Description (Bullet Points)</Label>
+                  
+                  <div className="space-y-2">
+                    {formData.description.map((point, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          value={point}
+                          onChange={(e) => handleDescriptionPointChange(index, e.target.value)}
+                          className="bg-background/50 flex-1"
+                          placeholder={`Bullet point ${index + 1}`}
+                        />
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => removeDescriptionPoint(index)}
+                          disabled={formData.description.length === 1}
+                          className="h-10 w-10 text-muted-foreground hover:text-destructive"
+                        >
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-2 flex items-center justify-center gap-1"
+                    onClick={addDescriptionPoint}
+                  >
+                    <PlusCircle size={16} />
+                    Add Bullet Point
+                  </Button>
                 </div>
                 
                 <div className="flex gap-2 justify-end">
@@ -266,7 +284,7 @@ export function AdminExperience() {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="space-y-4"
       >
-        {experiences.length === 0 ? (
+        {data.experiences.length === 0 ? (
           <Card className="glass border-white/10 border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-8">
               <p className="text-muted-foreground mb-4">No experience entries yet</p>
@@ -280,7 +298,7 @@ export function AdminExperience() {
             </CardContent>
           </Card>
         ) : (
-          experiences.map((experience, index) => (
+          data.experiences.map((experience, index) => (
             <Card 
               key={experience.id}
               className="glass border-white/10 hover:border-tech-accent/20 transition-colors"
@@ -288,42 +306,28 @@ export function AdminExperience() {
               <CardHeader className="pb-2">
                 <div className="flex justify-between">
                   <CardTitle className="text-xl flex items-center gap-2">
-                    {experience.role}
-                    {experience.isActive && (
+                    {experience.title}
+                    {experience.current && (
                       <span className="text-xs bg-tech-accent/20 text-tech-accent px-2 py-0.5 rounded-full">
                         Current
                       </span>
                     )}
                   </CardTitle>
-                  <div className="flex gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handleMoveUp(index)}
-                      disabled={index === 0}
-                    >
-                      <ArrowUp size={16} />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handleMoveDown(index)}
-                      disabled={index === experiences.length - 1}
-                    >
-                      <ArrowDown size={16} />
-                    </Button>
-                  </div>
                 </div>
                 <CardDescription>
-                  {experience.company} | {experience.duration}
+                  {experience.company} | {experience.period}
                 </CardDescription>
               </CardHeader>
               <CardContent className="py-2">
-                <p className="text-sm text-muted-foreground">
-                  {experience.description}
-                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5">
+                  {Array.isArray(experience.description) ? (
+                    experience.description.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))
+                  ) : (
+                    <li>{experience.description}</li>
+                  )}
+                </ul>
               </CardContent>
               <CardFooter className="flex justify-end gap-2 pt-2">
                 <Button

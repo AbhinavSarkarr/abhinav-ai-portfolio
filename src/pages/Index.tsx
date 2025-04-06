@@ -8,8 +8,14 @@ import { SkillsSection } from "@/components/sections/SkillsSection";
 import { PublicationsSection } from "@/components/sections/PublicationsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { Footer } from "@/components/Footer";
+import { useEffect } from "react";
 
 const Index = () => {
+  // Update document title when page loads
+  useEffect(() => {
+    document.title = "Abhinav Portfolio";
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Github, Globe, ArrowUpRight } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -13,9 +13,14 @@ export function ProjectsSection() {
   // For performance optimization
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { 
-    once: false, 
-    margin: "0px 0px -20% 0px" 
+    once: true,
+    margin: "0px 0px -10% 0px" 
   });
+
+  // Lazy load images for performance
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.classList.remove('opacity-0');
+  };
 
   return (
     <section id="projects" className="relative py-24" ref={sectionRef}>
@@ -41,21 +46,21 @@ export function ProjectsSection() {
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               className="h-full"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
               <Card className="h-full glass border-tech-neon/20 overflow-hidden group">
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-48 overflow-hidden bg-tech-glass/20">
                   <img 
                     src={project.image} 
                     alt={project.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-0"
+                    onLoad={handleImageLoad}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
                 </div>

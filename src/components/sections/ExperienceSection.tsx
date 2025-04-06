@@ -11,8 +11,8 @@ export function ExperienceSection() {
   // For performance optimization
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { 
-    once: false, 
-    margin: "0px 0px -20% 0px" 
+    once: true,
+    margin: "0px 0px -10% 0px" 
   });
 
   return (
@@ -36,8 +36,7 @@ export function ExperienceSection() {
               key={exp.id}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               className="relative pl-8 pb-12 last:pb-0"
             >
               {/* Timeline line */}
@@ -65,12 +64,26 @@ export function ExperienceSection() {
                 </div>
 
                 <ul className="space-y-2">
-                  {exp.description.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
-                      <span className="text-muted-foreground">{item}</span>
-                    </li>
-                  ))}
+                  {Array.isArray(exp.description) ? (
+                    exp.description.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))
+                  ) : (
+                    // Fallback for string description - split by periods and create bullet points
+                    exp.description.split('. ')
+                      .filter(item => item.trim().length > 0)
+                      .map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
+                          <span className="text-muted-foreground">
+                            {item.endsWith('.') ? item : `${item}.`}
+                          </span>
+                        </li>
+                      ))
+                  )}
                 </ul>
               </div>
             </motion.div>
