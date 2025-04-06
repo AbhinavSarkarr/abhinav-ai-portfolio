@@ -1,6 +1,6 @@
 
-import { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { motion, useInView, useAnimation } from 'framer-motion';
 import { Github, Globe, ArrowUpRight } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAdminData } from '@/contexts/AdminDataContext';
@@ -9,6 +9,7 @@ export function ProjectsSection() {
   const { data } = useAdminData();
   const { projects } = data;
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
   
   // For performance optimization
   const sectionRef = useRef(null);
@@ -17,9 +18,20 @@ export function ProjectsSection() {
     margin: "0px 0px -10% 0px" 
   });
 
-  // Lazy load images for performance
-  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    e.currentTarget.classList.remove('opacity-0');
+  const controls = useAnimation();
+  
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    }
+  }, [isInView, controls]);
+
+  // Track loaded images for smoother rendering
+  const handleImageLoad = (id: string) => {
+    setImagesLoaded(prev => ({
+      ...prev,
+      [id]: true
+    }));
   };
 
   return (
@@ -46,12 +58,27 @@ export function ProjectsSection() {
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 }
+              }}
+              initial="hidden"
+              animate={controls}
+              transition={{ 
+                duration: 0.4, 
+                delay: index * 0.1,
+                ease: "easeOut"
+              }}
+              viewport={{ once: true, amount: 0.2 }}
               className="h-full"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
+              onLoad={() => handleImageLoad(project.id)}
+              style={{ 
+                willChange: 'transform, opacity',
+                opacity: imagesLoaded[project.id] ? 1 : 0,
+                transition: 'opacity 0.5s ease'
+              }}
             >
               <Card className="h-full glass border-tech-neon/20 overflow-hidden group">
                 <div className="relative h-48 overflow-hidden bg-tech-glass/20">
@@ -59,8 +86,12 @@ export function ProjectsSection() {
                     src={project.image} 
                     alt={project.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-0"
-                    onLoad={handleImageLoad}
+                    onLoad={() => handleImageLoad(project.id)}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    style={{ 
+                      opacity: imagesLoaded[project.id] ? 1 : 0,
+                      transition: 'opacity 0.5s ease'
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
                 </div>

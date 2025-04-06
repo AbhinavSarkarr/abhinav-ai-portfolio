@@ -15,6 +15,20 @@ export function ExperienceSection() {
     margin: "0px 0px -10% 0px" 
   });
 
+  // Helper to ensure description is an array
+  const getDescriptionItems = (description: string[] | string): string[] => {
+    if (Array.isArray(description)) {
+      return description;
+    } else if (typeof description === 'string') {
+      // Split by periods, newlines, or bullet points
+      return description
+        .split(/[•\n]|(?<=\.)\s+/)
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+    }
+    return [String(description)];
+  };
+
   return (
     <section id="experience" className="relative py-24" ref={sectionRef}>
       <div className="container">
@@ -64,22 +78,12 @@ export function ExperienceSection() {
                 </div>
 
                 <ul className="space-y-2">
-                  {Array.isArray(exp.description) ? (
-                    exp.description.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))
-                  ) : (
-                    // Fallback for string description - handle as a single item if it's a string
-                    <li className="flex items-start gap-2">
+                  {getDescriptionItems(exp.description).map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
                       <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
-                      <span className="text-muted-foreground">
-                        {String(exp.description)}
-                      </span>
+                      <span className="text-muted-foreground">{item}</span>
                     </li>
-                  )}
+                  ))}
                 </ul>
               </div>
             </motion.div>

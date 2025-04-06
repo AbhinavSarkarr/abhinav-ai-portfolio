@@ -128,18 +128,20 @@ const SidebarItem = ({ icon: Icon, label, path, isActive, onClick }: SidebarItem
 // Shortcuts for mobile dashboard
 const MobileShortcutCard = ({ icon: Icon, label, onClick }: { icon: LucideIcon, label: string, onClick: () => void }) => {
   return (
-    <motion.div
+    <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
+      className="w-full"
+      type="button"
     >
-      <Card className="glass border-white/10 hover:border-tech-accent/30 transition-colors p-4 flex flex-col items-center gap-2 cursor-pointer">
+      <Card className="glass border-white/10 hover:border-tech-accent/30 transition-colors p-4 flex flex-col items-center gap-2 cursor-pointer w-full">
         <div className="p-3 rounded-full bg-tech-glass/30 text-tech-accent">
           <Icon size={24} />
         </div>
         <p className="text-sm font-medium">{label}</p>
       </Card>
-    </motion.div>
+    </motion.button>
   );
 };
 

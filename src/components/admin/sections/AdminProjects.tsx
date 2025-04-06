@@ -9,12 +9,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminData } from "@/contexts/AdminDataContext";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function AdminProjects() {
   const { toast } = useToast();
   const { data, addProject, updateProject, deleteProject } = useAdminData();
   
   const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     id: "",
     title: "",
@@ -77,15 +89,22 @@ export function AdminProjects() {
     setIsEditing(project.id);
   };
   
-  const handleDelete = (id: string) => {
-    deleteProject(id);
+  const handleConfirmDelete = () => {
+    if (projectToDelete) {
+      deleteProject(projectToDelete);
+      setProjectToDelete(null);
+      toast({
+        title: "Project deleted",
+        description: "The project has been removed from your portfolio."
+      });
+    }
   };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     
-    setTimeout(() => {
+    try {
       if (isEditing === "new") {
         // Add new project
         const { id, ...newProject } = formData;
@@ -109,10 +128,17 @@ export function AdminProjects() {
           description: `${formData.title} project has been updated.`
         });
       }
-      
+    } catch (error) {
+      console.error("Error saving project:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem saving your project.",
+        variant: "destructive"
+      });
+    } finally {
       setIsEditing(null);
       setIsSaving(false);
-    }, 800);
+    }
   };
   
   const handleCancel = () => {
@@ -265,12 +291,7 @@ export function AdminProjects() {
         </motion.div>
       )}
       
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {data.projects.map((project) => (
           <Card 
             key={project.id}
@@ -281,6 +302,7 @@ export function AdminProjects() {
                 src={project.image} 
                 alt={project.title}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60" />
             </div>
@@ -325,14 +347,33 @@ export function AdminProjects() {
               </div>
               
               <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-destructive"
-                  onClick={() => handleDelete(project.id)}
-                >
-                  <Trash2 size={16} />
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => setProjectToDelete(project.id)}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Project</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{project.title}"? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel onClick={() => setProjectToDelete(null)}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                
                 <Button
                   variant="ghost"
                   size="sm"
@@ -360,7 +401,25 @@ export function AdminProjects() {
             </CardContent>
           </Card>
         )}
-      </motion.div>
+      </div>
+      
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!projectToDelete} onOpenChange={(open) => !open && setProjectToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Project</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this project? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setProjectToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

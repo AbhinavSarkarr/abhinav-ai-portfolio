@@ -9,6 +9,7 @@ import { PublicationsSection } from "@/components/sections/PublicationsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { Footer } from "@/components/Footer";
 import { useEffect } from "react";
+import { AdminDataProvider } from "@/contexts/AdminDataContext";
 
 const Index = () => {
   // Update document title when page loads

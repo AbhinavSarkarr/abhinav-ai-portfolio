@@ -19,7 +19,8 @@ export function AdminHero() {
     introText: data.hero.description || "",
     aboutMe: "I am a passionate AI/LLM Engineer with expertise in natural language processing and deep learning. With a background in computer science and a focus on cutting-edge AI technologies, I build intelligent systems that solve real-world problems. I specialize in developing RAG pipelines and fine-tuning language models for specific use cases.",
     keywords: "AI, LLM, NLP, RAG, Fine-tuning, Machine Learning",
-    profileImage: data.hero.image || ""
+    profileImage: data.hero.image || "",
+    resumeLink: data.hero.resumeLink || ""
   });
   
   // Update form data when context data changes
@@ -29,7 +30,8 @@ export function AdminHero() {
       name: data.hero.name || "",
       headline: data.hero.title || "",
       introText: data.hero.description || "",
-      profileImage: data.hero.image || ""
+      profileImage: data.hero.image || "",
+      resumeLink: data.hero.resumeLink || ""
     }));
   }, [data.hero]);
   
@@ -50,14 +52,31 @@ export function AdminHero() {
         name: formData.name,
         title: formData.headline,
         description: formData.introText,
-        image: formData.profileImage
+        image: formData.profileImage,
+        resumeLink: formData.resumeLink
       });
+      
+      // Explicitly save to localStorage to ensure persistence
+      const currentData = localStorage.getItem('adminData');
+      if (currentData) {
+        const parsedData = JSON.parse(currentData);
+        parsedData.hero = {
+          ...parsedData.hero,
+          name: formData.name,
+          title: formData.headline,
+          description: formData.introText,
+          image: formData.profileImage,
+          resumeLink: formData.resumeLink
+        };
+        localStorage.setItem('adminData', JSON.stringify(parsedData));
+      }
       
       toast({
         title: "Success!",
         description: "Hero section information updated successfully.",
       });
     } catch (error) {
+      console.error("Error saving hero data:", error);
       toast({
         title: "Error",
         description: "Failed to update hero section. Please try again.",
@@ -125,6 +144,18 @@ export function AdminHero() {
                     value={formData.introText}
                     onChange={handleInputChange}
                     className="bg-background/50 min-h-[100px]"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="resumeLink">Resume Link</Label>
+                  <Input
+                    id="resumeLink"
+                    name="resumeLink"
+                    value={formData.resumeLink}
+                    onChange={handleInputChange}
+                    className="bg-background/50"
+                    placeholder="https://drive.google.com/file/your-resume-link"
                   />
                 </div>
                 
