@@ -72,17 +72,13 @@ export function ExperienceSection() {
                       </li>
                     ))
                   ) : (
-                    // Fallback for string description - split by periods and create bullet points
-                    exp.description.split('. ')
-                      .filter(item => item.trim().length > 0)
-                      .map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
-                          <span className="text-muted-foreground">
-                            {item.endsWith('.') ? item : `${item}.`}
-                          </span>
-                        </li>
-                      ))
+                    // Fallback for string description - handle as a single item if it's a string
+                    <li className="flex items-start gap-2">
+                      <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
+                      <span className="text-muted-foreground">
+                        {String(exp.description)}
+                      </span>
+                    </li>
                   )}
                 </ul>
               </div>
