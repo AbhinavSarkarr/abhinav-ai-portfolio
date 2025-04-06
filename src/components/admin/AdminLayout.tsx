@@ -14,11 +14,13 @@ import {
   Link as LinkIcon,
   LogOut,
   Menu,
-  X
+  X,
+  ArrowLeft
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Card } from "@/components/ui/card";
 
 // Auth hook to handle authentication state with token expiration
 const useAuth = () => {
@@ -123,6 +125,24 @@ const SidebarItem = ({ icon: Icon, label, path, isActive, onClick }: SidebarItem
   );
 };
 
+// Shortcuts for mobile dashboard
+const MobileShortcutCard = ({ icon: Icon, label, onClick }: { icon: LucideIcon, label: string, onClick: () => void }) => {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={onClick}
+    >
+      <Card className="glass border-white/10 hover:border-tech-accent/30 transition-colors p-4 flex flex-col items-center gap-2 cursor-pointer">
+        <div className="p-3 rounded-full bg-tech-glass/30 text-tech-accent">
+          <Icon size={24} />
+        </div>
+        <p className="text-sm font-medium">{label}</p>
+      </Card>
+    </motion.div>
+  );
+};
+
 const navigationItems = [
   { icon: Home, label: "Dashboard", path: "/admin" },
   { icon: User, label: "Hero & About", path: "/admin/hero" },
@@ -140,6 +160,14 @@ export function AdminLayout() {
   const location = useLocation();
   const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showBackButton, setShowBackButton] = useState(false);
+  
+  // Show back button on non-dashboard admin pages on mobile
+  useEffect(() => {
+    const isDashboard = location.pathname === "/admin";
+    const isMobile = window.innerWidth < 768;
+    setShowBackButton(isMobile && !isDashboard);
+  }, [location.pathname]);
   
   // Show loading state while checking authentication
   if (isLoading) {
@@ -181,20 +209,55 @@ export function AdminLayout() {
     setIsMobileMenuOpen(false);
   };
   
+  const handleBackToDashboard = () => {
+    navigate("/admin");
+  };
+  
+  // Specific mobile dashboard with shortcut cards
+  const renderMobileDashboard = () => {
+    if (location.pathname === "/admin") {
+      return (
+        <div className="grid grid-cols-2 gap-4 md:hidden mt-6">
+          {navigationItems.slice(1).map((item) => (
+            <MobileShortcutCard 
+              key={item.path}
+              icon={item.icon} 
+              label={item.label}
+              onClick={() => navigate(item.path)}
+            />
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+  
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="glass border-b border-white/10 p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={toggleMobileMenu}
-            >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </Button>
+            {showBackButton ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={handleBackToDashboard}
+              >
+                <ArrowLeft size={20} />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={toggleMobileMenu}
+              >
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </Button>
+            )}
+            
             <motion.h1 
               className="text-xl font-semibold bg-gradient-tech bg-clip-text text-transparent"
               initial={{ opacity: 0, y: -10 }}
@@ -301,6 +364,7 @@ export function AdminLayout() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
+          {renderMobileDashboard()}
           <Outlet />
         </motion.div>
       </div>

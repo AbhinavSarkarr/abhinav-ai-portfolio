@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,17 +7,31 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminData } from "@/contexts/AdminDataContext";
 
 export function AdminHero() {
   const { toast } = useToast();
+  const { data, updateHero } = useAdminData();
+  
   const [formData, setFormData] = useState({
-    name: "Abhinav Sarkar",
-    headline: "AI/LLM Engineer",
-    introText: "Specialized in NLP, RAG pipelines, and LLM fine-tuning. Creating solutions that leverage the power of artificial intelligence to solve real-world problems.",
+    name: data.hero.name || "",
+    headline: data.hero.title || "",
+    introText: data.hero.description || "",
     aboutMe: "I am a passionate AI/LLM Engineer with expertise in natural language processing and deep learning. With a background in computer science and a focus on cutting-edge AI technologies, I build intelligent systems that solve real-world problems. I specialize in developing RAG pipelines and fine-tuning language models for specific use cases.",
     keywords: "AI, LLM, NLP, RAG, Fine-tuning, Machine Learning",
-    profileImage: "/lovable-uploads/0f976acc-d38b-4ac7-96a7-02ccc53846b5.png"
+    profileImage: data.hero.image || ""
   });
+  
+  // Update form data when context data changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      name: data.hero.name || "",
+      headline: data.hero.title || "",
+      introText: data.hero.description || "",
+      profileImage: data.hero.image || ""
+    }));
+  }, [data.hero]);
   
   const [isSaving, setIsSaving] = useState(false);
   
@@ -30,10 +44,14 @@ export function AdminHero() {
     e.preventDefault();
     setIsSaving(true);
     
-    // This would be replaced with an actual API call
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Update hero data using context
+      updateHero({
+        name: formData.name,
+        title: formData.headline,
+        description: formData.introText,
+        image: formData.profileImage
+      });
       
       toast({
         title: "Success!",

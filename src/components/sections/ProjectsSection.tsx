@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { Github, Globe, ArrowUpRight } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAdminData } from '@/contexts/AdminDataContext';
@@ -9,9 +9,16 @@ export function ProjectsSection() {
   const { data } = useAdminData();
   const { projects } = data;
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
+  // For performance optimization
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { 
+    once: false, 
+    margin: "0px 0px -20% 0px" 
+  });
 
   return (
-    <section id="projects" className="relative py-24">
+    <section id="projects" className="relative py-24" ref={sectionRef}>
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/2 left-0 w-96 h-96 bg-tech-accent/5 rounded-full blur-[120px]" />
@@ -20,9 +27,8 @@ export function ProjectsSection() {
       <div className="container relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <h2 className="section-heading">Projects</h2>
@@ -36,7 +42,7 @@ export function ProjectsSection() {
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               className="h-full"
@@ -48,6 +54,7 @@ export function ProjectsSection() {
                   <img 
                     src={project.image} 
                     alt={project.title}
+                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />

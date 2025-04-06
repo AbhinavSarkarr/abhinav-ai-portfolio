@@ -1,20 +1,27 @@
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { Briefcase, Calendar } from 'lucide-react';
 import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function ExperienceSection() {
   const { data } = useAdminData();
   const { experiences } = data;
+  
+  // For performance optimization
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { 
+    once: false, 
+    margin: "0px 0px -20% 0px" 
+  });
 
   return (
-    <section id="experience" className="relative py-24">
+    <section id="experience" className="relative py-24" ref={sectionRef}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <h2 className="section-heading">Work Experience</h2>
@@ -28,7 +35,7 @@ export function ExperienceSection() {
             <motion.div
               key={exp.id}
               initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               className="relative pl-8 pb-12 last:pb-0"

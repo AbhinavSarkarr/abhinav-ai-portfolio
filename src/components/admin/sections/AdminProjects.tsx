@@ -8,47 +8,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  technologies: string[];
-  image: string;
-  github?: string;
-  liveUrl?: string;
-}
+import { useAdminData } from "@/contexts/AdminDataContext";
 
 export function AdminProjects() {
   const { toast } = useToast();
+  const { data, addProject, updateProject, deleteProject } = useAdminData();
   
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: 1,
-      title: "AutoDraft",
-      description: "Chrome extension that automates email replies using Tavily AI, Crew AI, and Llama3-8B",
-      technologies: ["TypeScript", "Langchain", "Llama", "Tavily AI", "Chrome Extension API"],
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-      github: "#",
-      liveUrl: "#"
-    },
-    {
-      id: 2,
-      title: "TextTweak",
-      description: "Real-time text improvement tool using fine-tuned Google T5-base for grammar/spell check",
-      technologies: ["Python", "PyTorch", "T5", "Transformers", "FastAPI"],
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-      github: "#",
-      liveUrl: "#"
-    }
-  ]);
-  
-  const [isEditing, setIsEditing] = useState<number | null>(null);
-  const [formData, setFormData] = useState<Project>({
-    id: 0,
+  const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    id: "",
     title: "",
     description: "",
-    technologies: [],
+    technologies: [] as string[],
     image: "",
     github: "",
     liveUrl: ""
@@ -82,7 +53,7 @@ export function AdminProjects() {
   
   const handleAdd = () => {
     setFormData({
-      id: 0,
+      id: "",
       title: "",
       description: "",
       technologies: [],
@@ -90,20 +61,24 @@ export function AdminProjects() {
       github: "",
       liveUrl: ""
     });
-    setIsEditing(0);
+    setIsEditing("new");
   };
   
-  const handleEdit = (project: Project) => {
-    setFormData(project);
+  const handleEdit = (project: any) => {
+    setFormData({
+      id: project.id,
+      title: project.title,
+      description: project.description,
+      technologies: [...project.technologies],
+      image: project.image,
+      github: project.github || "",
+      liveUrl: project.liveUrl || ""
+    });
     setIsEditing(project.id);
   };
   
-  const handleDelete = (id: number) => {
-    setProjects(prev => prev.filter(project => project.id !== id));
-    toast({
-      title: "Deleted",
-      description: "Project has been removed."
-    });
+  const handleDelete = (id: string) => {
+    deleteProject(id);
   };
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -111,22 +86,24 @@ export function AdminProjects() {
     setIsSaving(true);
     
     setTimeout(() => {
-      if (isEditing === 0) {
+      if (isEditing === "new") {
         // Add new project
-        const newProject = {
-          ...formData,
-          id: Date.now()
-        };
-        setProjects(prev => [...prev, newProject]);
+        const { id, ...newProject } = formData;
+        addProject(newProject);
         toast({
           title: "Added new project",
           description: `${formData.title} has been added to your portfolio.`
         });
       } else {
         // Update existing project
-        setProjects(prev => 
-          prev.map(project => project.id === isEditing ? formData : project)
-        );
+        updateProject(formData.id, {
+          title: formData.title,
+          description: formData.description,
+          technologies: formData.technologies,
+          image: formData.image,
+          github: formData.github,
+          liveUrl: formData.liveUrl
+        });
         toast({
           title: "Updated",
           description: `${formData.title} project has been updated.`
@@ -171,7 +148,7 @@ export function AdminProjects() {
           <Card className="glass border-white/10 border-2 border-tech-accent/30">
             <CardHeader>
               <CardTitle>
-                {isEditing === 0 ? "Add New Project" : "Edit Project"}
+                {isEditing === "new" ? "Add New Project" : "Edit Project"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -294,7 +271,7 @@ export function AdminProjects() {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
-        {projects.map((project) => (
+        {data.projects.map((project) => (
           <Card 
             key={project.id}
             className="glass border-white/10 hover:border-tech-accent/20 transition-colors overflow-hidden"
@@ -369,7 +346,7 @@ export function AdminProjects() {
           </Card>
         ))}
         
-        {projects.length === 0 && (
+        {data.projects.length === 0 && (
           <Card className="col-span-full glass border-white/10 border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-10">
               <p className="text-muted-foreground mb-4">No projects added yet</p>
