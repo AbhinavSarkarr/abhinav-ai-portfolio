@@ -48,28 +48,15 @@ export function AdminHero() {
     
     try {
       // Update hero data using context
-      updateHero({
+      const updatedData = {
         name: formData.name,
         title: formData.headline,
         description: formData.introText,
         image: formData.profileImage,
         resumeLink: formData.resumeLink
-      });
+      };
       
-      // Explicitly save to localStorage to ensure persistence
-      const currentData = localStorage.getItem('adminData');
-      if (currentData) {
-        const parsedData = JSON.parse(currentData);
-        parsedData.hero = {
-          ...parsedData.hero,
-          name: formData.name,
-          title: formData.headline,
-          description: formData.introText,
-          image: formData.profileImage,
-          resumeLink: formData.resumeLink
-        };
-        localStorage.setItem('adminData', JSON.stringify(parsedData));
-      }
+      updateHero(updatedData);
       
       toast({
         title: "Success!",

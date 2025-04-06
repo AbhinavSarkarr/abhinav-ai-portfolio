@@ -229,6 +229,16 @@ const generateId = () => `id-${Date.now()}-${Math.random().toString(36).substr(2
 // Create the context
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
 
+// Helper function to ensure localStorage updates
+const saveToLocalStorage = (data: AdminData) => {
+  try {
+    localStorage.setItem('adminData', JSON.stringify(data));
+    console.log('Data saved to localStorage:', data);
+  } catch (e) {
+    console.error('Failed to save admin data to localStorage', e);
+  }
+};
+
 // Provider component
 export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -237,7 +247,9 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
     const savedData = localStorage.getItem('adminData');
     if (savedData) {
       try {
-        return JSON.parse(savedData);
+        const parsed = JSON.parse(savedData);
+        console.log('Loaded data from localStorage:', parsed);
+        return parsed;
       } catch (e) {
         console.error('Failed to parse saved admin data', e);
       }
@@ -248,174 +260,238 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
 
   // Save to localStorage whenever data changes
   useEffect(() => {
-    try {
-      localStorage.setItem('adminData', JSON.stringify(data));
-    } catch (e) {
-      console.error('Failed to save admin data', e);
-    }
+    saveToLocalStorage(data);
     setIsLoading(false);
   }, [data]);
 
   // Data modification functions for each section
   const updateHero = (heroData: Partial<HeroData>) => {
-    setData(prev => ({
-      ...prev,
-      hero: {
-        ...prev.hero,
-        ...heroData
-      }
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        hero: {
+          ...prev.hero,
+          ...heroData
+        }
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Hero section updated", description: "Changes saved successfully" });
   };
 
   const addExperience = (item: Omit<ExperienceItem, 'id'>) => {
     const newItem = { ...item, id: generateId() };
-    setData(prev => ({
-      ...prev,
-      experiences: [...prev.experiences, newItem]
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        experiences: [...prev.experiences, newItem]
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Experience added", description: "New experience added successfully" });
   };
 
   const updateExperience = (id: string, item: Partial<ExperienceItem>) => {
-    setData(prev => ({
-      ...prev,
-      experiences: prev.experiences.map(exp => 
-        exp.id === id ? { ...exp, ...item } : exp
-      )
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        experiences: prev.experiences.map(exp => 
+          exp.id === id ? { ...exp, ...item } : exp
+        )
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Experience updated", description: "Changes saved successfully" });
   };
 
   const deleteExperience = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      experiences: prev.experiences.filter(exp => exp.id !== id)
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        experiences: prev.experiences.filter(exp => exp.id !== id)
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Experience deleted", description: "Item removed successfully" });
   };
 
   // Project functions
   const addProject = (item: Omit<ProjectItem, 'id'>) => {
     const newItem = { ...item, id: generateId() };
-    setData(prev => ({
-      ...prev,
-      projects: [...prev.projects, newItem]
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        projects: [...prev.projects, newItem]
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Project added", description: "New project added successfully" });
   };
 
   const updateProject = (id: string, item: Partial<ProjectItem>) => {
-    setData(prev => ({
-      ...prev,
-      projects: prev.projects.map(proj => 
-        proj.id === id ? { ...proj, ...item } : proj
-      )
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        projects: prev.projects.map(proj => 
+          proj.id === id ? { ...proj, ...item } : proj
+        )
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Project updated", description: "Changes saved successfully" });
   };
 
   const deleteProject = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      projects: prev.projects.filter(proj => proj.id !== id)
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        projects: prev.projects.filter(proj => proj.id !== id)
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Project deleted", description: "Item removed successfully" });
   };
 
   // Skill functions
   const addSkillCategory = (category: Omit<SkillCategory, 'id'>) => {
     const newCategory = { ...category, id: generateId() };
-    setData(prev => ({
-      ...prev,
-      skills: [...prev.skills, newCategory]
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        skills: [...prev.skills, newCategory]
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Skill category added", description: "New category added successfully" });
   };
 
   const updateSkillCategory = (id: string, category: Partial<SkillCategory>) => {
-    setData(prev => ({
-      ...prev,
-      skills: prev.skills.map(cat => 
-        cat.id === id ? { ...cat, ...category } : cat
-      )
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        skills: prev.skills.map(cat => 
+          cat.id === id ? { ...cat, ...category } : cat
+        )
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Skills updated", description: "Changes saved successfully" });
   };
 
   const deleteSkillCategory = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      skills: prev.skills.filter(cat => cat.id !== id)
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        skills: prev.skills.filter(cat => cat.id !== id)
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Skill category deleted", description: "Category removed successfully" });
   };
 
   // Certification functions
   const addCertification = (item: Omit<CertificationItem, 'id'>) => {
     const newItem = { ...item, id: generateId() };
-    setData(prev => ({
-      ...prev,
-      certifications: [...prev.certifications, newItem]
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        certifications: [...prev.certifications, newItem]
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Certification added", description: "New certification added successfully" });
   };
 
   const updateCertification = (id: string, item: Partial<CertificationItem>) => {
-    setData(prev => ({
-      ...prev,
-      certifications: prev.certifications.map(cert => 
-        cert.id === id ? { ...cert, ...item } : cert
-      )
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        certifications: prev.certifications.map(cert => 
+          cert.id === id ? { ...cert, ...item } : cert
+        )
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Certification updated", description: "Changes saved successfully" });
   };
 
   const deleteCertification = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      certifications: prev.certifications.filter(cert => cert.id !== id)
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        certifications: prev.certifications.filter(cert => cert.id !== id)
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Certification deleted", description: "Item removed successfully" });
   };
 
   // Publication functions
   const addPublication = (item: Omit<PublicationItem, 'id'>) => {
     const newItem = { ...item, id: generateId() };
-    setData(prev => ({
-      ...prev,
-      publications: [...prev.publications, newItem]
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        publications: [...prev.publications, newItem]
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Publication added", description: "New publication added successfully" });
   };
 
   const updatePublication = (id: string, item: Partial<PublicationItem>) => {
-    setData(prev => ({
-      ...prev,
-      publications: prev.publications.map(pub => 
-        pub.id === id ? { ...pub, ...item } : pub
-      )
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        publications: prev.publications.map(pub => 
+          pub.id === id ? { ...pub, ...item } : pub
+        )
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Publication updated", description: "Changes saved successfully" });
   };
 
   const deletePublication = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      publications: prev.publications.filter(pub => pub.id !== id)
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        publications: prev.publications.filter(pub => pub.id !== id)
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Publication deleted", description: "Item removed successfully" });
   };
 
   // Social links function
   const updateSocial = (links: Partial<SocialLinks>) => {
-    setData(prev => ({
-      ...prev,
-      social: {
-        ...prev.social,
-        ...links
-      }
-    }));
+    setData(prev => {
+      const updated = {
+        ...prev,
+        social: {
+          ...prev.social,
+          ...links
+        }
+      };
+      saveToLocalStorage(updated);
+      return updated;
+    });
     toast({ title: "Social links updated", description: "Changes saved successfully" });
   };
 

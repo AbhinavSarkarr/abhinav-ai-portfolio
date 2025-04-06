@@ -18,7 +18,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 export function AdminProjects() {
@@ -26,6 +25,7 @@ export function AdminProjects() {
   const { data, addProject, updateProject, deleteProject } = useAdminData();
   
   const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     id: "",
@@ -93,6 +93,7 @@ export function AdminProjects() {
     if (projectToDelete) {
       deleteProject(projectToDelete);
       setProjectToDelete(null);
+      setOpenDialog(false);
       toast({
         title: "Project deleted",
         description: "The project has been removed from your portfolio."
@@ -105,10 +106,16 @@ export function AdminProjects() {
     setIsSaving(true);
     
     try {
+      // Filter out empty bullet points
+      const cleanedTechnologies = formData.technologies.filter(tech => tech.trim() !== "");
+      
       if (isEditing === "new") {
         // Add new project
         const { id, ...newProject } = formData;
-        addProject(newProject);
+        addProject({
+          ...newProject,
+          technologies: cleanedTechnologies
+        });
         toast({
           title: "Added new project",
           description: `${formData.title} has been added to your portfolio.`
@@ -118,7 +125,7 @@ export function AdminProjects() {
         updateProject(formData.id, {
           title: formData.title,
           description: formData.description,
-          technologies: formData.technologies,
+          technologies: cleanedTechnologies,
           image: formData.image,
           github: formData.github,
           liveUrl: formData.liveUrl
@@ -127,6 +134,41 @@ export function AdminProjects() {
           title: "Updated",
           description: `${formData.title} project has been updated.`
         });
+      }
+      
+      // Explicitly save to localStorage
+      const currentData = localStorage.getItem('adminData');
+      if (currentData) {
+        try {
+          const parsedData = JSON.parse(currentData);
+          
+          if (isEditing === "new") {
+            const newId = `proj${Date.now()}`;
+            parsedData.projects.push({
+              ...formData,
+              id: newId,
+              technologies: cleanedTechnologies
+            });
+          } else {
+            parsedData.projects = parsedData.projects.map((proj: any) => 
+              proj.id === formData.id 
+                ? { 
+                    ...proj, 
+                    title: formData.title,
+                    description: formData.description,
+                    technologies: cleanedTechnologies,
+                    image: formData.image,
+                    github: formData.github,
+                    liveUrl: formData.liveUrl
+                  } 
+                : proj
+            );
+          }
+          
+          localStorage.setItem('adminData', JSON.stringify(parsedData));
+        } catch (err) {
+          console.error("Error updating localStorage:", err);
+        }
       }
     } catch (error) {
       console.error("Error saving project:", error);
@@ -143,6 +185,11 @@ export function AdminProjects() {
   
   const handleCancel = () => {
     setIsEditing(null);
+  };
+  
+  const handleDeleteClick = (id: string) => {
+    setProjectToDelete(id);
+    setOpenDialog(true);
   };
   
   return (
@@ -347,33 +394,14 @@ export function AdminProjects() {
               </div>
               
               <div className="flex gap-2">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground hover:text-destructive"
-                      onClick={() => setProjectToDelete(project.id)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Project</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete "{project.title}"? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel onClick={() => setProjectToDelete(null)}>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={() => handleDeleteClick(project.id)}
+                >
+                  <Trash2 size={16} />
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -404,7 +432,7 @@ export function AdminProjects() {
       </div>
       
       {/* Delete confirmation dialog */}
-      <AlertDialog open={!!projectToDelete} onOpenChange={(open) => !open && setProjectToDelete(null)}>
+      <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Project</AlertDialogTitle>
@@ -413,7 +441,10 @@ export function AdminProjects() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setProjectToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => {
+              setProjectToDelete(null);
+              setOpenDialog(false);
+            }}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Delete
             </AlertDialogAction>

@@ -20,13 +20,13 @@ export function ExperienceSection() {
     if (Array.isArray(description)) {
       return description;
     } else if (typeof description === 'string') {
-      // Split by periods, newlines, or bullet points
+      // Split by periods, newlines, or bullet points and filter out empty strings
       return description
         .split(/[•\n]|(?<=\.)\s+/)
         .map(item => item.trim())
         .filter(item => item.length > 0);
     }
-    return [String(description)];
+    return ["No description available"];
   };
 
   return (
