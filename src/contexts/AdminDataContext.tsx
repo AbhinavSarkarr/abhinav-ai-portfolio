@@ -16,7 +16,7 @@ type ExperienceItem = {
   company: string;
   period: string;
   current: boolean;
-  description: string[];
+  description: string[] | string;
   id: string;
 };
 
@@ -242,32 +242,40 @@ const saveToLocalStorage = (data: AdminData) => {
 // Provider component
 export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<AdminData>(() => {
-    // Try to load from localStorage first
-    const savedData = localStorage.getItem('adminData');
-    if (savedData) {
-      try {
+  const [data, setData] = useState<AdminData>(initialData);
+  const { toast } = useToast();
+  
+  // Initialize data from localStorage if available
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem('adminData');
+      if (savedData) {
         const parsed = JSON.parse(savedData);
         console.log('Loaded data from localStorage:', parsed);
-        return parsed;
-      } catch (e) {
-        console.error('Failed to parse saved admin data', e);
+        setData(parsed);
+      } else {
+        console.log('No data in localStorage, using initialData');
+        saveToLocalStorage(initialData);
       }
+    } catch (e) {
+      console.error('Failed to load saved admin data', e);
+      saveToLocalStorage(initialData);
+    } finally {
+      setIsLoading(false);
     }
-    return initialData;
-  });
-  const { toast } = useToast();
+  }, []);
 
   // Save to localStorage whenever data changes
   useEffect(() => {
     if (!isLoading) {
       saveToLocalStorage(data);
+      console.log("Data updated and saved to localStorage");
     }
-    setIsLoading(false);
   }, [data, isLoading]);
 
   // Data modification functions for each section
   const updateHero = (heroData: Partial<HeroData>) => {
+    console.log("Updating hero with:", heroData);
     setData(prev => {
       const updated = {
         ...prev,
@@ -276,7 +284,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
           ...heroData
         }
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Hero section updated", description: "Changes saved successfully" });
@@ -289,7 +296,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         experiences: [...prev.experiences, newItem]
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Experience added", description: "New experience added successfully" });
@@ -303,7 +309,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
           exp.id === id ? { ...exp, ...item } : exp
         )
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Experience updated", description: "Changes saved successfully" });
@@ -315,7 +320,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         experiences: prev.experiences.filter(exp => exp.id !== id)
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Experience deleted", description: "Item removed successfully" });
@@ -330,7 +334,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         projects: [...prev.projects, newItem]
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Project added", description: "New project added successfully" });
@@ -345,7 +348,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
           proj.id === id ? { ...proj, ...item } : proj
         )
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Project updated", description: "Changes saved successfully" });
@@ -358,7 +360,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         projects: prev.projects.filter(proj => proj.id !== id)
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Project deleted", description: "Item removed successfully" });
@@ -372,7 +373,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         skills: [...prev.skills, newCategory]
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Skill category added", description: "New category added successfully" });
@@ -386,7 +386,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
           cat.id === id ? { ...cat, ...category } : cat
         )
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Skills updated", description: "Changes saved successfully" });
@@ -398,7 +397,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         skills: prev.skills.filter(cat => cat.id !== id)
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Skill category deleted", description: "Category removed successfully" });
@@ -412,7 +410,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         certifications: [...prev.certifications, newItem]
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Certification added", description: "New certification added successfully" });
@@ -426,7 +423,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
           cert.id === id ? { ...cert, ...item } : cert
         )
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Certification updated", description: "Changes saved successfully" });
@@ -438,7 +434,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         certifications: prev.certifications.filter(cert => cert.id !== id)
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Certification deleted", description: "Item removed successfully" });
@@ -452,7 +447,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         publications: [...prev.publications, newItem]
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Publication added", description: "New publication added successfully" });
@@ -466,7 +460,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
           pub.id === id ? { ...pub, ...item } : pub
         )
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Publication updated", description: "Changes saved successfully" });
@@ -478,7 +471,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         publications: prev.publications.filter(pub => pub.id !== id)
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Publication deleted", description: "Item removed successfully" });
@@ -494,7 +486,6 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
           ...links
         }
       };
-      saveToLocalStorage(updated);
       return updated;
     });
     toast({ title: "Social links updated", description: "Changes saved successfully" });

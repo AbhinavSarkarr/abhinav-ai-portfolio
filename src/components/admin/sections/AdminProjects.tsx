@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Github, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,11 @@ export function AdminProjects() {
   
   const [techInput, setTechInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Log projects whenever they change
+  useEffect(() => {
+    console.log("Current projects in AdminProjects:", data.projects);
+  }, [data.projects]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -82,8 +87,8 @@ export function AdminProjects() {
       id: project.id,
       title: project.title,
       description: project.description,
-      technologies: [...project.technologies],
-      image: project.image,
+      technologies: Array.isArray(project.technologies) ? [...project.technologies] : [],
+      image: project.image || "",
       github: project.github || "",
       liveUrl: project.liveUrl || ""
     });
@@ -131,7 +136,7 @@ export function AdminProjects() {
           title: "Added new project",
           description: `${formData.title} has been added to your portfolio.`
         });
-      } else {
+      } else if (isEditing) {
         // Update existing project
         console.log("Updating project:", formData);
         updateProject(formData.id, {
@@ -197,7 +202,7 @@ export function AdminProjects() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} id="projectForm" className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Project Title</Label>
                   <Input
@@ -287,107 +292,109 @@ export function AdminProjects() {
                     placeholder="Type a technology and press Enter"
                   />
                 </div>
-                
-                <div className="flex gap-2 justify-end">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit"
-                    className="tech-btn"
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save Project"}
-                  </Button>
-                </div>
               </form>
             </CardContent>
+            <CardFooter className="flex gap-2 justify-end">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                form="projectForm"
+                className="tech-btn"
+                disabled={isSaving}
+              >
+                {isSaving ? "Saving..." : "Save Project"}
+              </Button>
+            </CardFooter>
           </Card>
         </motion.div>
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {data.projects.map((project) => (
-          <Card 
-            key={project.id}
-            className="glass border-white/10 hover:border-tech-accent/20 transition-colors overflow-hidden"
-          >
-            <div className="h-40 overflow-hidden relative">
-              <img 
-                src={project.image} 
-                alt={project.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60" />
-            </div>
-            
-            <CardHeader className="pb-2">
-              <CardTitle>{project.title}</CardTitle>
-              <CardDescription>
-                {project.description}
-              </CardDescription>
-            </CardHeader>
-            
-            <CardContent className="py-2">
-              <div className="flex flex-wrap gap-2">
-                {project.technologies.map((tech, index) => (
-                  <span
-                    key={index}
-                    className="skill-badge"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </CardContent>
-            
-            <CardFooter className="flex justify-between pt-2">
-              <div className="flex gap-2">
-                {project.github && (
-                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                    <a href={project.github} target="_blank" rel="noopener noreferrer">
-                      <Github size={16} />
-                    </a>
-                  </Button>
-                )}
-                
-                {project.liveUrl && (
-                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                    <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <Globe size={16} />
-                    </a>
-                  </Button>
-                )}
+        {data.projects && data.projects.length > 0 ? (
+          data.projects.map((project) => (
+            <Card 
+              key={project.id}
+              className="glass border-white/10 hover:border-tech-accent/20 transition-colors overflow-hidden"
+            >
+              <div className="h-40 overflow-hidden relative">
+                <img 
+                  src={project.image} 
+                  alt={project.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60" />
               </div>
               
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-muted-foreground hover:text-destructive"
-                  onClick={() => handleDeleteClick(project.id)}
-                >
-                  <Trash2 size={16} />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(project)}
-                >
-                  <Pencil size={16} className="mr-1" />
-                  Edit
-                </Button>
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
-        
-        {data.projects.length === 0 && (
+              <CardHeader className="pb-2">
+                <CardTitle>{project.title}</CardTitle>
+                <CardDescription>
+                  {project.description}
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="py-2">
+                <div className="flex flex-wrap gap-2">
+                  {project.technologies && project.technologies.map((tech, index) => (
+                    <span
+                      key={index}
+                      className="skill-badge"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </CardContent>
+              
+              <CardFooter className="flex justify-between pt-2">
+                <div className="flex gap-2">
+                  {project.github && (
+                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <a href={project.github} target="_blank" rel="noopener noreferrer">
+                        <Github size={16} />
+                      </a>
+                    </Button>
+                  )}
+                  
+                  {project.liveUrl && (
+                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                        <Globe size={16} />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => handleDeleteClick(project.id)}
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(project)}
+                  >
+                    <Pencil size={16} className="mr-1" />
+                    Edit
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          ))
+        ) : (
           <Card className="col-span-full glass border-white/10 border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-10">
               <p className="text-muted-foreground mb-4">No projects added yet</p>

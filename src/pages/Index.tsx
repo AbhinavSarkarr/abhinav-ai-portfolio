@@ -26,8 +26,15 @@ const Index = () => {
   }, [isLoading, data]);
 
   if (!dataReady) {
-    // Could add a loading spinner here if needed
-    return null;
+    // Show loading state
+    return (
+      <div className="flex justify-center items-center h-screen bg-background">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full border-4 border-tech-neon border-t-transparent animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading portfolio data...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

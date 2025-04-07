@@ -35,7 +35,7 @@ export function ProjectsSection() {
   };
 
   useEffect(() => {
-    console.log("Projects in ProjectsSection:", projects);
+    console.log("Projects data in ProjectsSection:", projects);
   }, [projects]);
 
   return (
@@ -49,7 +49,7 @@ export function ProjectsSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <h2 className="section-heading">Projects</h2>
@@ -58,105 +58,115 @@ export function ProjectsSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {projects && projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              initial="hidden"
-              animate="visible"
-              transition={{ 
-                duration: 0.4,
-                delay: index * 0.1,
-                ease: "easeOut"
-              }}
-              className="h-full"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              <Card className="h-full glass border-tech-neon/20 overflow-hidden group">
-                <div className="relative h-48 overflow-hidden bg-tech-glass/20">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    loading="lazy"
-                    onLoad={() => handleImageLoad(project.id)}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    style={{ 
-                      opacity: imagesLoaded[project.id] ? 1 : 0,
-                      transition: 'opacity 0.5s ease'
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-                </div>
-                
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    {project.title}
-                    <motion.span
-                      animate={{ 
-                        scale: hoveredIndex === index ? [1, 1.2, 1] : 1
+        {projects && projects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {projects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+                initial="hidden"
+                animate={controls}
+                transition={{ 
+                  duration: 0.4,
+                  delay: index * 0.1,
+                  ease: "easeOut"
+                }}
+                className="h-full"
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              >
+                <Card className="h-full glass border-tech-neon/20 overflow-hidden group">
+                  <div className="relative h-48 overflow-hidden bg-tech-glass/20">
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      loading="lazy"
+                      onLoad={() => handleImageLoad(project.id)}
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1560732488-7b5f5b6730a6?ixlib=rb-4.0.3";
+                        handleImageLoad(project.id);
                       }}
-                      transition={{
-                        duration: 0.6,
-                        repeat: hoveredIndex === index ? Infinity : 0,
-                        repeatDelay: 1
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      style={{ 
+                        opacity: imagesLoaded[project.id] ? 1 : 0,
+                        transition: 'opacity 0.5s ease'
                       }}
-                      className="text-tech-accent"
-                    >
-                      <ArrowUpRight size={18} />
-                    </motion.span>
-                  </CardTitle>
-                  <CardDescription>{project.description}</CardDescription>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {project.technologies && project.technologies.map((tech, i) => (
-                      <span 
-                        key={i} 
-                        className="skill-badge"
-                      >
-                        {tech}
-                      </span>
-                    ))}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
                   </div>
-                </CardContent>
-                
-                <CardFooter className="flex justify-between">
-                  <div className="flex gap-3">
-                    {project.github && (
-                      <a 
-                        href={project.github} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-full hover:bg-tech-glass transition-colors"
+                  
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      {project.title}
+                      <motion.span
+                        animate={{ 
+                          scale: hoveredIndex === index ? [1, 1.2, 1] : 1
+                        }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: hoveredIndex === index ? Infinity : 0,
+                          repeatDelay: 1
+                        }}
+                        className="text-tech-accent"
                       >
-                        <Github size={18} />
-                        <span className="sr-only">GitHub</span>
-                      </a>
-                    )}
-                    
-                    {project.liveUrl && (
-                      <a 
-                        href={project.liveUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-full hover:bg-tech-glass transition-colors"
-                      >
-                        <Globe size={18} />
-                        <span className="sr-only">Live Demo</span>
-                      </a>
-                    )}
-                  </div>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                        <ArrowUpRight size={18} />
+                      </motion.span>
+                    </CardTitle>
+                    <CardDescription>{project.description}</CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {project.technologies && project.technologies.map((tech, i) => (
+                        <span 
+                          key={i} 
+                          className="skill-badge"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                  
+                  <CardFooter className="flex justify-between">
+                    <div className="flex gap-3">
+                      {project.github && (
+                        <a 
+                          href={project.github} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-full hover:bg-tech-glass transition-colors"
+                        >
+                          <Github size={18} />
+                          <span className="sr-only">GitHub</span>
+                        </a>
+                      )}
+                      
+                      {project.liveUrl && (
+                        <a 
+                          href={project.liveUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-full hover:bg-tech-glass transition-colors"
+                        >
+                          <Globe size={18} />
+                          <span className="sr-only">Live Demo</span>
+                        </a>
+                      )}
+                    </div>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="glass-card text-center py-8">
+            <p className="text-muted-foreground">No projects added yet. Use the admin panel to add your projects.</p>
+          </div>
+        )}
       </div>
     </section>
   );

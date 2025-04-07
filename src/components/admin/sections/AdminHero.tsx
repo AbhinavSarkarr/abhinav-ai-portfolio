@@ -17,22 +17,20 @@ export function AdminHero() {
     name: data.hero.name || "",
     headline: data.hero.title || "",
     introText: data.hero.description || "",
-    aboutMe: "I am a passionate AI/LLM Engineer with expertise in natural language processing and deep learning. With a background in computer science and a focus on cutting-edge AI technologies, I build intelligent systems that solve real-world problems. I specialize in developing RAG pipelines and fine-tuning language models for specific use cases.",
-    keywords: "AI, LLM, NLP, RAG, Fine-tuning, Machine Learning",
     profileImage: data.hero.image || "",
     resumeLink: data.hero.resumeLink || ""
   });
   
   // Update form data when context data changes
   useEffect(() => {
-    setFormData(prev => ({
-      ...prev,
+    console.log("Hero data in AdminHero:", data.hero);
+    setFormData({
       name: data.hero.name || "",
       headline: data.hero.title || "",
       introText: data.hero.description || "",
       profileImage: data.hero.image || "",
       resumeLink: data.hero.resumeLink || ""
-    }));
+    });
   }, [data.hero]);
   
   const [isSaving, setIsSaving] = useState(false);
@@ -48,6 +46,7 @@ export function AdminHero() {
     
     try {
       // Update hero data using context
+      console.log("Updating hero with:", formData);
       const updatedData = {
         name: formData.name,
         title: formData.headline,
@@ -146,30 +145,6 @@ export function AdminHero() {
                   />
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="aboutMe">About Me</Label>
-                  <Textarea
-                    id="aboutMe"
-                    name="aboutMe"
-                    value={formData.aboutMe}
-                    onChange={handleInputChange}
-                    className="bg-background/50 min-h-[150px]"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="keywords">
-                    Keywords (comma separated)
-                  </Label>
-                  <Input
-                    id="keywords"
-                    name="keywords"
-                    value={formData.keywords}
-                    onChange={handleInputChange}
-                    className="bg-background/50"
-                  />
-                </div>
-                
                 <Button type="submit" className="tech-btn" disabled={isSaving}>
                   {isSaving ? "Saving..." : "Save Changes"}
                 </Button>
@@ -197,6 +172,9 @@ export function AdminHero() {
                     src={formData.profileImage}
                     alt="Profile"
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://via.placeholder.com/150?text=No+Image";
+                    }}
                   />
                 </div>
               </div>
@@ -213,7 +191,7 @@ export function AdminHero() {
               </div>
               
               <div className="pt-2">
-                <Button className="w-full glass border border-dashed border-white/20 hover:border-tech-accent/50 hover:bg-tech-glass/30">
+                <Button className="w-full glass border border-dashed border-white/20 hover:border-tech-accent/50 hover:bg-tech-glass/30" type="button">
                   Upload New Image
                 </Button>
                 

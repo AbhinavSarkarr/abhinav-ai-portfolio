@@ -1,8 +1,12 @@
 
 import { motion } from 'framer-motion';
 import { Award, GraduationCap, Mail, Phone } from 'lucide-react';
+import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function AboutSection() {
+  const { data } = useAdminData();
+  const { hero, certifications } = data;
+  
   return (
     <section id="about" className="relative py-24">
       {/* Background elements */}
@@ -32,12 +36,9 @@ export function AboutSection() {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <h3 className="text-3xl font-bold">Abhinav Sarkar</h3>
+            <h3 className="text-3xl font-bold">{hero.name || "Abhinav Sarkar"}</h3>
             <p className="text-muted-foreground leading-relaxed">
-              I'm an AI/LLM Engineer focused on developing intelligent systems that solve real-world problems.
-              With a strong foundation in machine learning and natural language processing, I build solutions
-              ranging from custom RAG pipelines to fine-tuned language models for specialized applications.
-              My passion lies in creating AI systems that are both powerful and accessible.
+              {hero.description || "I'm an AI/LLM Engineer focused on developing intelligent systems that solve real-world problems."}
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
@@ -101,18 +102,29 @@ export function AboutSection() {
               </div>
               
               <ul className="space-y-4 pl-12 border-l border-tech-neon/30">
-                <li>
-                  <h5 className="font-semibold">Finetuning Large Language Models</h5>
-                  <p className="text-sm text-muted-foreground">DeepLearning.AI | April 2024</p>
-                </li>
-                <li>
-                  <h5 className="font-semibold">Prompt Engineering with Llama 2&3</h5>
-                  <p className="text-sm text-muted-foreground">DeepLearning.AI | March 2024</p>
-                </li>
-                <li>
-                  <h5 className="font-semibold">Artificial Intelligence with Machine Learning</h5>
-                  <p className="text-sm text-muted-foreground">Oracle | November 2023</p>
-                </li>
+                {certifications && certifications.length > 0 ? (
+                  certifications.slice(0, 3).map((cert) => (
+                    <li key={cert.id}>
+                      <h5 className="font-semibold">{cert.title}</h5>
+                      <p className="text-sm text-muted-foreground">{cert.issuer} | {cert.date}</p>
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li>
+                      <h5 className="font-semibold">Finetuning Large Language Models</h5>
+                      <p className="text-sm text-muted-foreground">DeepLearning.AI | April 2024</p>
+                    </li>
+                    <li>
+                      <h5 className="font-semibold">Prompt Engineering with Llama 2&3</h5>
+                      <p className="text-sm text-muted-foreground">DeepLearning.AI | March 2024</p>
+                    </li>
+                    <li>
+                      <h5 className="font-semibold">Artificial Intelligence with Machine Learning</h5>
+                      <p className="text-sm text-muted-foreground">Oracle | November 2023</p>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
           </motion.div>

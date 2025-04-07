@@ -16,7 +16,7 @@ export function ExperienceSection() {
   });
   
   useEffect(() => {
-    console.log("Experiences in ExperienceSection:", experiences);
+    console.log("Experiences data in ExperienceSection:", experiences);
   }, [experiences]);
 
   // Helper to ensure description is an array
@@ -49,7 +49,7 @@ export function ExperienceSection() {
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
-          {experiences && experiences.map((exp, index) => (
+          {experiences && experiences.length > 0 ? experiences.map((exp, index) => (
             <motion.div
               key={exp.id}
               initial={{ opacity: 0, y: 30 }}
@@ -82,7 +82,7 @@ export function ExperienceSection() {
                 </div>
 
                 <ul className="space-y-2">
-                  {getDescriptionItems(exp.description as string[] | string).map((item, idx) => (
+                  {getDescriptionItems(exp.description).map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
                       <span className="text-muted-foreground">{item}</span>
@@ -91,7 +91,11 @@ export function ExperienceSection() {
                 </ul>
               </div>
             </motion.div>
-          ))}
+          )) : (
+            <div className="glass-card text-center py-8">
+              <p className="text-muted-foreground">No experience entries found. Use the admin panel to add your work experience.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -13,23 +13,15 @@ export function SkillsSection() {
     margin: "0px 0px -10% 0px"
   });
 
+  // Simple animation variants with reduced complexity for better performance
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.05
-      }
-    }
+    visible: { opacity: 1 }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.3 }
-    }
+    hidden: { opacity: 0, y: 5 },
+    visible: { opacity: 1, y: 0 }
   };
 
   return (
@@ -38,7 +30,7 @@ export function SkillsSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <h2 className="section-heading">Technical Skills</h2>
@@ -47,42 +39,50 @@ export function SkillsSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {skills.map((category, index) => (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="glass-card"
-            >
-              <h3 className="text-xl font-bold mb-4">{category.name}</h3>
-              
-              <motion.div 
-                className="grid grid-cols-2 gap-2"
-                variants={containerVariants}
-                initial="hidden"
-                animate={isInView ? "visible" : "hidden"}
+        {skills && skills.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {skills.map((category, index) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="glass-card"
               >
-                {category.skills.map((skill, idx) => (
-                  <motion.div
-                    key={idx}
-                    variants={itemVariants}
-                    className="flex items-center gap-2"
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-tech-accent" />
-                    <span className="text-sm">{skill}</span>
-                  </motion.div>
-                ))}
+                <h3 className="text-xl font-bold mb-4">{category.name}</h3>
+                
+                <motion.div 
+                  className="grid grid-cols-2 gap-2"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate={isInView ? "visible" : "hidden"}
+                  transition={{ duration: 0.2, staggerChildren: 0.03 }}
+                >
+                  {category.skills.map((skill, idx) => (
+                    <motion.div
+                      key={idx}
+                      variants={itemVariants}
+                      className="flex items-center gap-2"
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-tech-accent" />
+                      <span className="text-sm">{skill}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
               </motion.div>
-            </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="glass-card text-center py-8">
+            <p className="text-muted-foreground">No skills added yet. Use the admin panel to add your technical skills.</p>
+          </div>
+        )}
         
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
           className="mt-16 p-8 glass rounded-2xl max-w-3xl mx-auto text-center"
         >
           <h3 className="text-2xl font-bold mb-3">
