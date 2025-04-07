@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from "@/hooks/use-toast";
 
@@ -49,6 +48,7 @@ type PublicationItem = {
   publisher: string;
   date: string;
   link: string;
+  description?: string;
   id: string;
 };
 
@@ -92,6 +92,7 @@ interface AdminDataContextType {
   deletePublication: (id: string) => void;
   updateSocial: (links: Partial<SocialLinks>) => void;
   isLoading: boolean;
+  saveToServer: () => void;
 }
 
 // Sample initial data that matches the main site display
@@ -204,14 +205,16 @@ const initialData: AdminData = {
       title: "LLM Optimizations for Production Applications",
       publisher: "Medium",
       date: "Mar 2024",
-      link: "#"
+      link: "#",
+      description: "A comprehensive analysis of techniques to optimize large language models for real-world production environments."
     },
     {
       id: "pub2",
       title: "Efficient RAG Pipelines With Hybrid Search",
       publisher: "Towards Data Science",
       date: "Jan 2024",
-      link: "#"
+      link: "#",
+      description: "Exploring the implementation of hybrid search methods to improve retrieval augmented generation pipelines."
     }
   ],
   social: {
@@ -229,13 +232,28 @@ const generateId = () => `id-${Date.now()}-${Math.random().toString(36).substr(2
 // Create the context
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
 
-// Helper function to ensure localStorage updates
+// Helper function to ensure data is saved
 const saveToLocalStorage = (data: AdminData) => {
   try {
     localStorage.setItem('adminData', JSON.stringify(data));
     console.log('Data saved to localStorage:', data);
   } catch (e) {
     console.error('Failed to save admin data to localStorage', e);
+  }
+};
+
+// Simulated function to "save to server" - in a real app this would be an API call
+const simulateServerSave = async (data: AdminData) => {
+  console.log('Simulating saving data to server:', data);
+  try {
+    // In a real application, this would be an actual API call
+    // For now we're just using localStorage as our "server"
+    localStorage.setItem('deployedAdminData', JSON.stringify(data));
+    localStorage.setItem('adminData', JSON.stringify(data));
+    return true;
+  } catch (e) {
+    console.error('Error saving to "server":', e);
+    return false;
   }
 };
 
@@ -248,18 +266,32 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   // Initialize data from localStorage if available
   useEffect(() => {
     try {
-      const savedData = localStorage.getItem('adminData');
-      if (savedData) {
-        const parsed = JSON.parse(savedData);
-        console.log('Loaded data from localStorage:', parsed);
+      // First try to load from "deployed" data (representing server data)
+      const deployedData = localStorage.getItem('deployedAdminData');
+      if (deployedData) {
+        const parsed = JSON.parse(deployedData);
+        console.log('Loaded data from "deployed" storage:', parsed);
         setData(parsed);
-      } else {
-        console.log('No data in localStorage, using initialData');
-        saveToLocalStorage(initialData);
+      } 
+      // Then try local admin data (representing draft changes)
+      else {
+        const savedData = localStorage.getItem('adminData');
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          console.log('Loaded data from localStorage:', parsed);
+          setData(parsed);
+        } else {
+          console.log('No data in localStorage, using initialData');
+          saveToLocalStorage(initialData);
+          // Also "deploy" the initial data
+          localStorage.setItem('deployedAdminData', JSON.stringify(initialData));
+        }
       }
     } catch (e) {
       console.error('Failed to load saved admin data', e);
       saveToLocalStorage(initialData);
+      // Also "deploy" the initial data
+      localStorage.setItem('deployedAdminData', JSON.stringify(initialData));
     } finally {
       setIsLoading(false);
     }
@@ -269,9 +301,36 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!isLoading) {
       saveToLocalStorage(data);
-      console.log("Data updated and saved to localStorage");
+      console.log("Data updated and saved to localStorage (draft)");
     }
   }, [data, isLoading]);
+
+  // Function to "deploy" changes (simulate saving to server)
+  const saveToServer = async () => {
+    toast({ title: "Deploying changes...", description: "Please wait..." });
+    try {
+      const success = await simulateServerSave(data);
+      if (success) {
+        toast({ 
+          title: "Changes deployed successfully", 
+          description: "All users will now see your updates" 
+        });
+      } else {
+        toast({ 
+          title: "Deployment failed", 
+          description: "Please try again later", 
+          variant: "destructive" 
+        });
+      }
+    } catch (error) {
+      toast({ 
+        title: "Deployment error", 
+        description: "An unexpected error occurred", 
+        variant: "destructive" 
+      });
+      console.error("Error during deployment:", error);
+    }
+  };
 
   // Data modification functions for each section
   const updateHero = (heroData: Partial<HeroData>) => {
@@ -512,7 +571,8 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         updatePublication, 
         deletePublication,
         updateSocial,
-        isLoading
+        isLoading,
+        saveToServer
       }}
     >
       {children}

@@ -17,6 +17,16 @@ const Index = () => {
   
   // Update document title and wait for data to be ready
   useEffect(() => {
+    // First check for deployed data
+    try {
+      const deployedData = localStorage.getItem('deployedAdminData');
+      if (deployedData) {
+        console.log("Using deployed data for portfolio view");
+      }
+    } catch (err) {
+      console.error("Error checking deployed data:", err);
+    }
+    
     document.title = `${data.hero.name || 'Abhinav'} Portfolio`;
     
     if (!isLoading) {

@@ -1,28 +1,21 @@
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { BookOpen, ExternalLink, Clock } from 'lucide-react';
-
-type Publication = {
-  title: string;
-  journal: string;
-  date: string;
-  description: string;
-  url?: string;
-};
-
-const publications: Publication[] = [
-  {
-    title: "A Comprehensive Survey on Answer Generation Methods using NLP",
-    journal: "NLP Journal (ScienceDirect)",
-    date: "2023",
-    description: "A detailed analysis of various natural language processing techniques for answer generation in question-answering systems.",
-    url: "#"
-  }
-];
+import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function PublicationsSection() {
+  const { data } = useAdminData();
+  const { publications } = data;
+  
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { 
+    once: true,
+    margin: "0px 0px -10% 0px" 
+  });
+
   return (
-    <section id="publications" className="relative py-24">
+    <section id="publications" className="relative py-24" ref={sectionRef}>
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute bottom-1/3 right-0 w-64 h-64 bg-tech-neon/10 rounded-full blur-[80px]" />
@@ -31,9 +24,8 @@ export function PublicationsSection() {
       <div className="container relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <h2 className="section-heading">Publications</h2>
@@ -43,13 +35,12 @@ export function PublicationsSection() {
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
-          {publications.map((pub, index) => (
+          {publications && publications.length > 0 ? publications.map((pub) => (
             <motion.div
-              key={index}
+              key={pub.id}
               initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
               className="glass-card relative overflow-hidden mb-6"
             >
               <div className="absolute top-0 left-0 bottom-0 w-1 bg-tech-neon/50" />
@@ -68,12 +59,14 @@ export function PublicationsSection() {
                     </div>
                   </div>
                   
-                  <p className="text-sm text-tech-accent mb-2">{pub.journal}</p>
-                  <p className="text-muted-foreground mb-4">{pub.description}</p>
+                  <p className="text-sm text-tech-accent mb-2">{pub.publisher}</p>
+                  <p className="text-muted-foreground mb-4">
+                    {pub.description || "A detailed publication in the field of AI and machine learning."}
+                  </p>
                   
-                  {pub.url && (
+                  {pub.link && (
                     <a 
-                      href={pub.url} 
+                      href={pub.link} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="flex items-center gap-1.5 text-tech-accent hover:underline"
@@ -85,7 +78,11 @@ export function PublicationsSection() {
                 </div>
               </div>
             </motion.div>
-          ))}
+          )) : (
+            <div className="glass-card text-center py-8">
+              <p className="text-muted-foreground">No publications added yet. Use the admin panel to add your publications.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
