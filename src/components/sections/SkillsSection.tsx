@@ -40,7 +40,7 @@ export function SkillsSection() {
         </motion.div>
 
         {skills && skills.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {skills.map((category, index) => (
               <motion.div
                 key={category.id}
@@ -52,7 +52,7 @@ export function SkillsSection() {
                 <h3 className="text-xl font-bold mb-4">{category.name}</h3>
                 
                 <motion.div 
-                  className="grid grid-cols-2 gap-2"
+                  className="grid grid-cols-1 gap-2"
                   variants={containerVariants}
                   initial="hidden"
                   animate={isInView ? "visible" : "hidden"}

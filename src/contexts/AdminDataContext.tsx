@@ -17,6 +17,7 @@ type ExperienceItem = {
   current: boolean;
   description: string[] | string;
   id: string;
+  certificateLink?: string;
 };
 
 type ProjectItem = {
@@ -58,6 +59,7 @@ type SocialLinks = {
   twitter?: string;
   huggingface?: string;
   resume?: string;
+  portfolio?: string;
 };
 
 // Define overall admin data structure
@@ -100,7 +102,7 @@ const initialData: AdminData = {
   hero: {
     name: "Abhinav Sarkar",
     title: "AI/LLM Engineer",
-    description: "Specialized in NLP, RAG pipelines, and LLM fine-tuning. Creating solutions that leverage the power of artificial intelligence to solve real-world problems.",
+    description: "Specialized in NLP, RAG pipelines, LLM fine-tuning, and creating custom transformer architectures. Building intelligent systems that leverage the power of artificial intelligence to solve real-world problems.",
     image: "/lovable-uploads/0f976acc-d38b-4ac7-96a7-02ccc53846b5.png",
     resumeLink: "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
   },
@@ -109,119 +111,114 @@ const initialData: AdminData = {
       id: "exp1",
       title: "Artificial Intelligence Engineer",
       company: "Jellyfish Technologies Pvt. Ltd.",
-      period: "Apr 2024 – Present",
+      period: "February 2024 – Present",
       current: true,
       description: [
-        "Built SaaS platform for custom RAG-based chatbot creation using Qdrant and Llama3-70B",
-        "Developed system to cross-verify services in insurance documents",
-        "Created automated complaint registration system using Whisper v3 + fine-tuned GPT-4"
+        "Fine-tuned Mistral-7B-Instruct-v0.3 on Indian legal corpus by scraping and processing judiciary judgments, CPC and IPC, implementing DAPT on 18GB of text followed by SFT on 760K+ curated input-response pairs",
+        "Architected and deployed a SaaS platform for building custom RAG-based chatbots using diverse knowledge sources, incorporating hybrid search with re-ranking techniques for enhanced retrieval accuracy",
+        "Implemented a Graph-based Entity extraction system using decoder architecture that identifies document-entity and entity-entity relationships during training and leverages those patterns for automatic extraction"
       ]
     },
     {
       id: "exp2",
       title: "Deep Learning Intern",
       company: "Bhramaand Pvt. Ltd.",
-      period: "Jun – Sep 2023",
+      period: "June – September 2023",
       current: false,
       description: [
-        "Designed zero-shot classification system with bart-large-mnli",
-        "Built modules for real-time news story generation",
-        "Developed financial forecasting models using XGBoost"
-      ]
+        "Designed and executed a zero-shot classification system using bart-large-mnli 1.0 to categorize individuals based on their preferences, work experience, and career aspirations",
+        "Developed predictive modules for financial forecasting, utilizing XGBoost Regressor to predict corporate maintenance expenditures and contractor profits based on projected workload"
+      ],
+      certificateLink: "https://drive.google.com/file/d/1Izrznc1wU2PE8EEQo2YMWLBPYWW12QV7/view?usp=sharing"
     }
   ],
   projects: [
     {
       id: "proj1",
-      title: "AutoDraft",
-      description: "Chrome extension that automates email replies using Tavily AI, Crew AI, and Llama3-8B",
-      technologies: ["TypeScript", "Langchain", "Llama", "Tavily AI", "Chrome Extension API"],
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-      github: "#",
-      liveUrl: "#"
+      title: "JurisGPT",
+      description: "A decoder-only transformer architecture built from scratch and trained on Supreme Court judgments data.",
+      technologies: ["PyTorch", "Natural Language Processing", "Transformer Architecture", "GELU Activation", "BPE Tokenization"],
+      image: "https://images.unsplash.com/photo-1589994965-fcf48d80b0fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      github: "https://github.com/AbhinavSarkarr/LLM-From-Scratch",
+      liveUrl: "https://bytepairtokenizer.netlify.app/"
     },
     {
       id: "proj2",
       title: "TextTweak",
-      description: "Real-time text improvement tool using fine-tuned Google T5-base for grammar/spell check",
-      technologies: ["Python", "PyTorch", "T5", "Transformers", "FastAPI"],
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-      github: "#",
-      liveUrl: "#"
+      description: "A tool that identifies and corrects spelling and grammatical errors, offering accurate suggestions for improved text clarity.",
+      technologies: ["Hugging Face", "PyTorch", "T5", "Transformers", "Fine-tuning"],
+      image: "https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3",
+      liveUrl: "https://huggingface.co/spaces/abhinavsarkar/TextTweakAI"
     },
     {
       id: "proj3",
-      title: "RAG Pipeline Builder",
-      description: "End-to-end system for creating custom retrieval augmented generation pipelines",
-      technologies: ["Python", "Qdrant", "LangChain", "Llama", "React"],
-      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-      github: "#"
-    },
-    {
-      id: "proj4",
-      title: "Insurance Document Analyzer",
-      description: "AI system that extracts and cross-verifies services in insurance documents",
-      technologies: ["OCR", "NLP", "BERT", "FastAPI", "React"],
-      image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1",
-      github: "#"
+      title: "Custom Tokenizer",
+      description: "An interactive web application allowing users to train custom tokenizers using Byte Pair Encoding technique and visualize the tokenization process.",
+      technologies: ["Byte Pair Encoding", "Tokenization", "Web Application", "Interactive Visualization"],
+      image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3",
+      liveUrl: "https://bytepairtokenizer.netlify.app/"
     }
   ],
   skills: [
     {
       id: "skill1",
-      name: "Languages",
-      skills: ["Python", "JavaScript", "TypeScript", "SQL", "R", "C++"]
+      name: "Libraries",
+      skills: ["Accelerate", "DeepSpeed", "Pydantic", "BeautifulSoup", "Selenium", "Transformers", "XGBoost", "Keras"]
     },
     {
       id: "skill2",
-      name: "ML/AI",
-      skills: ["PyTorch", "TensorFlow", "Scikit-learn", "LangChain", "Transformers", "Hugging Face"]
+      name: "Frameworks",
+      skills: ["PyTorch", "Langchain", "FastAPI", "Axolotl", "Pandas", "NumPy", "Scikit-learn"]
     },
     {
       id: "skill3",
-      name: "Web/Cloud",
-      skills: ["React", "FastAPI", "AWS", "Azure", "Docker", "GCP"]
+      name: "Databases",
+      skills: ["MySQL", "Redis", "Chroma DB", "QDrant VectorDB", "Pinecone", "Neo4j"]
+    },
+    {
+      id: "skill4",
+      name: "Tools",
+      skills: ["Docker", "RabbitMQ", "GitHub", "CI/CD Pipelines"]
     }
   ],
   certifications: [
     {
       id: "cert1",
-      title: "Deep Learning Specialization",
+      title: "Finetuning Large Language Models",
       issuer: "DeepLearning.AI",
-      date: "Dec 2023",
+      date: "April 2024",
       link: "#"
     },
     {
       id: "cert2",
-      title: "AWS Machine Learning Specialty",
-      issuer: "Amazon Web Services",
-      date: "May 2024",
+      title: "Prompt Engineering with Llama 2&3",
+      issuer: "DeepLearning.AI",
+      date: "March 2024",
+      link: "#"
+    },
+    {
+      id: "cert3",
+      title: "Artificial Intelligence with Machine Learning",
+      issuer: "Oracle",
+      date: "November 2023",
       link: "#"
     }
   ],
   publications: [
     {
       id: "pub1",
-      title: "LLM Optimizations for Production Applications",
-      publisher: "Medium",
-      date: "Mar 2024",
-      link: "#",
-      description: "A comprehensive analysis of techniques to optimize large language models for real-world production environments."
-    },
-    {
-      id: "pub2",
-      title: "Efficient RAG Pipelines With Hybrid Search",
-      publisher: "Towards Data Science",
-      date: "Jan 2024",
-      link: "#",
-      description: "Exploring the implementation of hybrid search methods to improve retrieval augmented generation pipelines."
+      title: "A Comprehensive Survey on Answer Generation Methods using NLP",
+      publisher: "NLP Journal",
+      date: "2024",
+      link: "https://doi.org/10.1016/j.nlp.2024.100088",
+      description: "A detailed analysis of various approaches, techniques, and challenges in generating accurate and contextually appropriate answers using modern NLP methods."
     }
   ],
   social: {
-    github: "https://github.com/abhinav",
-    linkedin: "https://linkedin.com/in/abhinav",
-    twitter: "https://twitter.com/abhinav",
-    huggingface: "https://huggingface.co/abhinav",
+    github: "https://github.com/AbhinavSarkarr",
+    linkedin: "https://www.linkedin.com/in/abhinavsarkarrr",
+    huggingface: "https://huggingface.co/abhinavsarkar",
+    portfolio: "https://abhinav-ai-portfolio.lovable.app/",
     resume: "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
   }
 };

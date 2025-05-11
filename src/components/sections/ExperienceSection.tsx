@@ -1,7 +1,7 @@
 
 import { useRef, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Briefcase, Calendar } from 'lucide-react';
+import { Briefcase, Calendar, Link } from 'lucide-react';
 import { useAdminData } from '@/contexts/AdminDataContext';
 
 export function ExperienceSection() {
@@ -69,7 +69,20 @@ export function ExperienceSection() {
               <div className="glass-card">
                 <div className="flex flex-wrap gap-4 items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-bold">{exp.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xl font-bold">{exp.title}</h3>
+                      {exp.certificateLink && (
+                        <a 
+                          href={exp.certificateLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-tech-accent hover:text-tech-neon transition-colors"
+                          title="View Certificate"
+                        >
+                          <Link size={16} />
+                        </a>
+                      )}
+                    </div>
                     <p className="text-tech-accent">{exp.company}</p>
                   </div>
                   <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tech-glass text-sm font-medium">
