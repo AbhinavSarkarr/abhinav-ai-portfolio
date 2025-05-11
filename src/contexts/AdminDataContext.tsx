@@ -139,7 +139,7 @@ const initialData: AdminData = {
       title: "JurisGPT",
       description: "A decoder-only transformer architecture built from scratch and trained on Supreme Court judgments data.",
       technologies: ["PyTorch", "Natural Language Processing", "Transformer Architecture", "GELU Activation", "BPE Tokenization"],
-      image: "https://images.unsplash.com/photo-1589994965-fcf48d80b0fd?ixlib=rb-4.0.3",
+      image: "https://images.unsplash.com/photo-1589994965-fcf48d80b0fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
       github: "https://github.com/AbhinavSarkarr/LLM-From-Scratch",
       liveUrl: "https://bytepairtokenizer.netlify.app/"
     },
@@ -148,7 +148,7 @@ const initialData: AdminData = {
       title: "TextTweak",
       description: "A tool that identifies and corrects spelling and grammatical errors, offering accurate suggestions for improved text clarity.",
       technologies: ["Hugging Face", "PyTorch", "T5", "Transformers", "Fine-tuning"],
-      image: "https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3",
+      image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
       liveUrl: "https://huggingface.co/spaces/abhinavsarkar/TextTweakAI"
     },
     {
@@ -156,7 +156,7 @@ const initialData: AdminData = {
       title: "WhatsApp Virtual Try-On Bot",
       description: "A WhatsApp-based bot that allows users to send images and try on virtual outfits using a pre-trained model.",
       technologies: ["FastAPI", "Twilio", "Gradio", "Cloudinary", "Docker", "Python"],
-      image: "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?ixlib=rb-4.0.3",
+      image: "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
       whatsappLink: "+14155238886",
       liveUrl: "https://github.com/your-username/whatsapp-virtual-try-on"
     },
@@ -165,7 +165,7 @@ const initialData: AdminData = {
       title: "Custom Tokenizer",
       description: "An interactive web application allowing users to train custom tokenizers using Byte Pair Encoding technique and visualize the tokenization process.",
       technologies: ["Byte Pair Encoding", "Tokenization", "Web Application", "Interactive Visualization"],
-      image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3",
+      image: "https://images.unsplash.com/photo-1555949963-aa4f59b51407?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
       liveUrl: "https://bytepairtokenizer.netlify.app/"
     }
   ],

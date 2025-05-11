@@ -32,6 +32,22 @@ const Index = () => {
     if (!isLoading) {
       setDataReady(true);
       console.log("Portfolio data ready:", data);
+      
+      // Force a revalidation of image sources to ensure they load properly
+      setTimeout(() => {
+        const projectImages = document.querySelectorAll('img[loading="lazy"]');
+        projectImages.forEach((img: Element) => {
+          const imgElement = img as HTMLImageElement;
+          const originalSrc = imgElement.src;
+          if (originalSrc) {
+            // Force browser to refresh the image
+            imgElement.src = '';
+            setTimeout(() => {
+              imgElement.src = originalSrc;
+            }, 10);
+          }
+        });
+      }, 500);
     }
   }, [isLoading, data]);
 

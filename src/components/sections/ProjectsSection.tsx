@@ -34,6 +34,26 @@ export function ProjectsSection() {
     }));
   };
 
+  // Handle image errors by providing fallbacks
+  const handleImageError = (id: string, e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error(`Error loading image for project ${id}`, e);
+    
+    // Set project-specific fallback images based on project name/type
+    const fallbacks: Record<string, string> = {
+      "JurisGPT": "https://images.unsplash.com/photo-1589994965-fcf48d80b0fd?ixlib=rb-4.0.3",
+      "WhatsApp Virtual Try-On Bot": "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?ixlib=rb-4.0.3",
+      "default": "https://images.unsplash.com/photo-1560732488-7b5f5b6730a6?ixlib=rb-4.0.3"
+    };
+
+    // Find the project by id
+    const project = projects.find(p => p.id === id);
+    const projectName = project?.title || "";
+    
+    // Use project-specific fallback or default
+    e.currentTarget.src = fallbacks[projectName] || fallbacks.default;
+    handleImageLoad(id);
+  };
+
   useEffect(() => {
     console.log("Projects data in ProjectsSection:", projects);
   }, [projects]);
@@ -85,10 +105,7 @@ export function ProjectsSection() {
                       alt={project.title}
                       loading="lazy"
                       onLoad={() => handleImageLoad(project.id)}
-                      onError={(e) => {
-                        e.currentTarget.src = "https://images.unsplash.com/photo-1560732488-7b5f5b6730a6?ixlib=rb-4.0.3";
-                        handleImageLoad(project.id);
-                      }}
+                      onError={(e) => handleImageError(project.id, e)}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       style={{ 
                         opacity: imagesLoaded[project.id] ? 1 : 0,
