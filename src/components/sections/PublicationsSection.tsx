@@ -2,11 +2,10 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { BookOpen, ExternalLink, Clock } from 'lucide-react';
-import { useAdminData } from '@/contexts/AdminDataContext';
+import { portfolioData } from '@/data/portfolioData';
 
 export function PublicationsSection() {
-  const { data } = useAdminData();
-  const { publications } = data;
+  const { publications } = portfolioData;
   
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { 
@@ -35,7 +34,7 @@ export function PublicationsSection() {
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
-          {publications && publications.length > 0 ? publications.map((pub) => (
+          {publications.map((pub) => (
             <motion.div
               key={pub.id}
               initial={{ opacity: 0, y: 30 }}
@@ -78,11 +77,7 @@ export function PublicationsSection() {
                 </div>
               </div>
             </motion.div>
-          )) : (
-            <div className="glass-card text-center py-8">
-              <p className="text-muted-foreground">No publications added yet. Use the admin panel to add your publications.</p>
-            </div>
-          )}
+          ))}
         </div>
       </div>
     </section>

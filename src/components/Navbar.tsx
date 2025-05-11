@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
-import { Menu, X, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { name: "Home", href: "#home" },
@@ -76,19 +75,6 @@ export function Navbar() {
           >
             <Button className="tech-btn">Resume</Button>
           </motion.a>
-          
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            <Link to="/admin/login">
-              <Button variant="ghost" size="icon" className="rounded-full border border-tech-accent/30 bg-tech-glass/50 hover:bg-tech-glass hover:border-tech-accent/70">
-                <Lock size={16} className="text-tech-accent" />
-                <span className="sr-only">Admin</span>
-              </Button>
-            </Link>
-          </motion.div>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -152,20 +138,6 @@ export function Navbar() {
               >
                 <Button className="mt-2 tech-btn w-full">Resume</Button>
               </motion.a>
-              <motion.div
-                variants={{
-                  visible: { opacity: 1, x: 0 },
-                  hidden: { opacity: 0, x: -20 }
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              >
-                <Link to="/admin/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full mt-2 flex gap-2 items-center justify-center border-tech-accent/30 hover:bg-tech-glass hover:border-tech-accent/70">
-                    <Lock size={16} className="text-tech-accent" />
-                    <span>Admin Login</span>
-                  </Button>
-                </Link>
-              </motion.div>
             </motion.div>
           </motion.div>
         )}

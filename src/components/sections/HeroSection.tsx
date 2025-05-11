@@ -2,11 +2,10 @@
 import { motion } from 'framer-motion';
 import { ArrowDown, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useAdminData } from '@/contexts/AdminDataContext';
+import { portfolioData } from '@/data/portfolioData';
 
 export function HeroSection() {
-  const { data } = useAdminData();
-  const { hero } = data;
+  const { hero } = portfolioData;
 
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
@@ -86,7 +85,7 @@ export function HeroSection() {
                 <Button 
                   variant="link" 
                   className="text-sm p-0 flex items-center gap-1.5 text-white hover:text-tech-accent transition-colors" 
-                  onClick={() => window.open(hero.resumeLink || "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view", "_blank")}
+                  onClick={() => window.open(hero.resumeLink, "_blank")}
                 >
                   <span className="text-xl">📄</span>
                   <span>Resume</span>

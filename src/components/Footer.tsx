@@ -1,7 +1,11 @@
-import { Github, Linkedin, Mail, ExternalLink } from 'lucide-react';
+
+import { Github, Linkedin, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { portfolioData } from '@/data/portfolioData';
 
 export function Footer() {
+  const { social } = portfolioData;
+  
   return (
     <footer className="py-12 border-t border-white/10">
       <div className="container flex flex-col gap-8">
@@ -32,15 +36,15 @@ export function Footer() {
           <div className="flex flex-col gap-3">
             <h3 className="text-xl font-bold mb-2">Connect</h3>
             <div className="flex items-center gap-4">
-              <a href="https://github.com/AbhinavSarkarr" target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
+              <a href={social.github} target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
                 <Github size={20} />
                 <span className="sr-only">GitHub</span>
               </a>
-              <a href="https://www.linkedin.com/in/abhinavsarkarrr/" target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
+              <a href={social.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
                 <Linkedin size={20} />
                 <span className="sr-only">LinkedIn</span>
               </a>
-              <a href="https://huggingface.co/abhinavsarkar" target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
+              <a href={social.huggingface} target="_blank" rel="noopener noreferrer" className="hover:text-tech-accent transition-colors">
                 <span className="flex items-center gap-1">
                   <span className="text-xl" role="img" aria-label="Hugging Face">🤗</span>
                 </span>

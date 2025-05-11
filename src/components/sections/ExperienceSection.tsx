@@ -1,12 +1,11 @@
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Briefcase, Calendar, Link } from 'lucide-react';
-import { useAdminData } from '@/contexts/AdminDataContext';
+import { portfolioData } from '@/data/portfolioData';
 
 export function ExperienceSection() {
-  const { data } = useAdminData();
-  const { experiences } = data;
+  const { experiences } = portfolioData;
   
   // For performance optimization
   const sectionRef = useRef(null);
@@ -15,10 +14,6 @@ export function ExperienceSection() {
     margin: "0px 0px -10% 0px" 
   });
   
-  useEffect(() => {
-    console.log("Experiences data in ExperienceSection:", experiences);
-  }, [experiences]);
-
   // Helper to ensure description is an array
   const getDescriptionItems = (description: string[] | string): string[] => {
     if (Array.isArray(description)) {
@@ -49,7 +44,7 @@ export function ExperienceSection() {
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
-          {experiences && experiences.length > 0 ? experiences.map((exp, index) => (
+          {experiences.map((exp, index) => (
             <motion.div
               key={exp.id}
               initial={{ opacity: 0, y: 30 }}
@@ -104,11 +99,7 @@ export function ExperienceSection() {
                 </ul>
               </div>
             </motion.div>
-          )) : (
-            <div className="glass-card text-center py-8">
-              <p className="text-muted-foreground">No experience entries found. Use the admin panel to add your work experience.</p>
-            </div>
-          )}
+          ))}
         </div>
       </div>
     </section>
