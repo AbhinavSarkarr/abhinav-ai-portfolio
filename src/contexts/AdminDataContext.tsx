@@ -139,7 +139,7 @@ const initialData: AdminData = {
       title: "JurisGPT",
       description: "A decoder-only transformer architecture built from scratch and trained on Supreme Court judgments data.",
       technologies: ["PyTorch", "Natural Language Processing", "Transformer Architecture", "GELU Activation", "BPE Tokenization"],
-      image: "https://images.unsplash.com/photo-1589994965-fcf48d80b0fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "https://images.unsplash.com/photo-1589994965-fcf48d80b0fd?ixlib=rb-4.0.3",
       github: "https://github.com/AbhinavSarkarr/LLM-From-Scratch",
       liveUrl: "https://bytepairtokenizer.netlify.app/"
     },
