@@ -1,3 +1,4 @@
+
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { AboutSection } from "@/components/sections/AboutSection";
@@ -10,7 +11,6 @@ import { Footer } from "@/components/Footer";
 import { useEffect, useState } from "react";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import { motion } from "framer-motion";
-import { Brain } from "lucide-react"; // Added this import for the Brain icon
 
 const Index = () => {
   const { data, isLoading } = useAdminData();
@@ -49,7 +49,8 @@ const Index = () => {
               animate={{ opacity: [0, 1, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             >
-              <Brain className="w-8 h-8 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+              {/* Remove Brain component usage */}
+              <div className="w-8 h-8 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
             </motion.div>
           </div>
           <motion.p 
