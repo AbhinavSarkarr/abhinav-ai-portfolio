@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import { useEffect, useState } from "react";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import { motion } from "framer-motion";
+import { Brain } from "lucide-react"; // Added missing import
 
 const Index = () => {
   const { data, isLoading } = useAdminData();
