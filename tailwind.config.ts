@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -69,12 +68,14 @@ export default {
         },
         // Custom futuristic palette
         tech: {
-          'neon': '#7B42F6',       // Neon purple
-          'accent': '#00E0FF',     // Bright cyan
-          'glow': '#9D41FB',       // Glow purple
+          'neon': '#8B5CF6',       // Vibrant purple
+          'accent': '#06CDFF',     // Bright blue
+          'glow': '#AB4AFA',       // Glow purple
           'highlight': '#FF3DDB',  // Highlight pink
-          'dark': '#0A0426',       // Deep background
-          'glass': 'rgba(44, 31, 97, 0.35)', // Glass effect
+          'dark': '#0F0A23',       // Deep background
+          'glass': 'rgba(51, 38, 103, 0.35)', // Glass effect
+          'matrix': '#00FF47',     // Matrix green
+          'cyber': '#FC0FC0',      // Cyberpunk pink
         }
       },
       borderRadius: {
@@ -127,8 +128,11 @@ export default {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-tech': 'linear-gradient(90deg, #7B42F6 0%, #B01EFF 100%)',
-        'gradient-highlight': 'linear-gradient(90deg, #00E0FF 0%, #7B42F6 100%)',
+        'gradient-tech': 'linear-gradient(90deg, #8B5CF6 0%, #C026D3 100%)',
+        'gradient-highlight': 'linear-gradient(90deg, #06CDFF 0%, #8B5CF6 100%)',
+        'gradient-cyber': 'linear-gradient(90deg, #FC0FC0 0%, #06CDFF 100%)',
+        'gradient-matrix': 'linear-gradient(90deg, #00FF47 0%, #06CDFF 100%)',
+        'neural-pattern': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
       },
     },
   },

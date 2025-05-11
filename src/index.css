@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -50,8 +50,8 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     background-image: 
-      radial-gradient(circle at 25% 10%, rgba(123, 66, 246, 0.15) 0%, transparent 20%),
-      radial-gradient(circle at 75% 75%, rgba(0, 224, 255, 0.1) 0%, transparent 20%);
+      radial-gradient(circle at 25% 10%, rgba(139, 92, 246, 0.15) 0%, transparent 25%),
+      radial-gradient(circle at 75% 75%, rgba(6, 205, 255, 0.1) 0%, transparent 25%);
     background-attachment: fixed;
   }
 
@@ -78,11 +78,15 @@
 
 @layer components {
   .glass {
-    @apply bg-tech-glass backdrop-blur-md border border-white/10 rounded-2xl;
+    @apply bg-tech-glass backdrop-blur-md border border-white/10 rounded-2xl shadow-lg shadow-tech-neon/5;
   }
   
   .glass-card {
     @apply glass p-6 transition-all hover:border-tech-accent/40 hover:shadow-md hover:shadow-tech-neon/20;
+  }
+  
+  .neural-card {
+    @apply bg-tech-glass backdrop-blur-md border border-white/10 rounded-2xl shadow-lg shadow-tech-neon/5 bg-neural-pattern;
   }
   
   .neon-border {
@@ -90,7 +94,7 @@
   }
   
   .section-heading {
-    @apply text-3xl font-bold mb-8 relative inline-block;
+    @apply text-3xl font-bold mb-8 relative inline-block font-['Space_Grotesk'] tracking-tight;
   }
   
   .section-heading::after {
@@ -98,14 +102,64 @@
   }
   
   .glow-text {
-    text-shadow: 0 0 8px rgba(123, 66, 246, 0.5);
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
   }
   
   .tech-btn {
     @apply px-6 py-2 rounded-full bg-gradient-tech text-white font-medium transition-all hover:shadow-lg hover:shadow-tech-neon/30 hover:scale-105 active:scale-95;
   }
   
+  .cyber-btn {
+    @apply px-6 py-2 rounded-full bg-gradient-cyber text-white font-medium transition-all hover:shadow-lg hover:shadow-tech-cyber/30 hover:scale-105 active:scale-95;
+  }
+  
+  .matrix-btn {
+    @apply px-6 py-2 rounded-full bg-gradient-matrix text-white font-medium transition-all hover:shadow-lg hover:shadow-tech-matrix/30 hover:scale-105 active:scale-95;
+  }
+  
   .skill-badge {
-    @apply px-3 py-1 rounded-full bg-tech-glass text-sm font-medium border border-tech-neon/30;
+    @apply px-3 py-1 rounded-full bg-tech-glass text-sm font-medium border border-tech-neon/30 transition-all duration-300 hover:border-tech-accent/80;
+  }
+  
+  .animated-border {
+    @apply relative;
+  }
+  
+  .animated-border::before {
+    content: "";
+    @apply absolute inset-0 rounded-2xl;
+    background: linear-gradient(90deg, #8B5CF6, #06CDFF, #8B5CF6);
+    background-size: 200% 200%;
+    animation: border-flow 3s ease infinite;
+    z-index: -1;
+    margin: -2px;
+  }
+  
+  @keyframes border-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .animated-gradient-text {
+    background: linear-gradient(90deg, #8B5CF6, #06CDFF, #FC0FC0, #8B5CF6);
+    background-size: 300% 300%;
+    animation: gradient-shift 8s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+  }
+  
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .matrix-dots {
+    background-image: radial-gradient(#06CDFF 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-color: transparent;
   }
 }

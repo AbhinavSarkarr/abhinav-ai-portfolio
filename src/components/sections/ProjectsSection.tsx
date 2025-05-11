@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, useInView, useAnimation } from 'framer-motion';
-import { Github, Globe, ArrowUpRight } from 'lucide-react';
+import { Github, Globe, ArrowUpRight, Code, Layers } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAdminData } from '@/contexts/AdminDataContext';
 
@@ -43,6 +43,11 @@ export function ProjectsSection() {
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/2 left-0 w-96 h-96 bg-tech-accent/5 rounded-full blur-[120px]" />
+        
+        {/* Circuit pattern */}
+        <div className="hidden md:block absolute left-10 top-10 text-tech-matrix/10 w-[100px] h-[100px]">
+          <Layers size={100} strokeWidth={0.5} />
+        </div>
       </div>
       
       <div className="container relative z-10">
@@ -52,7 +57,7 @@ export function ProjectsSection() {
           transition={{ duration: 0.4 }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
-          <h2 className="section-heading">Projects</h2>
+          <h2 className="section-heading animated-gradient-text">Projects</h2>
           <p className="text-lg text-muted-foreground mt-6">
             Exploring the intersection of AI, language models, and practical applications
           </p>
@@ -78,7 +83,7 @@ export function ProjectsSection() {
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
-                <Card className="h-full glass border-tech-neon/20 overflow-hidden group">
+                <Card className={`h-full ${index % 2 === 0 ? 'neural-card' : 'glass'} border-tech-neon/20 overflow-hidden group`}>
                   <div className="relative h-48 overflow-hidden bg-tech-glass/20">
                     <img 
                       src={project.image} 
@@ -96,6 +101,9 @@ export function ProjectsSection() {
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
+                    
+                    {/* AI overlay effect */}
+                    <div className="absolute inset-0 bg-tech-glass/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                   
                   <CardHeader>
@@ -123,7 +131,7 @@ export function ProjectsSection() {
                       {project.technologies && project.technologies.map((tech, i) => (
                         <span 
                           key={i} 
-                          className="skill-badge"
+                          className={`skill-badge ${i % 3 === 0 ? 'border-tech-neon/30' : i % 3 === 1 ? 'border-tech-accent/30' : 'border-tech-cyber/30'}`}
                         >
                           {tech}
                         </span>
@@ -140,7 +148,7 @@ export function ProjectsSection() {
                           rel="noopener noreferrer"
                           className="p-2 rounded-full hover:bg-tech-glass transition-colors"
                         >
-                          <Github size={18} />
+                          <Github size={18} className="text-tech-matrix hover:text-tech-accent transition-colors" />
                           <span className="sr-only">GitHub</span>
                         </a>
                       )}
@@ -152,10 +160,15 @@ export function ProjectsSection() {
                           rel="noopener noreferrer"
                           className="p-2 rounded-full hover:bg-tech-glass transition-colors"
                         >
-                          <Globe size={18} />
+                          <Globe size={18} className="text-tech-matrix hover:text-tech-accent transition-colors" />
                           <span className="sr-only">Live Demo</span>
                         </a>
                       )}
+                    </div>
+                    
+                    <div className="flex items-center gap-1 text-tech-accent">
+                      <Code size={16} />
+                      <span className="text-xs">AI Project</span>
                     </div>
                   </CardFooter>
                 </Card>
