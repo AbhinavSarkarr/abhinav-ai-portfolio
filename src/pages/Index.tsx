@@ -10,7 +10,6 @@ import { ContactSection } from "@/components/sections/ContactSection";
 import { Footer } from "@/components/Footer";
 import { useEffect, useState } from "react";
 import { useAdminData } from "@/contexts/AdminDataContext";
-import { motion } from "framer-motion";
 
 const Index = () => {
   const { data, isLoading } = useAdminData();
@@ -37,30 +36,12 @@ const Index = () => {
   }, [isLoading, data]);
 
   if (!dataReady) {
-    // Show loading state with AI-themed loader
+    // Show loading state
     return (
       <div className="flex justify-center items-center h-screen bg-background">
         <div className="text-center">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-tech-neon border-t-transparent animate-spin mx-auto mb-4"></div>
-            <motion.div 
-              className="absolute inset-0 text-tech-neon"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              {/* Remove Brain component usage */}
-              <div className="w-8 h-8 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-            </motion.div>
-          </div>
-          <motion.p 
-            className="text-muted-foreground mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            Loading AI portfolio data...
-          </motion.p>
+          <div className="w-12 h-12 rounded-full border-4 border-tech-neon border-t-transparent animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading portfolio data...</p>
         </div>
       </div>
     );

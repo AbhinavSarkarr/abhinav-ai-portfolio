@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Rocket, Brain, Microchip, CircuitBoard, Database, Code, Layers, Network, Bot } from "lucide-react";
+import { ArrowRight, Rocket } from "lucide-react";
 import { useAdminData } from "@/contexts/AdminDataContext";
 
 export function AdminDashboard() {
@@ -10,26 +10,23 @@ export function AdminDashboard() {
   const { saveToServer } = useAdminData();
 
   const sections = [
-    { name: "Hero Section", path: "/admin/hero", icon: <Brain className="text-tech-accent" size={24} /> },
-    { name: "Experience", path: "/admin/experience", icon: <CircuitBoard className="text-tech-accent" size={24} /> },
-    { name: "Projects", path: "/admin/projects", icon: <Code className="text-tech-matrix" size={24} /> },
-    { name: "Skills", path: "/admin/skills", icon: <Microchip className="text-tech-accent" size={24} /> },
-    { name: "Publications", path: "/admin/publications", icon: <Database className="text-tech-matrix" size={24} /> },
-    { name: "Certifications", path: "/admin/certifications", icon: <Layers className="text-tech-accent" size={24} /> },
-    { name: "Social Links", path: "/admin/social", icon: <Network className="text-tech-matrix" size={24} /> },
+    { name: "Hero Section", path: "/admin/hero", icon: "✨" },
+    { name: "Experience", path: "/admin/experience", icon: "💼" },
+    { name: "Projects", path: "/admin/projects", icon: "🚀" },
+    { name: "Skills", path: "/admin/skills", icon: "🧠" },
+    { name: "Publications", path: "/admin/publications", icon: "📝" },
+    { name: "Certifications", path: "/admin/certifications", icon: "🏆" },
+    { name: "Social Links", path: "/admin/social", icon: "🌐" },
   ];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <Bot className="text-tech-neon h-8 w-8" />
-          <h1 className="text-3xl font-bold animated-gradient-text">Admin Dashboard</h1>
-        </div>
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <Button 
           onClick={saveToServer} 
           variant="default" 
-          className="cyber-btn"
+          className="bg-green-600 hover:bg-green-700"
         >
           <Rocket className="mr-2 h-4 w-4" /> Deploy Changes
         </Button>
@@ -47,13 +44,13 @@ export function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
             whileHover={{ scale: 1.03 }}
-            className={`${index % 2 === 0 ? 'glass' : 'neural-card'} rounded-lg p-6 cursor-pointer transition-all duration-300`}
+            className="glass rounded-lg p-6 cursor-pointer"
             onClick={() => navigate(section.path)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                {section.icon}
-                <h2 className="text-xl font-semibold ml-3">{section.name}</h2>
+                <span className="text-2xl mr-3">{section.icon}</span>
+                <h2 className="text-xl font-semibold">{section.name}</h2>
               </div>
               <ArrowRight size={18} className="text-tech-neon" />
             </div>
@@ -61,7 +58,7 @@ export function AdminDashboard() {
         ))}
       </div>
 
-      <div className="mt-12 p-6 border border-orange-500/30 bg-orange-500/10 rounded-lg glass">
+      <div className="mt-12 p-6 border border-orange-500/30 bg-orange-500/10 rounded-lg">
         <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
           <span className="text-orange-500">⚠️</span> Important Note
         </h2>

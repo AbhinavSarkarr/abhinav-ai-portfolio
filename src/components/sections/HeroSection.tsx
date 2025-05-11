@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { ArrowDown, ExternalLink, Brain, CircuitBoard } from 'lucide-react';
+import { ArrowDown, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useAdminData } from '@/contexts/AdminDataContext';
 
@@ -14,14 +14,6 @@ export function HeroSection() {
       <div className="absolute inset-0 z-0">
         <div className="absolute top-40 left-0 w-72 h-72 bg-tech-neon/20 rounded-full blur-[100px]" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-tech-accent/10 rounded-full blur-[120px]" />
-        
-        {/* Matrix-inspired animated dots */}
-        <div className="absolute inset-0 matrix-dots opacity-10" />
-        
-        {/* Circuit pattern */}
-        <div className="hidden md:block absolute right-10 bottom-10 text-tech-accent/20 w-[200px] h-[200px]">
-          <CircuitBoard size={200} strokeWidth={0.5} />
-        </div>
       </div>
       
       <div className="container relative z-10">
@@ -33,19 +25,19 @@ export function HeroSection() {
               transition={{ duration: 0.5 }}
             >
               <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-tech-glass border border-tech-accent/20 inline-flex items-center gap-1.5">
-                <Brain size={16} className="text-tech-accent" />
-                <span>AI/LLM Engineer</span>
+                <span className="w-2 h-2 rounded-full bg-tech-accent animate-pulse-soft" />
+                AI/LLM Engineer
               </span>
             </motion.div>
             
             <motion.h1 
-              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight font-['Space_Grotesk'] tracking-tight"
+              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               Building<br />
-              <span className="animated-gradient-text">
+              <span className="bg-gradient-tech bg-clip-text text-transparent">
                 intelligent systems
               </span><br />
               for the future
@@ -66,12 +58,8 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <Button className="cyber-btn" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
-                Get in touch
-              </Button>
-              <Button variant="outline" className="border-tech-accent/30 hover:border-tech-accent/70 hover:bg-tech-glass" onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}>
-                View Projects
-              </Button>
+              <Button className="tech-btn" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Get in touch</Button>
+              <Button variant="outline" className="border-tech-accent/30 hover:border-tech-accent/70 hover:bg-tech-glass" onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}>View Projects</Button>
             </motion.div>
           </div>
           
@@ -82,7 +70,6 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <div className="relative">
-              <div className="absolute inset-0 rounded-full animated-border opacity-70"></div>
               <div className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-tech-accent/30 shadow-lg shadow-tech-neon/30 animate-float">
                 <img 
                   src={hero.image} 
