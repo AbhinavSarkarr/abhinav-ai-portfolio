@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, useInView, useAnimation } from 'framer-motion';
-import { Github, Globe, ArrowUpRight } from 'lucide-react';
+import { Github, Globe, ArrowUpRight, Whatsapp } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAdminData } from '@/contexts/AdminDataContext';
 
@@ -155,6 +155,23 @@ export function ProjectsSection() {
                           <Globe size={18} />
                           <span className="sr-only">Live Demo</span>
                         </a>
+                      )}
+                      
+                      {project.whatsappLink && (
+                        <div className="flex items-center">
+                          <a 
+                            href={`https://wa.me/${project.whatsappLink.replace(/[^0-9]/g, '')}`}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-full hover:bg-tech-glass transition-colors"
+                          >
+                            <Whatsapp size={18} />
+                            <span className="sr-only">WhatsApp</span>
+                          </a>
+                          <span className="text-xs text-muted-foreground ml-1">
+                            Message "join action-practice"
+                          </span>
+                        </div>
                       )}
                     </div>
                   </CardFooter>

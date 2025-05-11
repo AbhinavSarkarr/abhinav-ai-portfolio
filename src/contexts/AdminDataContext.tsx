@@ -28,6 +28,7 @@ type ProjectItem = {
   github?: string;
   liveUrl?: string;
   id: string;
+  whatsappLink?: string;
 };
 
 type SkillCategory = {
@@ -114,9 +115,9 @@ const initialData: AdminData = {
       period: "February 2024 – Present",
       current: true,
       description: [
-        "Fine-tuned Mistral-7B-Instruct-v0.3 on Indian legal corpus by scraping and processing judiciary judgments, CPC and IPC, implementing DAPT on 18GB of text followed by SFT on 760K+ curated input-response pairs",
-        "Architected and deployed a SaaS platform for building custom RAG-based chatbots using diverse knowledge sources, incorporating hybrid search with re-ranking techniques for enhanced retrieval accuracy",
-        "Implemented a Graph-based Entity extraction system using decoder architecture that identifies document-entity and entity-entity relationships during training and leverages those patterns for automatic extraction"
+        "Fine-tuned Mistral-7B-Instruct-v0.3 on Indian legal corpus by scraping and processing judiciary judgments, CPC and IPC, implementing DAPT on 18GB of text followed by SFT on 760K+ curated input-response pairs leveraging DDP across 4 H200 GPUs, reducing training time from 40 to 8 days through optimized hyperparameters and parallelization",
+        "Architected and deployed a SaaS platform for building custom RAG-based chatbots using diverse knowledge sources, incorporating hybrid search with re-ranking techniques for enhanced retrieval accuracy, leveraging llama-3.3-70b-Instruct, and seamlessly integrated a meeting scheduler agent via Dialogflow",
+        "Implemented a Graph-based Entity extraction system using decoder architecture that identifies document-entity and entity-entity relationships during training and leverages those patterns for automatic extraction from new documents, achieving 91% precision with partial matching threshold of 60%"
       ]
     },
     {
@@ -126,8 +127,8 @@ const initialData: AdminData = {
       period: "June – September 2023",
       current: false,
       description: [
-        "Designed and executed a zero-shot classification system using bart-large-mnli 1.0 to categorize individuals based on their preferences, work experience, and career aspirations",
-        "Developed predictive modules for financial forecasting, utilizing XGBoost Regressor to predict corporate maintenance expenditures and contractor profits based on projected workload"
+        "Designed and executed a zero-shot classification system using bart-large-mnli 1.0 to categorize individuals based on their preferences, work experience, and career aspirations with predefined categories",
+        "Developed predictive modules for financial forecasting, utilizing XGBoost Regressor to predict corporate maintenance expenditures and contractor profits based on projected workload for branch operations"
       ],
       certificateLink: "https://drive.google.com/file/d/1Izrznc1wU2PE8EEQo2YMWLBPYWW12QV7/view?usp=sharing"
     }
@@ -149,6 +150,15 @@ const initialData: AdminData = {
       technologies: ["Hugging Face", "PyTorch", "T5", "Transformers", "Fine-tuning"],
       image: "https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3",
       liveUrl: "https://huggingface.co/spaces/abhinavsarkar/TextTweakAI"
+    },
+    {
+      id: "proj4",
+      title: "WhatsApp Virtual Try-On Bot",
+      description: "A WhatsApp-based bot that allows users to send images and try on virtual outfits using a pre-trained model.",
+      technologies: ["FastAPI", "Twilio", "Gradio", "Cloudinary", "Docker", "Python"],
+      image: "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?ixlib=rb-4.0.3",
+      whatsappLink: "+14155238886",
+      liveUrl: "https://github.com/your-username/whatsapp-virtual-try-on"
     },
     {
       id: "proj3",
