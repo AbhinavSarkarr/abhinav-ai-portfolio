@@ -1,3 +1,4 @@
+
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { AboutSection } from "@/components/sections/AboutSection";
@@ -10,7 +11,6 @@ import { Footer } from "@/components/Footer";
 import { useEffect, useState } from "react";
 import { useAdminData } from "@/contexts/AdminDataContext";
 import { motion } from "framer-motion";
-import { Brain } from "lucide-react";
 
 const Index = () => {
   const { data, isLoading } = useAdminData();
