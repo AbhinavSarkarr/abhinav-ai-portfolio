@@ -8,13 +8,18 @@ export type HeroData = {
   resumeLink: string;
 };
 
+export type DescriptionItem = {
+  main: string;
+  subPoints?: string[];
+};
+
 export type ExperienceItem = {
   id: string;
   title: string;
   company: string;
   period: string;
   current: boolean;
-  description: string[] | string;
+  description: DescriptionItem[];
   certificateLink?: string;
 };
 
@@ -73,25 +78,67 @@ export const portfolioData = {
   experiences: [
     {
       id: "exp1",
-      title: "Artificial Intelligence Engineer",
+      title: "Artificial Intelligence Engineer - 1",
       company: "Jellyfish Technologies Pvt. Ltd.",
-      period: "February 2024 – Present",
+      period: "January 2025 – Present",
       current: true,
       description: [
-        "Fine-tuned Mistral-7B-Instruct-v0.3 on Indian legal corpus by scraping and processing judiciary judgments, CPC and IPC, implementing DAPT on 18GB of text followed by SFT on 760K+ curated input-response pairs leveraging DDP across 4 H200 GPUs, reducing training time from 40 to 8 days through optimized hyperparameters and parallelization",
-        "Architected and deployed a SaaS platform for building custom RAG-based chatbots using diverse knowledge sources, incorporating hybrid search with re-ranking techniques for enhanced retrieval accuracy, leveraging llama-3.3-70b-Instruct, and seamlessly integrated a meeting scheduler agent via Dialogflow",
-        "Implemented a Graph-based Entity extraction system using decoder architecture that identifies document-entity and entity-entity relationships during training and leverages those patterns for automatic extraction from new documents, achieving 91% precision with partial matching threshold of 60%"
+        {
+          main: "Led delivery of GenAI systems for job matching, data quality, and platform safety, collaborating with cross-functional teams on candidate-facing and analytics workflows.",
+          subPoints: [
+            "Engineered content moderation and entity extraction system achieving 96% accuracy @ 75% match, ensuring reliable screening (110s P95) and structured population of candidate/job profiles.",
+            "Designed hybrid lexical + semantic recommendation engine for skill-based job matching, achieving sub-500ms retrieval latency and increasing apply-through on job postings."
+          ]
+        },
+        {
+          main: "Spearheaded lead quality by designing dual-agent AI workflow, enabling context-aware hand-off from data capture to guided sales across 12+ tools using shared memory and persistent sessions."
+        },
+        {
+          main: "Pioneered audio-based multimodal RAG search system for sales workflows, translating customer queries into precise service/product retrieval across 9,000+ indexed offerings."
+        }
       ]
     },
     {
       id: "exp2",
-      title: "Deep Learning Intern",
-      company: "Bhramaand Pvt. Ltd.",
+      title: "Associate Artificial Intelligence Engineer",
+      company: "Jellyfish Technologies Pvt. Ltd.",
+      period: "February 2024 – December 2024",
+      current: false,
+      description: [
+        {
+          main: "Spearheaded AI-driven support automation, partnering with 3-member engineering team to improve ticket triage accuracy and response reliability.",
+          subPoints: [
+            "Architected email query extraction and escalation pipeline achieving 94% escalation precision and 92% extraction accuracy, reducing manual triage by 40%.",
+            "Developed and documented RAG support response system, achieving 87% context precision with P99 latency of 13.64s, improving automated reply reliability."
+          ]
+        },
+        {
+          main: "Fine-tuned Mistral-7B on 18GB Indian legal corpus using DAPT + SFT with 760K+ instruction pairs, reducing perplexity from 18.2 to 10.5 and achieving 83% accuracy on 5K legal QA set.",
+          subPoints: [
+            "Trained with DDP across 4×H100 GPUs, achieving 3× throughput and 87% scaling efficiency, reducing training time from 6 to 2 days."
+          ]
+        },
+        {
+          main: "Built radar-based vital-sign prediction models achieving ±5 BPM heart-rate accuracy across 222K samples and breathing-rate detection across 119K samples, optimized for edge inference via PyTorch JIT."
+        },
+        {
+          main: "Resolved heart-rate inference issues under motion via FFT-based periodicity analysis across 30 radar bins, IIR band-pass filtering, and Viterbi-style temporal smoothing."
+        }
+      ]
+    },
+    {
+      id: "exp3",
+      title: "Deep Learning Engineer",
+      company: "AI Zoned",
       period: "June – September 2023",
       current: false,
       description: [
-        "Designed and executed a zero-shot classification system using bart-large-mnli 1.0 to categorize individuals based on their preferences, work experience, and career aspirations with predefined categories",
-        "Developed predictive modules for financial forecasting, utilizing XGBoost Regressor to predict corporate maintenance expenditures and contractor profits based on projected workload for branch operations"
+        {
+          main: "Designed and executed a zero-shot classification system using bart-large-mnli 1.0 to categorize individuals based on their preferences, work experience, and career aspirations with predefined categories."
+        },
+        {
+          main: "Developed predictive modules for financial forecasting, utilizing XGBoost Regressor to predict corporate maintenance expenditures and contractor profits based on projected workload for branch operations."
+        }
       ],
       certificateLink: "https://drive.google.com/file/d/1Izrznc1wU2PE8EEQo2YMWLBPYWW12QV7/view?usp=sharing"
     }
@@ -157,20 +204,34 @@ export const portfolioData = {
   certifications: [
     {
       id: "cert1",
+      title: "AWS Certified Cloud Practitioner",
+      issuer: "Amazon Web Services",
+      date: "2024",
+      link: "https://www.credly.com/badges/aws-cloud-practitioner"
+    },
+    {
+      id: "cert2",
+      title: "Databricks Certified Machine Learning Professional",
+      issuer: "Databricks",
+      date: "2024",
+      link: "https://credentials.databricks.com/machine-learning-professional"
+    },
+    {
+      id: "cert3",
       title: "Finetuning Large Language Models",
       issuer: "DeepLearning.AI",
       date: "April 2024",
       link: "#"
     },
     {
-      id: "cert2",
+      id: "cert4",
       title: "Prompt Engineering with Llama 2&3",
       issuer: "DeepLearning.AI",
       date: "March 2024",
       link: "#"
     },
     {
-      id: "cert3",
+      id: "cert5",
       title: "Artificial Intelligence with Machine Learning",
       issuer: "Oracle",
       date: "November 2023",

@@ -1,32 +1,18 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Briefcase, Calendar, Link } from 'lucide-react';
-import { portfolioData } from '@/data/portfolioData';
+import { Briefcase, Calendar, Link, Circle } from 'lucide-react';
+import { portfolioData, DescriptionItem } from '@/data/portfolioData';
 
 export function ExperienceSection() {
   const { experiences } = portfolioData;
-  
+
   // For performance optimization
   const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { 
+  const isInView = useInView(sectionRef, {
     once: true,
-    margin: "0px 0px -10% 0px" 
+    margin: "0px 0px -10% 0px"
   });
-  
-  // Helper to ensure description is an array
-  const getDescriptionItems = (description: string[] | string): string[] => {
-    if (Array.isArray(description)) {
-      return description;
-    } else if (typeof description === 'string' && description.length > 0) {
-      // Split by periods, newlines, or bullet points and filter out empty strings
-      return description
-        .split(/[•\n]|(?<=\.)\s+/)
-        .map(item => item.trim())
-        .filter(item => item.length > 0);
-    }
-    return ["No description available"];
-  };
 
   return (
     <section id="experience" className="relative py-24" ref={sectionRef}>
@@ -67,7 +53,7 @@ export function ExperienceSection() {
                     <div className="flex items-center gap-2">
                       <h3 className="text-xl font-bold">{exp.title}</h3>
                       {exp.certificateLink && (
-                        <a 
+                        <a
                           href={exp.certificateLink}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -89,11 +75,25 @@ export function ExperienceSection() {
                   </span>
                 </div>
 
-                <ul className="space-y-2">
-                  {getDescriptionItems(exp.description).map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
-                      <span className="text-muted-foreground">{item}</span>
+                <ul className="space-y-3">
+                  {exp.description.map((item: DescriptionItem, idx: number) => (
+                    <li key={idx}>
+                      {/* Main bullet point */}
+                      <div className="flex items-start gap-2">
+                        <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
+                        <span className="text-muted-foreground">{item.main}</span>
+                      </div>
+                      {/* Sub-bullet points */}
+                      {item.subPoints && item.subPoints.length > 0 && (
+                        <ul className="ml-6 mt-2 space-y-2">
+                          {item.subPoints.map((subItem, subIdx) => (
+                            <li key={subIdx} className="flex items-start gap-2">
+                              <Circle size={8} className="mt-2 flex-shrink-0 text-tech-accent/60" />
+                              <span className="text-muted-foreground text-sm">{subItem}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   ))}
                 </ul>
