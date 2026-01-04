@@ -1,11 +1,10 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useAdminData } from '@/contexts/AdminDataContext';
+import { portfolioData } from '@/data/portfolioData';
 
 export function SkillsSection() {
-  const { data } = useAdminData();
-  const { skills } = data;
+  const { skills } = portfolioData;
   
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { 
