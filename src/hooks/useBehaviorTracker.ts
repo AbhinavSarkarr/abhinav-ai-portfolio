@@ -69,7 +69,7 @@ export const useBehaviorTracker = () => {
   }, []);
 
   // Track case study page view
-  // First visit: 6 seconds, Subsequent (from recommendation): 16 seconds
+  // First visit: 8 seconds, Subsequent (from recommendation): 16 seconds
   const trackCaseStudyView = useCallback((projectId: string, fromRecommendation: boolean = false) => {
     setCurrentViewingProject(projectId);
 
@@ -91,8 +91,8 @@ export const useBehaviorTracker = () => {
       clearTimeout(caseStudyTimer.current);
     }
 
-    // Determine wait time: 6s for first visit, 16s if from recommendation
-    const waitTime = isFromRecommendation || fromRecommendation ? 16000 : 6000;
+    // Determine wait time: 8s for first visit, 16s if from recommendation
+    const waitTime = isFromRecommendation || fromRecommendation ? 16000 : 8000;
 
     // Set timer
     caseStudyTimer.current = setTimeout(() => {
