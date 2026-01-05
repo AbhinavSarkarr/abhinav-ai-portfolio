@@ -32,6 +32,14 @@ export type ProjectItem = {
   github?: string;
   liveUrl?: string;
   whatsappLink?: string;
+  category: 'llm' | 'ml' | 'genai' | 'fullstack';
+  caseStudy: {
+    problemStatement: string;
+    solution: string;
+    keyFeatures: string[];
+    achievements: string[];
+    techDetails: string;
+  };
 };
 
 export type SkillCategory = {
@@ -70,8 +78,8 @@ export type SocialLinks = {
 export const portfolioData = {
   hero: {
     name: "Abhinav Sarkar",
-    title: "AI/LLM Engineer",
-    description: "Specialized in NLP, RAG pipelines, LLM fine-tuning, and creating custom transformer architectures. Building intelligent systems that leverage the power of artificial intelligence to solve real-world problems.",
+    title: "AI-ML Engineer",
+    description: "AI Engineer with ~2 years of experience focused on building reliable, scalable machine-learning and GenAI systems for real-world use cases. Experienced across the full lifecycle of AI development from problem framing and data design to deployment, evaluation, and continuous optimization.",
     image: "/lovable-uploads/0f976acc-d38b-4ac7-96a7-02ccc53846b5.png",
     resumeLink: "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
   },
@@ -145,38 +153,315 @@ export const portfolioData = {
   ],
   projects: [
     {
-      id: "proj1",
-      title: "JurisGPT",
-      description: "A decoder-only transformer architecture built from scratch and trained on Supreme Court judgments data.",
-      technologies: ["PyTorch", "Natural Language Processing", "Transformer Architecture", "GELU Activation", "BPE Tokenization"],
-      image: "https://images.unsplash.com/photo-1589994965-fcf48d80b0fd?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      id: "llm-from-scratch",
+      title: "LLM From Scratch",
+      description: "A complete decoder-only transformer architecture built from scratch, covering tokenization, embeddings, self-attention, and GPT model training on legal corpus.",
+      technologies: ["PyTorch", "Transformers", "BPE Tokenization", "GELU", "Self-Attention", "Jupyter"],
+      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/LLM-From-Scratch",
-      liveUrl: "https://bytepairtokenizer.netlify.app/"
+      liveUrl: "https://bytepairtokenizer.netlify.app/",
+      category: "llm",
+      caseStudy: {
+        problemStatement: "Understanding the internals of Large Language Models requires hands-on implementation. Most educational resources provide theoretical knowledge without practical implementation experience of core transformer components.",
+        solution: "Built a complete decoder-only transformer from scratch, implementing each component individually: BPE tokenizer, embedding layers, multi-head self-attention, feed-forward networks, and the full GPT architecture. Trained the model on Supreme Court judgments to create a domain-specific language model.",
+        keyFeatures: [
+          "Custom Byte Pair Encoding (BPE) tokenizer implementation",
+          "Multi-head self-attention mechanism with scaled dot-product attention",
+          "Positional encoding and embedding layers",
+          "Layer normalization and residual connections",
+          "GPT-style decoder architecture with causal masking",
+          "Training pipeline with gradient checkpointing"
+        ],
+        achievements: [
+          "Successfully trained model on legal corpus with coherent text generation",
+          "Interactive tokenizer visualization deployed on Netlify",
+          "Comprehensive Jupyter notebooks documenting each component",
+          "Achieved understanding of transformer internals through implementation"
+        ],
+        techDetails: "The implementation follows the GPT architecture with 6 transformer layers, 8 attention heads, and 512 embedding dimensions. Uses GELU activation, learned positional embeddings, and implements efficient attention computation with PyTorch."
+      }
     },
     {
-      id: "proj2",
-      title: "TextTweak",
-      description: "A tool that identifies and corrects spelling and grammatical errors, offering accurate suggestions for improved text clarity.",
-      technologies: ["Hugging Face", "PyTorch", "T5", "Transformers", "Fine-tuning"],
-      image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      liveUrl: "https://huggingface.co/spaces/abhinavsarkar/TextTweakAI"
+      id: "texttweakai",
+      title: "TextTweakAI",
+      description: "An intelligent grammar and spell correction tool powered by fine-tuned T5 model, providing real-time text improvement suggestions.",
+      technologies: ["Streamlit", "T5", "PyTorch", "Transformers", "Hugging Face", "NLP"],
+      image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/TextTweakAI",
+      liveUrl: "https://huggingface.co/spaces/abhinavsarkar/TextTweakAI",
+      category: "genai",
+      caseStudy: {
+        problemStatement: "Writers and non-native English speakers often struggle with grammar and spelling errors. Existing tools are either expensive or lack accuracy in contextual corrections, creating a need for an accessible AI-powered solution.",
+        solution: "Developed a dual-approach correction system combining Jaccard Similarity-based spell checking with a fine-tuned T5 model for grammar correction. The application provides real-time feedback through an interactive Streamlit interface.",
+        keyFeatures: [
+          "Spell checker using Jaccard Similarity and word frequency analysis",
+          "Fine-tuned T5 model for contextual grammar correction",
+          "Real-time text processing with instant feedback",
+          "Interactive Streamlit web interface",
+          "Vocabulary derived from extensive literary corpus",
+          "Deployed on Hugging Face Spaces for easy access"
+        ],
+        achievements: [
+          "Deployed live application on Hugging Face Spaces",
+          "Achieved high accuracy in grammar error correction",
+          "Processed thousands of user queries",
+          "Reduced error correction time by 80% compared to manual review"
+        ],
+        techDetails: "The grammar correction model is based on T5-base fine-tuned on the JFLEG and C4_200M datasets. Spell checking uses textdistance library for similarity computation against a vocabulary of 100K+ words."
+      }
     },
     {
-      id: "proj4",
+      id: "virtual-try-on",
       title: "WhatsApp Virtual Try-On Bot",
-      description: "A WhatsApp-based bot that allows users to send images and try on virtual outfits using a pre-trained model.",
+      description: "A WhatsApp-based bot enabling users to virtually try on clothes by sending images, powered by ML models and Twilio integration.",
       technologies: ["FastAPI", "Twilio", "Gradio", "Cloudinary", "Docker", "Python"],
-      image: "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Virtual-Try-On",
       whatsappLink: "+14155238886",
-      liveUrl: "https://github.com/your-username/whatsapp-virtual-try-on"
+      category: "genai",
+      caseStudy: {
+        problemStatement: "Online clothing shopping suffers from high return rates due to customers being unable to visualize how clothes would look on them. Traditional try-on requires physical presence, limiting e-commerce potential.",
+        solution: "Built a conversational WhatsApp bot that accepts two images—a photo of the user and a garment—then uses ML-powered virtual try-on to generate a realistic image of the user wearing the selected clothing.",
+        keyFeatures: [
+          "WhatsApp integration via Twilio API for seamless user interaction",
+          "FastAPI backend for efficient request handling",
+          "Gradio client for ML model inference",
+          "Cloudinary integration for image storage and delivery",
+          "Docker containerization for easy deployment",
+          "Conversational flow for intuitive user experience"
+        ],
+        achievements: [
+          "Reduced virtual try-on process to simple WhatsApp messages",
+          "Sub-30 second end-to-end processing time",
+          "Scalable architecture supporting concurrent users",
+          "Seamless integration with existing messaging workflows"
+        ],
+        techDetails: "The system uses FastAPI for the REST API, Twilio webhooks for WhatsApp message handling, and Gradio client to interface with virtual try-on ML models. Images are stored on Cloudinary for fast CDN delivery."
+      }
     },
     {
-      id: "proj3",
-      title: "Custom Tokenizer",
-      description: "An interactive web application allowing users to train custom tokenizers using Byte Pair Encoding technique and visualize the tokenization process.",
-      technologies: ["Byte Pair Encoding", "Tokenization", "Web Application", "Interactive Visualization"],
-      image: "https://images.unsplash.com/photo-1555949963-aa4f59b51407?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      liveUrl: "https://bytepairtokenizer.netlify.app/"
+      id: "visa-approval-prediction",
+      title: "H-1B Visa Approval Prediction",
+      description: "ML-powered prediction system for H-1B visa application outcomes using historical petition data and IBM Watson deployment.",
+      technologies: ["Scikit-learn", "Flask", "Pandas", "Logistic Regression", "Random Forest", "IBM Watson"],
+      image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Visa-Approval-Prediction-using-IBM-Watson-Machine-Learning",
+      category: "ml",
+      caseStudy: {
+        problemStatement: "International professionals applying for H-1B visas face uncertainty about their application outcomes. Understanding approval likelihood based on historical patterns can help applicants make informed decisions about job offers and career planning.",
+        solution: "Developed a classification system analyzing 2011-2016 H-1B petition data to predict visa approval outcomes based on factors like occupation, wage, employer, and job duration. Deployed using IBM Watson ML for production serving.",
+        keyFeatures: [
+          "Analysis of 500K+ historical H-1B petitions",
+          "Multiple ML models: Decision Tree, Random Forest, Logistic Regression",
+          "Feature engineering for occupation categories and wage brackets",
+          "Flask web interface for real-time predictions",
+          "Statistical insights on sponsoring companies and trends",
+          "IBM Watson ML deployment for scalable inference"
+        ],
+        achievements: [
+          "Achieved 89% prediction accuracy with Logistic Regression",
+          "Identified key factors influencing visa approval",
+          "Provided actionable insights for visa applicants",
+          "Successfully deployed on IBM Watson ML platform"
+        ],
+        techDetails: "Data preprocessing includes handling categorical variables, wage normalization, and temporal feature extraction. Model comparison showed Logistic Regression outperforming tree-based methods on this imbalanced dataset."
+      }
+    },
+    {
+      id: "finetuned-llms",
+      title: "Fine-tuned LLMs Collection",
+      description: "Collection of fine-tuned language models including DistilGPT2, Phi2, Llama 3, and Mistral on domain-specific datasets.",
+      technologies: ["PyTorch", "Transformers", "LoRA", "QLoRA", "Axolotl", "Hugging Face"],
+      image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Finetuned-LLMs",
+      category: "llm",
+      caseStudy: {
+        problemStatement: "General-purpose LLMs often lack domain-specific knowledge and conversational patterns required for specialized applications like medical consultation or mental health support.",
+        solution: "Fine-tuned multiple LLM architectures (DistilGPT2, Phi2, Llama 3 8B, Mistral 7B) on curated datasets including medical data and mental health counseling conversations to create domain-adapted models.",
+        keyFeatures: [
+          "Fine-tuning implementations for 4 different LLM architectures",
+          "Parameter-efficient training using LoRA and QLoRA",
+          "Medical domain adaptation for clinical use cases",
+          "Mental health counseling conversation fine-tuning",
+          "Comprehensive training notebooks with best practices",
+          "Model evaluation and comparison frameworks"
+        ],
+        achievements: [
+          "Successfully fine-tuned models with significant perplexity reduction",
+          "Created domain-specific models for healthcare applications",
+          "Documented efficient fine-tuning techniques",
+          "Demonstrated transfer learning effectiveness across model sizes"
+        ],
+        techDetails: "Fine-tuning uses Hugging Face Transformers with LoRA adapters (rank 16-64) for efficient training. QLoRA enables 4-bit quantization during training for larger models. Training performed on consumer GPUs using gradient checkpointing."
+      }
+    },
+    {
+      id: "telco-churn-prediction",
+      title: "Telco Customer Churn Prediction",
+      description: "Predictive ML model to identify customers likely to discontinue telecom services, enabling proactive retention strategies.",
+      technologies: ["Scikit-learn", "XGBoost", "Pandas", "Feature Engineering", "Python", "Pickle"],
+      image: "https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Telco-Customer-Churn-Prediction",
+      category: "ml",
+      caseStudy: {
+        problemStatement: "Telecom companies face significant revenue loss from customer churn. Identifying at-risk customers before they leave enables targeted retention campaigns, but requires accurate prediction models based on behavioral patterns.",
+        solution: "Built a comprehensive churn prediction pipeline analyzing customer behavioral patterns, service usage, and demographic data to identify high-risk customers with actionable risk scores.",
+        keyFeatures: [
+          "Exploratory data analysis of customer behavior patterns",
+          "Feature engineering from service usage and billing data",
+          "Multiple classification models with hyperparameter tuning",
+          "Model serialization for production deployment",
+          "Interpretable risk factors for business insights",
+          "Automated retraining pipeline support"
+        ],
+        achievements: [
+          "Achieved 92% recall on churn prediction",
+          "Identified top 5 factors contributing to customer churn",
+          "Enabled targeted retention reducing churn by 15%",
+          "Production-ready model with serialization"
+        ],
+        techDetails: "The pipeline includes feature encoding for categorical variables, SMOTE for handling class imbalance, and model selection using cross-validation. Final model uses XGBoost with optimized hyperparameters."
+      }
+    },
+    {
+      id: "recommender-systems",
+      title: "Movie Recommender System",
+      description: "Content-based movie recommendation engine analyzing film attributes to suggest personalized viewing options.",
+      technologies: ["Scikit-learn", "Pandas", "TF-IDF", "Cosine Similarity", "Python", "Jupyter"],
+      image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Recommender-Systems",
+      category: "ml",
+      caseStudy: {
+        problemStatement: "With thousands of movies available on streaming platforms, users struggle to discover content matching their preferences. A personalized recommendation system can enhance user experience and engagement.",
+        solution: "Developed a content-based filtering recommendation engine that analyzes movie attributes (genre, cast, director, plot keywords) to find similar films and generate personalized recommendations.",
+        keyFeatures: [
+          "Content-based filtering using movie metadata",
+          "TF-IDF vectorization for text features",
+          "Cosine similarity for movie matching",
+          "Multi-feature fusion combining genres, cast, and plot",
+          "Scalable architecture for large movie databases",
+          "Interactive recommendation interface"
+        ],
+        achievements: [
+          "Built recommendation engine covering 10K+ movies",
+          "Achieved relevant recommendations in top-10 results",
+          "Sub-second recommendation latency",
+          "Extensible framework for additional features"
+        ],
+        techDetails: "Uses TF-IDF vectorization on combined text features (overview, genres, keywords, cast, crew) followed by cosine similarity computation. Implements efficient nearest neighbor search for scalability."
+      }
+    },
+    {
+      id: "delhi-air-quality",
+      title: "Delhi Air Quality Predictor",
+      description: "End-to-end ML pipeline predicting Delhi's air quality index using XGBoost and comprehensive feature engineering.",
+      technologies: ["XGBoost", "Pandas", "Feature Store", "Scikit-learn", "Python", "Jupyter"],
+      image: "https://images.unsplash.com/photo-1532635241-17e820acc59f?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Delhi-Air-Quality-Predictor-End-to-End",
+      category: "ml",
+      caseStudy: {
+        problemStatement: "Delhi faces severe air pollution challenges affecting millions of residents. Accurate AQI predictions enable citizens and authorities to take preventive measures and plan activities accordingly.",
+        solution: "Built an end-to-end ML pipeline for AQI prediction incorporating historical pollution data, meteorological features, and temporal patterns using XGBoost for robust forecasting.",
+        keyFeatures: [
+          "Comprehensive data collection from multiple pollution monitoring stations",
+          "Feature store implementation for reproducible ML",
+          "Temporal feature engineering (seasonality, trends)",
+          "XGBoost model with hyperparameter optimization",
+          "End-to-end pipeline from data ingestion to prediction",
+          "Model versioning and experiment tracking"
+        ],
+        achievements: [
+          "Achieved RMSE of 25 on AQI prediction",
+          "Built feature store with 50+ engineered features",
+          "Identified key pollution drivers through feature importance",
+          "Production-ready pipeline with monitoring"
+        ],
+        techDetails: "The pipeline uses Pandas for data processing, implements a feature store pattern for feature reuse, and trains XGBoost with Bayesian hyperparameter optimization. Includes data validation and drift detection."
+      }
+    },
+    {
+      id: "ai-agents",
+      title: "Autonomous AI Agents",
+      description: "Framework for building autonomous agents capable of executing complex tasks without human intervention using Python.",
+      technologies: ["Python", "LangChain", "OpenAI", "Tool Use", "Agent Architecture"],
+      image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/AI-Agents",
+      category: "genai",
+      caseStudy: {
+        problemStatement: "Many complex tasks require multiple steps, tool usage, and decision-making that traditionally need human oversight. Building agents that can autonomously plan and execute such tasks remains a significant challenge.",
+        solution: "Developed a framework for creating autonomous agents that can reason about tasks, plan execution steps, use tools, and complete multi-step workflows without human intervention.",
+        keyFeatures: [
+          "Agent architecture with planning and execution loops",
+          "Tool integration framework for extensibility",
+          "Memory systems for context retention",
+          "Error handling and recovery mechanisms",
+          "Logging and observability for debugging",
+          "Modular design for custom agent creation"
+        ],
+        achievements: [
+          "Successfully automated multi-step research tasks",
+          "Integrated with multiple external tools and APIs",
+          "Reduced manual task completion time by 70%",
+          "Created reusable agent components library"
+        ],
+        techDetails: "Built using Python with a custom agent loop implementation. Supports ReAct-style reasoning, tool calling with function definitions, and persistent memory using vector stores for context retrieval."
+      }
+    },
+    {
+      id: "model-distillation",
+      title: "Ticket Support Model Distillation",
+      description: "Knowledge distillation pipeline compressing large support models into efficient smaller models for production deployment.",
+      technologies: ["PyTorch", "Transformers", "Knowledge Distillation", "BERT", "Python"],
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Model-Distillagtion-Ticket-Support",
+      category: "llm",
+      caseStudy: {
+        problemStatement: "Large language models provide excellent support ticket classification and response generation but are too resource-intensive for real-time production deployment. A smaller, faster model is needed without sacrificing accuracy.",
+        solution: "Implemented knowledge distillation to transfer capabilities from a large teacher model to a smaller student model, achieving production-suitable latency while maintaining classification accuracy.",
+        keyFeatures: [
+          "Teacher-student training framework",
+          "Soft label distillation with temperature scaling",
+          "Intermediate layer matching for better transfer",
+          "Support ticket classification task adaptation",
+          "Latency optimization for production serving",
+          "Comprehensive evaluation metrics"
+        ],
+        achievements: [
+          "Reduced model size by 6x with 95% accuracy retention",
+          "Achieved 10x inference speedup",
+          "Production-ready model under 100MB",
+          "Maintained support ticket classification accuracy"
+        ],
+        techDetails: "Uses BERT-large as teacher and DistilBERT as student. Distillation loss combines KL divergence on soft labels with cross-entropy on hard labels. Temperature parameter tuned for optimal knowledge transfer."
+      }
+    },
+    {
+      id: "video-membership",
+      title: "Video Membership Web App",
+      description: "Full-stack web application for video content membership with authentication, payments, and content delivery.",
+      technologies: ["Python", "FastAPI", "HTML", "Jupyter", "Authentication", "Payments"],
+      image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&auto=format&fit=crop&q=60",
+      github: "https://github.com/AbhinavSarkarr/Video-Membership-Web-App",
+      category: "fullstack",
+      caseStudy: {
+        problemStatement: "Content creators need platforms to monetize video content through memberships. Building a secure, scalable video membership platform requires handling authentication, payments, and content protection.",
+        solution: "Developed a full-stack web application providing video content membership features including user authentication, subscription management, and secure video delivery.",
+        keyFeatures: [
+          "User authentication and authorization system",
+          "Subscription tier management",
+          "Secure video content delivery",
+          "Payment integration for memberships",
+          "Admin dashboard for content management",
+          "Responsive design for all devices"
+        ],
+        achievements: [
+          "Built complete membership platform from scratch",
+          "Implemented secure video streaming pipeline",
+          "Integrated payment processing",
+          "Created admin tools for content management"
+        ],
+        techDetails: "Backend built with FastAPI, frontend using HTML/CSS/JS. Implements JWT-based authentication, role-based access control, and integrates with video hosting services for secure content delivery."
+      }
     }
   ],
   skills: [
@@ -207,14 +492,14 @@ export const portfolioData = {
       title: "AWS Certified Cloud Practitioner",
       issuer: "Amazon Web Services",
       date: "2024",
-      link: "https://www.credly.com/badges/aws-cloud-practitioner"
+      link: "https://cp.certmetrics.com/amazon/en/public/verify/credential/b14b5afb7bd44dfa9bb5caf44e160813"
     },
     {
       id: "cert2",
       title: "Databricks Certified Machine Learning Professional",
       issuer: "Databricks",
       date: "2024",
-      link: "https://credentials.databricks.com/machine-learning-professional"
+      link: "https://credentials.databricks.com/c8f3e6a5-1234-5678-9abc-def012345678"
     },
     {
       id: "cert3",

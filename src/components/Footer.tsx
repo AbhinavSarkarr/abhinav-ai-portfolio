@@ -18,7 +18,7 @@ export function Footer() {
         >
           <div className="flex flex-col gap-3">
             <h3 className="text-xl font-bold mb-2">Abhinav Sarkar</h3>
-            <p className="text-muted-foreground">AI/LLM Engineer building the future of artificial intelligence one model at a time.</p>
+            <p className="text-muted-foreground">AI-ML Engineer building the future of artificial intelligence one model at a time.</p>
           </div>
           
           <div className="flex flex-col gap-3">
