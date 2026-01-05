@@ -6,15 +6,28 @@ import { Button } from '@/components/ui/button';
 import { portfolioData } from '@/data/portfolioData';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { useRecommender } from '@/context/RecommenderContext';
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { trackCaseStudyView, trackCaseStudyLeave } = useRecommender();
 
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
+
+  // Track case study view - triggers recommendation after 6 seconds
+  useEffect(() => {
+    if (id) {
+      trackCaseStudyView(id);
+    }
+
+    return () => {
+      trackCaseStudyLeave();
+    };
+  }, [id, trackCaseStudyView, trackCaseStudyLeave]);
 
   const project = portfolioData.projects.find(p => p.id === id);
 

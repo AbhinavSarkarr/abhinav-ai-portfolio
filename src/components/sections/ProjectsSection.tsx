@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { Github, Globe, ArrowUpRight, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { portfolioData } from '@/data/portfolioData';
+import { useRecommender } from '@/context/RecommenderContext';
 import {
   staggerContainer,
   sectionHeading,
@@ -15,6 +16,7 @@ export function ProjectsSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
+  const { trackHoverStart, trackHoverEnd } = useRecommender();
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -112,8 +114,14 @@ export function ProjectsSection() {
               initial="hidden"
               animate={isInView ? 'visible' : 'hidden'}
               className="h-full"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
+              onMouseEnter={() => {
+                setHoveredIndex(index);
+                trackHoverStart(project.id);
+              }}
+              onMouseLeave={() => {
+                setHoveredIndex(null);
+                trackHoverEnd();
+              }}
             >
               <motion.div
                 whileHover={{
