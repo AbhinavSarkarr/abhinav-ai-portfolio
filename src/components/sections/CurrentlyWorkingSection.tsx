@@ -10,24 +10,24 @@ import {
 const currentItems = [
   {
     icon: TrendingUp,
-    title: "Time Series Analysis",
-    description: "Exploring advanced forecasting techniques using transformers and hybrid models for financial and IoT data.",
+    title: "MLOps Pipeline Architecture",
+    description: "Building end-to-end ML pipelines with feature stores, model versioning, A/B testing, and automated retraining workflows.",
     status: "In Progress",
-    progress: 65,
+    progress: 70,
   },
   {
     icon: Brain,
-    title: "Multi-Agent Systems",
-    description: "Building collaborative AI agents that can reason, plan, and execute complex tasks autonomously.",
+    title: "Time Series Forecasting",
+    description: "Implementing transformer-based models for multi-variate time series prediction with uncertainty quantification.",
     status: "Researching",
-    progress: 40,
+    progress: 45,
   },
   {
     icon: Lightbulb,
-    title: "RAG Optimization",
-    description: "Experimenting with advanced retrieval strategies and re-ranking techniques for better context precision.",
+    title: "Model Optimization",
+    description: "Exploring quantization, pruning, and distillation techniques for deploying large models on edge devices.",
     status: "Ongoing",
-    progress: 80,
+    progress: 60,
   },
 ];
 

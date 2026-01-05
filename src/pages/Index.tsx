@@ -1,6 +1,7 @@
 
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { StatsSection } from "@/components/sections/StatsSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
@@ -14,12 +15,13 @@ import { ParticleBackground } from "@/components/ParticleBackground";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { CustomCursor } from "@/components/CustomCursor";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ScrollProgress } from "@/components/ScrollProgress";
 import { useEffect } from "react";
 
 const Index = () => {
   // Update document title and scroll to top
   useEffect(() => {
-    document.title = 'Abhinav Sarkar Portfolio';
+    document.title = 'Abhinav Sarkar | AI-ML Engineer Portfolio';
     window.scrollTo(0, 0);
   }, []);
 
@@ -28,11 +30,13 @@ const Index = () => {
       <LoadingScreen />
       <CustomCursor />
       <ThemeToggle />
+      <ScrollProgress />
       <ParticleBackground />
       <div className="flex flex-col min-h-screen relative z-10">
         <Navbar />
         <main>
           <HeroSection />
+          <StatsSection />
           <AboutSection />
           <ExperienceSection />
           <ProjectsSection />
