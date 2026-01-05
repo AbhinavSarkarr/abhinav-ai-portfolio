@@ -28,6 +28,7 @@ export type ProjectItem = {
   title: string;
   description: string;
   technologies: string[];
+  languages: string[];
   image: string;
   github?: string;
   liveUrl?: string;
@@ -154,9 +155,10 @@ export const portfolioData = {
   projects: [
     {
       id: "llm-from-scratch",
-      title: "LLM From Scratch",
+      title: "JurisGPT",
       description: "A complete decoder-only transformer architecture built from scratch, covering tokenization, embeddings, self-attention, and GPT model training on legal corpus.",
       technologies: ["PyTorch", "Transformers", "BPE Tokenization", "GELU", "Self-Attention", "Jupyter"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/LLM-From-Scratch",
       liveUrl: "https://bytepairtokenizer.netlify.app/",
@@ -186,6 +188,7 @@ export const portfolioData = {
       title: "TextTweakAI",
       description: "An intelligent grammar and spell correction tool powered by fine-tuned T5 model, providing real-time text improvement suggestions.",
       technologies: ["Streamlit", "T5", "PyTorch", "Transformers", "Hugging Face", "NLP"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/TextTweakAI",
       liveUrl: "https://huggingface.co/spaces/abhinavsarkar/TextTweakAI",
@@ -215,6 +218,7 @@ export const portfolioData = {
       title: "WhatsApp Virtual Try-On Bot",
       description: "A WhatsApp-based bot enabling users to virtually try on clothes by sending images, powered by ML models and Twilio integration.",
       technologies: ["FastAPI", "Twilio", "Gradio", "Cloudinary", "Docker", "Python"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Virtual-Try-On",
       whatsappLink: "+14155238886",
@@ -244,6 +248,7 @@ export const portfolioData = {
       title: "H-1B Visa Approval Prediction",
       description: "ML-powered prediction system for H-1B visa application outcomes using historical petition data and IBM Watson deployment.",
       technologies: ["Scikit-learn", "Flask", "Pandas", "Logistic Regression", "Random Forest", "IBM Watson"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Visa-Approval-Prediction-using-IBM-Watson-Machine-Learning",
       category: "ml",
@@ -272,6 +277,7 @@ export const portfolioData = {
       title: "Fine-tuned LLMs Collection",
       description: "Collection of fine-tuned language models including DistilGPT2, Phi2, Llama 3, and Mistral on domain-specific datasets.",
       technologies: ["PyTorch", "Transformers", "LoRA", "QLoRA", "Axolotl", "Hugging Face"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Finetuned-LLMs",
       category: "llm",
@@ -300,6 +306,7 @@ export const portfolioData = {
       title: "Telco Customer Churn Prediction",
       description: "Predictive ML model to identify customers likely to discontinue telecom services, enabling proactive retention strategies.",
       technologies: ["Scikit-learn", "XGBoost", "Pandas", "Feature Engineering", "Python", "Pickle"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Telco-Customer-Churn-Prediction",
       category: "ml",
@@ -328,6 +335,7 @@ export const portfolioData = {
       title: "Movie Recommender System",
       description: "Content-based movie recommendation engine analyzing film attributes to suggest personalized viewing options.",
       technologies: ["Scikit-learn", "Pandas", "TF-IDF", "Cosine Similarity", "Python", "Jupyter"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Recommender-Systems",
       category: "ml",
@@ -356,6 +364,7 @@ export const portfolioData = {
       title: "Delhi Air Quality Predictor",
       description: "End-to-end ML pipeline predicting Delhi's air quality index using XGBoost and comprehensive feature engineering.",
       technologies: ["XGBoost", "Pandas", "Feature Store", "Scikit-learn", "Python", "Jupyter"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1532635241-17e820acc59f?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Delhi-Air-Quality-Predictor-End-to-End",
       category: "ml",
@@ -384,6 +393,7 @@ export const portfolioData = {
       title: "Autonomous AI Agents",
       description: "Framework for building autonomous agents capable of executing complex tasks without human intervention using Python.",
       technologies: ["Python", "LangChain", "OpenAI", "Tool Use", "Agent Architecture"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/AI-Agents",
       category: "genai",
@@ -412,6 +422,7 @@ export const portfolioData = {
       title: "Ticket Support Model Distillation",
       description: "Knowledge distillation pipeline compressing large support models into efficient smaller models for production deployment.",
       technologies: ["PyTorch", "Transformers", "Knowledge Distillation", "BERT", "Python"],
+      languages: ["Python"],
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Model-Distillagtion-Ticket-Support",
       category: "llm",
@@ -440,6 +451,7 @@ export const portfolioData = {
       title: "Video Membership Web App",
       description: "Full-stack web application for video content membership with authentication, payments, and content delivery.",
       technologies: ["Python", "FastAPI", "HTML", "Jupyter", "Authentication", "Payments"],
+      languages: ["Python", "HTML"],
       image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&auto=format&fit=crop&q=60",
       github: "https://github.com/AbhinavSarkarr/Video-Membership-Web-App",
       category: "fullstack",

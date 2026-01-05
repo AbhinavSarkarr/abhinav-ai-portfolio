@@ -164,7 +164,7 @@ export function ProjectsSection() {
                       }}
                       transition={{ duration: 0.3 }}
                     >
-                      {project.technologies?.[0]}
+                      {project.languages?.join(', ')}
                     </motion.div>
                   </div>
 
