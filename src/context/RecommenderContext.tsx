@@ -6,16 +6,19 @@ type RecommendationState = {
   show: boolean;
   project: ProjectItem | null;
   sourceProject: ProjectItem | null;
-  type: 'hover' | 'case-study' | null;
+  type: 'hover' | 'case-study' | 'long-press' | null;
 };
 
 type RecommenderContextType = {
   trackHoverStart: (projectId: string) => void;
   trackHoverEnd: () => void;
-  trackCaseStudyView: (projectId: string) => void;
+  trackLongPressStart: (projectId: string) => void;
+  trackLongPressEnd: () => void;
+  trackCaseStudyView: (projectId: string, fromRecommendation?: boolean) => void;
   trackCaseStudyLeave: () => void;
   recommendation: RecommendationState;
   dismissRecommendation: () => void;
+  markFromRecommendation: () => void;
 };
 
 const RecommenderContext = createContext<RecommenderContextType | null>(null);
@@ -33,8 +36,11 @@ export const RecommenderProvider: React.FC<{ children: React.ReactNode }> = ({ c
     triggerRecommendation,
     trackHoverStart,
     trackHoverEnd,
+    trackLongPressStart,
+    trackLongPressEnd,
     trackCaseStudyView,
     trackCaseStudyLeave,
+    markFromRecommendation,
     resetTrigger,
   } = useBehaviorTracker();
 
@@ -121,10 +127,13 @@ export const RecommenderProvider: React.FC<{ children: React.ReactNode }> = ({ c
       value={{
         trackHoverStart,
         trackHoverEnd,
+        trackLongPressStart,
+        trackLongPressEnd,
         trackCaseStudyView,
         trackCaseStudyLeave,
         recommendation,
         dismissRecommendation,
+        markFromRecommendation,
       }}
     >
       {children}

@@ -16,7 +16,7 @@ export function ProjectsSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
-  const { trackHoverStart, trackHoverEnd } = useRecommender();
+  const { trackHoverStart, trackHoverEnd, trackLongPressStart, trackLongPressEnd } = useRecommender();
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -121,6 +121,15 @@ export function ProjectsSection() {
               onMouseLeave={() => {
                 setHoveredIndex(null);
                 trackHoverEnd();
+              }}
+              onTouchStart={() => {
+                trackLongPressStart(project.id);
+              }}
+              onTouchEnd={() => {
+                trackLongPressEnd();
+              }}
+              onTouchCancel={() => {
+                trackLongPressEnd();
               }}
             >
               <motion.div

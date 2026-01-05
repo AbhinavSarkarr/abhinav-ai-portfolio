@@ -86,7 +86,12 @@ export default function ProjectDetail() {
             <Button
               variant="ghost"
               className="mb-8 hover:bg-tech-glass"
-              onClick={() => navigate('/')}
+              onClick={() => {
+                navigate('/');
+                setTimeout(() => {
+                  document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
             >
               <ArrowLeft size={18} className="mr-2" />
               Back to Projects

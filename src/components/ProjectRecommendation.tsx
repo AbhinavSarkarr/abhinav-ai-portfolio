@@ -4,13 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { useRecommender } from '@/context/RecommenderContext';
 
 export const ProjectRecommendation = () => {
-  const { recommendation, dismissRecommendation } = useRecommender();
+  const { recommendation, dismissRecommendation, markFromRecommendation } = useRecommender();
   const { show, project, sourceProject, type } = recommendation;
   const navigate = useNavigate();
 
   if (!project) return null;
 
   const handleProjectClick = () => {
+    // Mark that user is navigating from a recommendation (40s timer next time)
+    markFromRecommendation();
     dismissRecommendation();
     // Navigate to the recommended project's case study
     navigate(`/project/${project.id}`);
@@ -18,7 +20,7 @@ export const ProjectRecommendation = () => {
 
   // Generate contextual message based on trigger type
   const getMessage = () => {
-    if (type === 'hover' && sourceProject) {
+    if ((type === 'hover' || type === 'long-press') && sourceProject) {
       return (
         <>
           Since you're interested in <span className="font-semibold text-cyan-400">{sourceProject.title}</span>, you might also like:
@@ -43,7 +45,7 @@ export const ProjectRecommendation = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.95 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-6 right-6 z-50 max-w-sm"
+          className="fixed bottom-4 right-4 left-4 sm:left-auto sm:right-6 sm:bottom-6 z-50 max-w-sm mx-auto sm:mx-0"
         >
           <div className="relative bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl shadow-purple-500/20 overflow-hidden">
             {/* Animated gradient border */}
@@ -54,10 +56,10 @@ export const ProjectRecommendation = () => {
               {/* Close button */}
               <button
                 onClick={dismissRecommendation}
-                className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors"
+                className="absolute top-3 right-3 p-2 sm:p-1.5 rounded-full bg-gray-700/50 hover:bg-gray-600/50 active:bg-gray-500/50 transition-colors touch-manipulation"
                 aria-label="Dismiss recommendation"
               >
-                <X className="w-4 h-4 text-gray-400" />
+                <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-400" />
               </button>
 
               {/* Header */}
@@ -78,7 +80,7 @@ export const ProjectRecommendation = () => {
               {/* Project card */}
               <div
                 onClick={handleProjectClick}
-                className="group cursor-pointer bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300"
+                className="group cursor-pointer bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 hover:border-purple-500/50 active:border-purple-500/70 transition-all duration-300 touch-manipulation"
               >
                 {/* Project image */}
                 <div className="relative h-32 rounded-lg overflow-hidden mb-3">
@@ -152,7 +154,7 @@ export const ProjectRecommendation = () => {
               {/* View project button */}
               <button
                 onClick={handleProjectClick}
-                className="mt-4 w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-500/20 to-cyan-500/20 hover:from-purple-500/30 hover:to-cyan-500/30 border border-purple-500/30 text-sm font-medium text-white transition-all duration-300"
+                className="mt-4 w-full py-3 sm:py-2.5 rounded-lg bg-gradient-to-r from-purple-500/20 to-cyan-500/20 hover:from-purple-500/30 hover:to-cyan-500/30 active:from-purple-500/40 active:to-cyan-500/40 border border-purple-500/30 text-sm font-medium text-white transition-all duration-300 touch-manipulation"
               >
                 View Project Details →
               </button>

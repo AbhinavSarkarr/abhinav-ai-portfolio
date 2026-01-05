@@ -81,8 +81,8 @@ export function HeroSection() {
         />
       </div>
 
-      {/* Floating code snippets */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      {/* Floating code snippets - hidden on mobile for performance */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none hidden sm:block">
         {codeSnippets.map((snippet, index) => (
           <motion.div
             key={index}
@@ -148,7 +148,7 @@ export function HeroSection() {
 
             {/* Main heading */}
             <motion.div variants={fadeInUp}>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
                 <motion.span
                   className="block"
                   initial={{ opacity: 0, x: -20 }}
@@ -270,7 +270,7 @@ export function HeroSection() {
             <div className="relative">
               {/* Animated rings */}
               <motion.div
-                className="absolute inset-0 w-72 h-72 md:w-80 md:h-80"
+                className="absolute inset-0 w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80"
                 style={{ margin: '-20px' }}
               >
                 <motion.div
@@ -290,11 +290,11 @@ export function HeroSection() {
                 />
               </motion.div>
 
-              {/* Floating tech icons */}
+              {/* Floating tech icons - hidden on small mobile */}
               {['🧠', '🤖', '📊', '⚡'].map((emoji, index) => (
                 <motion.div
                   key={index}
-                  className="absolute w-10 h-10 rounded-full bg-tech-glass/80 backdrop-blur-sm border border-tech-neon/30 flex items-center justify-center text-lg"
+                  className="absolute w-10 h-10 rounded-full bg-tech-glass/80 backdrop-blur-sm border border-tech-neon/30 items-center justify-center text-lg hidden sm:flex"
                   style={{
                     top: `${20 + Math.sin(index * Math.PI / 2) * 40}%`,
                     left: `${50 + Math.cos(index * Math.PI / 2) * 60}%`,
@@ -316,7 +316,7 @@ export function HeroSection() {
 
               {/* Profile image */}
               <motion.div
-                className="relative w-64 h-64 md:w-72 md:h-72 rounded-full overflow-hidden"
+                className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full overflow-hidden"
                 animate={{
                   y: [0, -8, 0],
                 }}

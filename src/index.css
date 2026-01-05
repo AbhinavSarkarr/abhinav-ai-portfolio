@@ -575,3 +575,57 @@
     display: none !important;
   }
 }
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Better touch targets */
+  .tech-btn {
+    @apply min-h-[44px] px-5;
+  }
+
+  .skill-badge {
+    @apply px-3 py-2 text-xs;
+  }
+
+  /* Reduce padding on mobile */
+  section {
+    @apply py-12;
+  }
+
+  .glass-card {
+    @apply p-4;
+  }
+
+  /* Smaller section headings */
+  .section-heading {
+    @apply text-2xl;
+  }
+
+  /* Better scrolling performance */
+  .glass {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Touch-friendly interactions */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Hide floating code snippets on mobile for performance */
+  .floating-code {
+    display: none;
+  }
+}
+
+/* Touch manipulation for better mobile response */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Safe area for notched phones */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
