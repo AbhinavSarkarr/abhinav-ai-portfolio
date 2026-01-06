@@ -5,7 +5,6 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
-import { GitHubSection } from "@/components/sections/GitHubSection";
 import { PublicationsSection } from "@/components/sections/PublicationsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { Footer } from "@/components/Footer";
@@ -14,6 +13,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { CustomCursor } from "@/components/CustomCursor";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { SmartScroll } from "@/components/SmartScroll";
 import { useEffect } from "react";
 
 const Index = () => {
@@ -29,6 +29,7 @@ const Index = () => {
       <CustomCursor />
       <ThemeToggle />
       <ScrollProgress />
+      <SmartScroll />
       <ParticleBackground />
       <div className="flex flex-col min-h-screen relative z-10">
         <Navbar />
@@ -38,7 +39,6 @@ const Index = () => {
           <ExperienceSection />
           <ProjectsSection />
           <SkillsSection />
-          <GitHubSection />
           <PublicationsSection />
           <ContactSection />
         </main>
