@@ -190,14 +190,6 @@ export function HeroSection() {
               </span>
             </motion.div>
 
-            {/* Description */}
-            <motion.p
-              className="text-lg text-muted-foreground max-w-xl leading-relaxed"
-              variants={fadeInUp}
-            >
-              {hero.description}
-            </motion.p>
-
             {/* CTA Buttons */}
             <motion.div
               className="flex flex-wrap gap-4 pt-4"
@@ -215,6 +207,23 @@ export function HeroSection() {
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-tech-accent to-tech-neon opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   />
+                </Button>
+              </motion.div>
+              <motion.div whileHover={buttonHover} whileTap={buttonTap}>
+                <Button
+                  variant="outline"
+                  className="border-tech-accent/40 hover:border-tech-accent hover:bg-tech-glass/50 backdrop-blur-sm transition-all duration-300 px-8 py-6 text-base group"
+                  onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  <span className="flex items-center gap-2">
+                    About Me
+                    <motion.span
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      →
+                    </motion.span>
+                  </span>
                 </Button>
               </motion.div>
               <motion.div whileHover={buttonHover} whileTap={buttonTap}>
@@ -242,9 +251,9 @@ export function HeroSection() {
               className="flex flex-wrap gap-8 pt-6 border-t border-white/10"
             >
               {[
-                { value: '2+', label: 'Years Experience' },
-                { value: '12+', label: 'ML Projects' },
-                { value: '20+', label: 'Models Trained' },
+                { value: '2', label: 'YOE' },
+                { value: '12+', label: 'AI&ML Projects' },
+                { value: '7+', label: 'Client Projects' },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -374,29 +383,7 @@ export function HeroSection() {
                 </div>
               </motion.div>
 
-              {/* Status indicator */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 1.2 }}
-                className="absolute -top-2 -left-2 glass px-4 py-2 rounded-xl border border-tech-neon/40"
-              >
-                <div className="flex items-center gap-2 text-xs">
-                  <motion.div
-                    className="w-2 h-2 rounded-full bg-tech-neon"
-                    animate={{
-                      scale: [1, 1.5, 1],
-                      opacity: [1, 0.5, 1],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                    }}
-                  />
-                  <span className="text-tech-neon font-medium">AI-ML Engineer</span>
-                </div>
-              </motion.div>
-            </div>
+                          </div>
           </motion.div>
         </div>
 

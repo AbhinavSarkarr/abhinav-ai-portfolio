@@ -1,12 +1,10 @@
 
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { StatsSection } from "@/components/sections/StatsSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
-import { CurrentlyWorkingSection } from "@/components/sections/CurrentlyWorkingSection";
 import { GitHubSection } from "@/components/sections/GitHubSection";
 import { PublicationsSection } from "@/components/sections/PublicationsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
@@ -36,12 +34,10 @@ const Index = () => {
         <Navbar />
         <main>
           <HeroSection />
-          <StatsSection />
           <AboutSection />
           <ExperienceSection />
           <ProjectsSection />
           <SkillsSection />
-          <CurrentlyWorkingSection />
           <GitHubSection />
           <PublicationsSection />
           <ContactSection />

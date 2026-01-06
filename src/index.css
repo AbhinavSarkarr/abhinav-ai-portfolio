@@ -594,6 +594,16 @@
 
   .glass-card {
     @apply p-4;
+    overflow: visible;
+    height: auto;
+    max-height: none;
+  }
+
+  .glass-card p {
+    overflow: visible;
+    text-overflow: unset;
+    -webkit-line-clamp: unset;
+    display: block;
   }
 
   /* Smaller section headings */

@@ -216,8 +216,8 @@ export default function ProjectDetail() {
                 </div>
                 <h2 className="text-2xl font-bold">Problem Statement</h2>
               </div>
-              <div className="glass-card">
-                <p className="text-muted-foreground leading-relaxed">
+              <div className="glass-card overflow-visible">
+                <p className="text-muted-foreground leading-relaxed whitespace-normal break-words">
                   {project.caseStudy.problemStatement}
                 </p>
               </div>
@@ -237,8 +237,8 @@ export default function ProjectDetail() {
                 </div>
                 <h2 className="text-2xl font-bold">Solution</h2>
               </div>
-              <div className="glass-card">
-                <p className="text-muted-foreground leading-relaxed">
+              <div className="glass-card overflow-visible">
+                <p className="text-muted-foreground leading-relaxed whitespace-normal break-words">
                   {project.caseStudy.solution}
                 </p>
               </div>

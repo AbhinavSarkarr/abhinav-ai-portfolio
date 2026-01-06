@@ -80,7 +80,7 @@ export const portfolioData = {
   hero: {
     name: "Abhinav Sarkar",
     title: "AI-ML Engineer",
-    description: "ML Engineer with ~2 years of experience building production ML systems, from classical models to deep learning and GenAI. Skilled in end-to-end ML pipelines: data engineering, feature stores, model training, MLOps, and deployment. Focused on delivering scalable, reliable AI solutions with measurable business impact.",
+    description: "AI-ML Engineer with ~2 years of experience building production ML systems, from classical models to deep learning and GenAI. Skilled in end-to-end ML pipelines: data engineering, feature stores, model training, MLOps, and deployment. Focused on delivering scalable, reliable AI solutions with measurable business impact.",
     image: "/lovable-uploads/0f976acc-d38b-4ac7-96a7-02ccc53846b5.png",
     resumeLink: "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
   },
@@ -520,22 +520,22 @@ export const portfolioData = {
   certifications: [
     {
       id: "cert1",
-      title: "AWS Certified Cloud Practitioner",
-      issuer: "Amazon Web Services",
-      date: "2024",
-      link: "https://cp.certmetrics.com/amazon/en/public/verify/credential/b14b5afb7bd44dfa9bb5caf44e160813"
-    },
-    {
-      id: "cert2",
       title: "Databricks Certified Machine Learning Professional",
       issuer: "Databricks",
-      date: "2024",
+      date: "November 2025",
       link: "https://credentials.databricks.com/c8f3e6a5-1234-5678-9abc-def012345678"
     },
     {
+      id: "cert2",
+      title: "AWS Certified AI Practitioner",
+      issuer: "Amazon Web Services",
+      date: "September 2025",
+      link: "https://cp.certmetrics.com/amazon/en/public/verify/credential/b14b5afb7bd44dfa9bb5caf44e160813"
+    },
+    {
       id: "cert3",
-      title: "Finetuning Large Language Models",
-      issuer: "DeepLearning.AI",
+      title: "Oracle Certified AIML Foundations",
+      issuer: "Oracle",
       date: "April 2024",
       link: "#"
     },
