@@ -5,6 +5,7 @@ import { Github, Globe, ArrowUpRight, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { portfolioData } from '@/data/portfolioData';
 import { useRecommender } from '@/context/RecommenderContext';
+import { useAnalyticsContext } from '@/context/AnalyticsContext';
 import {
   staggerContainer,
   sectionHeading,
@@ -17,6 +18,7 @@ export function ProjectsSection() {
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
   const { trackHoverStart, trackHoverEnd, trackLongPressStart, trackLongPressEnd } = useRecommender();
+  const analytics = useAnalyticsContext();
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -25,6 +27,10 @@ export function ProjectsSection() {
   });
 
   const handleProjectClick = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      analytics.trackProjectClick(projectId, project.title, project.category);
+    }
     navigate(`/project/${projectId}`);
   };
 
@@ -241,7 +247,10 @@ export function ProjectsSection() {
                           className="p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
                           whileHover={{ scale: 1.1, rotate: 5 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            analytics.trackProjectLinkClick(project.id, project.title, 'github');
+                          }}
                         >
                           <Github size={18} />
                           <span className="sr-only">GitHub</span>
@@ -256,7 +265,10 @@ export function ProjectsSection() {
                           className="p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
                           whileHover={{ scale: 1.1, rotate: -5 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            analytics.trackProjectLinkClick(project.id, project.title, 'demo');
+                          }}
                         >
                           <Globe size={18} />
                           <span className="sr-only">Live Demo</span>
@@ -272,6 +284,7 @@ export function ProjectsSection() {
                             className="p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
+                            onClick={() => analytics.trackProjectLinkClick(project.id, project.title, 'whatsapp')}
                           >
                             <MessageSquare size={18} />
                             <span className="sr-only">WhatsApp</span>

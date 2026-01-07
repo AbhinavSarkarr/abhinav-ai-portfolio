@@ -7,22 +7,25 @@ import Index from "./pages/Index";
 import ProjectDetail from "./pages/ProjectDetail";
 import NotFound from "./pages/NotFound";
 import { RecommenderProvider } from "@/context/RecommenderContext";
+import { AnalyticsProvider } from "@/context/AnalyticsContext";
 import { ProjectRecommendation } from "@/components/ProjectRecommendation";
 
 const App = () => (
   <TooltipProvider>
     <Toaster />
     <Sonner />
-    <RecommenderProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/project/:id" element={<ProjectDetail />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <ProjectRecommendation />
-      </BrowserRouter>
-    </RecommenderProvider>
+    <BrowserRouter>
+      <AnalyticsProvider>
+        <RecommenderProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/project/:id" element={<ProjectDetail />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <ProjectRecommendation />
+        </RecommenderProvider>
+      </AnalyticsProvider>
+    </BrowserRouter>
   </TooltipProvider>
 );
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from '@/components/ui/use-toast';
+import { useAnalyticsContext } from '@/context/AnalyticsContext';
 import {
   staggerContainer,
   staggerItem,
@@ -23,6 +24,8 @@ export function ContactSection() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasStartedForm, setHasStartedForm] = useState(false);
+  const analytics = useAnalyticsContext();
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -33,11 +36,24 @@ export function ContactSection() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Track form start on first interaction
+    if (!hasStartedForm) {
+      setHasStartedForm(true);
+      analytics.trackContactFormStart();
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Track form submission
+    analytics.trackContactFormSubmit({
+      hasName: !!formData.name.trim(),
+      hasEmail: !!formData.email.trim(),
+      hasMessage: !!formData.message.trim(),
+    });
 
     setTimeout(() => {
       toast({
@@ -45,6 +61,7 @@ export function ContactSection() {
         description: "Thanks for reaching out! I'll get back to you soon.",
       });
       setFormData({ name: '', email: '', message: '' });
+      setHasStartedForm(false);
       setIsSubmitting(false);
     }, 1500);
   };
@@ -226,6 +243,7 @@ export function ContactSection() {
                   variants={staggerItem}
                   className="flex items-center gap-4 p-4 rounded-2xl bg-tech-glass/50 border border-white/5 group hover:border-tech-accent/30 transition-all duration-300"
                   whileHover={{ x: 8, scale: 1.02 }}
+                  onClick={() => analytics.trackSocialClick(item.label, item.href)}
                 >
                   <motion.div
                     className={`p-3 rounded-xl bg-gradient-to-br ${item.color} group-hover:shadow-lg transition-shadow duration-300`}
@@ -255,6 +273,7 @@ export function ContactSection() {
                 variants={staggerItem}
                 className="flex items-center gap-4 p-4 rounded-2xl bg-tech-glass/50 border border-white/5 group hover:border-tech-accent/30 transition-all duration-300"
                 whileHover={{ x: 8, scale: 1.02 }}
+                onClick={() => analytics.trackSocialClick('Hugging Face', 'https://huggingface.co/abhinavsarkar')}
               >
                 <motion.div
                   className="p-3 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 group-hover:shadow-lg transition-shadow duration-300"
@@ -283,7 +302,10 @@ export function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.8 }}
               whileHover={{ scale: 1.02 }}
-              onClick={() => window.open("https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view", "_blank")}
+              onClick={() => {
+                analytics.trackResumeDownload();
+                window.open("https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view", "_blank");
+              }}
             >
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-tech-neon/10 via-tech-accent/10 to-tech-highlight/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"

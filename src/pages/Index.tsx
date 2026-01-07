@@ -14,6 +14,7 @@ import { CustomCursor } from "@/components/CustomCursor";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { SmartScroll } from "@/components/SmartScroll";
+import { TrackedSection } from "@/components/TrackedSection";
 import { useEffect } from "react";
 
 const Index = () => {
@@ -34,13 +35,27 @@ const Index = () => {
       <div className="flex flex-col min-h-screen relative z-10">
         <Navbar />
         <main>
-          <HeroSection />
-          <AboutSection />
-          <ExperienceSection />
-          <ProjectsSection />
-          <SkillsSection />
-          <PublicationsSection />
-          <ContactSection />
+          <TrackedSection sectionId="hero" sectionName="Hero">
+            <HeroSection />
+          </TrackedSection>
+          <TrackedSection sectionId="about" sectionName="About">
+            <AboutSection />
+          </TrackedSection>
+          <TrackedSection sectionId="experience" sectionName="Experience">
+            <ExperienceSection />
+          </TrackedSection>
+          <TrackedSection sectionId="projects" sectionName="Projects">
+            <ProjectsSection />
+          </TrackedSection>
+          <TrackedSection sectionId="skills" sectionName="Skills">
+            <SkillsSection />
+          </TrackedSection>
+          <TrackedSection sectionId="publications" sectionName="Publications">
+            <PublicationsSection />
+          </TrackedSection>
+          <TrackedSection sectionId="contact" sectionName="Contact">
+            <ContactSection />
+          </TrackedSection>
         </main>
         <Footer />
       </div>

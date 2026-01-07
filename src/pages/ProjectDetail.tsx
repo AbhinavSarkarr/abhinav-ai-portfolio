@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Github, Globe, ExternalLink, CheckCircle2, Lightbulb, Target, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,11 +7,15 @@ import { portfolioData } from '@/data/portfolioData';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { useRecommender } from '@/context/RecommenderContext';
+import { useAnalyticsContext } from '@/context/AnalyticsContext';
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { trackCaseStudyView, trackCaseStudyLeave } = useRecommender();
+  const analytics = useAnalyticsContext();
+  const startTime = useRef<number>(Date.now());
+  const maxScrollDepth = useRef<number>(0);
 
   // Scroll to top on page load
   useEffect(() => {
@@ -22,12 +26,36 @@ export default function ProjectDetail() {
   useEffect(() => {
     if (id) {
       trackCaseStudyView(id);
+      const project = portfolioData.projects.find(p => p.id === id);
+      if (project) {
+        analytics.trackCaseStudyOpen(id, project.title, project.category);
+      }
+      startTime.current = Date.now();
     }
+
+    // Track scroll depth
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollDepth = (window.scrollY / scrollHeight) * 100;
+      maxScrollDepth.current = Math.max(maxScrollDepth.current, scrollDepth);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       trackCaseStudyLeave();
+      window.removeEventListener('scroll', handleScroll);
+
+      // Track engagement on leave
+      if (id) {
+        const project = portfolioData.projects.find(p => p.id === id);
+        if (project) {
+          const timeSpent = (Date.now() - startTime.current) / 1000;
+          analytics.trackCaseStudyEngagement(id, project.title, timeSpent, maxScrollDepth.current);
+        }
+      }
     };
-  }, [id, trackCaseStudyView, trackCaseStudyLeave]);
+  }, [id, trackCaseStudyView, trackCaseStudyLeave, analytics]);
 
   const project = portfolioData.projects.find(p => p.id === id);
 
@@ -142,6 +170,7 @@ export default function ProjectDetail() {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => analytics.trackProjectLinkClick(project.id, project.title, 'github')}
                   >
                     <Button className="bg-tech-glass border border-tech-accent/30 hover:bg-tech-accent/20">
                       <Github size={18} className="mr-2" />
@@ -156,6 +185,7 @@ export default function ProjectDetail() {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => analytics.trackProjectLinkClick(project.id, project.title, 'demo')}
                   >
                     <Button className="tech-btn">
                       <Globe size={18} className="mr-2" />
