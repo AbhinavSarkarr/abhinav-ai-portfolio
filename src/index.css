@@ -83,6 +83,23 @@
     background-attachment: fixed;
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: justify;
+  }
+
+  /* Justify text for paragraphs and content */
+  p, .text-justify {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  /* Keep headings and specific elements left-aligned */
+  h1, h2, h3, h4, h5, h6,
+  .text-left,
+  .text-center,
+  nav, footer,
+  button, a.tech-btn,
+  .skill-badge {
+    text-align: inherit;
   }
 
   .dark body,

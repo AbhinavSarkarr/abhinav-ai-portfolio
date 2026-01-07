@@ -27,6 +27,17 @@ import {
   trackSocialClick,
   trackCertificationClick,
   trackPublicationClick,
+  // Client work tracking
+  trackClientView,
+  trackClientClick,
+  trackClientCaseStudyOpen,
+  trackClientCaseStudyEngagement,
+  trackDomainInterest,
+  trackClientTechStackClick,
+  trackExperienceLevelInterest,
+  trackContributionView,
+  trackProblemStatementRead,
+  trackSolutionRead,
 } from '@/hooks/useAnalytics';
 
 interface AnalyticsContextType {
@@ -36,6 +47,18 @@ interface AnalyticsContextType {
   trackCaseStudyOpen: typeof trackCaseStudyOpen;
   trackCaseStudyEngagement: typeof trackCaseStudyEngagement;
   trackProjectLinkClick: typeof trackProjectLinkClick;
+
+  // Client work tracking
+  trackClientView: typeof trackClientView;
+  trackClientClick: typeof trackClientClick;
+  trackClientCaseStudyOpen: typeof trackClientCaseStudyOpen;
+  trackClientCaseStudyEngagement: typeof trackClientCaseStudyEngagement;
+  trackDomainInterest: typeof trackDomainInterest;
+  trackClientTechStackClick: typeof trackClientTechStackClick;
+  trackExperienceLevelInterest: typeof trackExperienceLevelInterest;
+  trackContributionView: typeof trackContributionView;
+  trackProblemStatementRead: typeof trackProblemStatementRead;
+  trackSolutionRead: typeof trackSolutionRead;
 
   // Recommendation tracking
   trackRecommendationShown: typeof trackRecommendationShown;
@@ -110,6 +133,18 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     trackCaseStudyOpen,
     trackCaseStudyEngagement,
     trackProjectLinkClick,
+
+    // Client work tracking
+    trackClientView,
+    trackClientClick,
+    trackClientCaseStudyOpen,
+    trackClientCaseStudyEngagement,
+    trackDomainInterest,
+    trackClientTechStackClick,
+    trackExperienceLevelInterest,
+    trackContributionView,
+    trackProblemStatementRead,
+    trackSolutionRead,
 
     // Recommendation tracking
     trackRecommendationShown,

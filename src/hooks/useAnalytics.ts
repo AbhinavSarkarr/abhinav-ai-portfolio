@@ -215,6 +215,165 @@ export function trackProjectLinkClick(
 }
 
 // ============================================
+// CLIENT WORK & EXPERIENCE TRACKING
+// ============================================
+
+export function trackClientView(
+  clientId: string,
+  clientName: string,
+  domain: string,
+  experienceId: string,
+  experienceTitle: string
+) {
+  trackEvent('client_view', {
+    event_category: 'Client Work',
+    event_label: clientName,
+    client_id: clientId,
+    client_name: clientName,
+    domain: domain,
+    experience_id: experienceId,
+    experience_title: experienceTitle,
+  });
+}
+
+export function trackClientClick(
+  clientId: string,
+  clientName: string,
+  domain: string,
+  experienceId: string
+) {
+  trackEvent('client_click', {
+    event_category: 'Client Work',
+    event_label: clientName,
+    client_id: clientId,
+    client_name: clientName,
+    domain: domain,
+    experience_id: experienceId,
+  });
+}
+
+export function trackClientCaseStudyOpen(
+  clientId: string,
+  clientName: string,
+  domain: string,
+  experienceTitle: string
+) {
+  trackEvent('client_case_study_open', {
+    event_category: 'Client Work',
+    event_label: clientName,
+    client_id: clientId,
+    client_name: clientName,
+    domain: domain,
+    experience_title: experienceTitle,
+  });
+}
+
+export function trackClientCaseStudyEngagement(
+  clientId: string,
+  clientName: string,
+  domain: string,
+  timeSpent: number,
+  scrollDepth: number
+) {
+  trackEvent('client_case_study_engagement', {
+    event_category: 'Client Work',
+    event_label: clientName,
+    client_id: clientId,
+    client_name: clientName,
+    domain: domain,
+    time_spent_seconds: Math.round(timeSpent),
+    scroll_depth_percent: Math.round(scrollDepth),
+    value: Math.round(timeSpent),
+  });
+}
+
+export function trackDomainInterest(domain: string, clientId: string, clientName: string) {
+  trackEvent('domain_interest', {
+    event_category: 'Career Insights',
+    event_label: domain,
+    domain: domain,
+    source_client_id: clientId,
+    source_client_name: clientName,
+  });
+}
+
+export function trackClientTechStackClick(
+  technology: string,
+  clientId: string,
+  clientName: string,
+  domain: string
+) {
+  trackEvent('client_tech_stack_click', {
+    event_category: 'Tech Demand',
+    event_label: technology,
+    technology: technology,
+    client_id: clientId,
+    client_name: clientName,
+    domain: domain,
+  });
+}
+
+export function trackExperienceLevelInterest(
+  experienceId: string,
+  experienceTitle: string,
+  company: string
+) {
+  trackEvent('experience_level_interest', {
+    event_category: 'Career Insights',
+    event_label: experienceTitle,
+    experience_id: experienceId,
+    experience_title: experienceTitle,
+    company: company,
+  });
+}
+
+export function trackContributionView(
+  clientId: string,
+  clientName: string,
+  contributionIndex: number
+) {
+  trackEvent('contribution_view', {
+    event_category: 'Client Work',
+    event_label: `${clientName} - Contribution ${contributionIndex + 1}`,
+    client_id: clientId,
+    client_name: clientName,
+    contribution_index: contributionIndex,
+  });
+}
+
+export function trackProblemStatementRead(
+  clientId: string,
+  clientName: string,
+  domain: string,
+  readTime: number
+) {
+  trackEvent('problem_statement_read', {
+    event_category: 'Client Work',
+    event_label: clientName,
+    client_id: clientId,
+    client_name: clientName,
+    domain: domain,
+    read_time_seconds: Math.round(readTime),
+  });
+}
+
+export function trackSolutionRead(
+  clientId: string,
+  clientName: string,
+  domain: string,
+  readTime: number
+) {
+  trackEvent('solution_read', {
+    event_category: 'Client Work',
+    event_label: clientName,
+    client_id: clientId,
+    client_name: clientName,
+    domain: domain,
+    read_time_seconds: Math.round(readTime),
+  });
+}
+
+// ============================================
 // RECOMMENDATION TRACKING
 // ============================================
 

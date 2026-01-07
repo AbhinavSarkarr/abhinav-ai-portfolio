@@ -1,15 +1,19 @@
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
-import { Briefcase, Calendar, Link, Circle } from 'lucide-react';
+import { Briefcase, Calendar, Link, Circle, Building2, ArrowRight } from 'lucide-react';
 import { portfolioData, DescriptionItem } from '@/data/portfolioData';
 import {
   staggerContainer,
   sectionHeading,
   sectionSubheading,
 } from '@/lib/animations';
+import { useAnalyticsContext } from '@/context/AnalyticsContext';
 
 export function ExperienceSection() {
   const { experiences } = portfolioData;
+  const navigate = useNavigate();
+  const analytics = useAnalyticsContext();
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -200,52 +204,101 @@ export function ExperienceSection() {
                     </motion.span>
                   </div>
 
-                  <ul className="space-y-3">
-                    {exp.description.map((item: DescriptionItem, idx: number) => (
-                      <motion.li
-                        key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
-                        transition={{ duration: 0.4, delay: index * 0.2 + idx * 0.1 }}
-                      >
-                        {/* Main bullet point */}
+                  {/* Render clients if available, otherwise render description */}
+                  {exp.clients && exp.clients.length > 0 ? (
+                    <div className="grid gap-3">
+                      {exp.clients.map((client, idx) => (
                         <motion.div
-                          className="flex items-start gap-2 group/item"
-                          whileHover={{ x: 5, transition: { duration: 0.2 } }}
+                          key={client.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+                          transition={{ duration: 0.4, delay: index * 0.2 + idx * 0.1 }}
+                          className="group/client cursor-pointer"
+                          onClick={() => {
+                            analytics.trackClientClick(client.id, client.name, client.domain, exp.id);
+                            analytics.trackDomainInterest(client.domain, client.id, client.name);
+                            navigate(`/client/${exp.id}/${client.id}`);
+                          }}
                         >
                           <motion.div
-                            whileHover={{ scale: 1.2, rotate: 10 }}
-                            transition={{ duration: 0.2 }}
+                            className="p-4 rounded-lg bg-tech-glass/50 border border-tech-accent/10 hover:border-tech-accent/30 transition-all duration-300"
+                            whileHover={{ x: 5, backgroundColor: 'rgba(var(--tech-accent-rgb), 0.05)' }}
                           >
-                            <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
-                          </motion.div>
-                          <span className="text-muted-foreground group-hover/item:text-foreground transition-colors duration-300">
-                            {item.main}
-                          </span>
-                        </motion.div>
-                        {/* Sub-bullet points */}
-                        {item.subPoints && item.subPoints.length > 0 && (
-                          <ul className="ml-6 mt-2 space-y-2">
-                            {item.subPoints.map((subItem, subIdx) => (
-                              <motion.li
-                                key={subIdx}
-                                className="flex items-start gap-2 group/subitem"
-                                initial={{ opacity: 0, x: -5 }}
-                                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
-                                transition={{ duration: 0.3, delay: index * 0.2 + idx * 0.1 + subIdx * 0.05 }}
-                                whileHover={{ x: 5, transition: { duration: 0.2 } }}
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Building2 size={16} className="text-tech-accent flex-shrink-0" />
+                                  <h4 className="font-semibold text-foreground group-hover/client:text-tech-accent transition-colors duration-300">
+                                    {client.name}
+                                  </h4>
+                                  <span className="px-2 py-0.5 text-xs rounded-full bg-tech-accent/10 text-tech-accent border border-tech-accent/20">
+                                    {client.domain}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                  {client.shortDescription}
+                                </p>
+                              </div>
+                              <motion.div
+                                className="flex-shrink-0 mt-1"
+                                whileHover={{ x: 3 }}
+                                transition={{ duration: 0.2 }}
                               >
-                                <Circle size={8} className="mt-2 flex-shrink-0 text-tech-accent/60 group-hover/subitem:text-tech-accent transition-colors duration-300" />
-                                <span className="text-muted-foreground text-sm group-hover/subitem:text-foreground transition-colors duration-300">
-                                  {subItem}
-                                </span>
-                              </motion.li>
-                            ))}
-                          </ul>
-                        )}
-                      </motion.li>
-                    ))}
-                  </ul>
+                                <ArrowRight size={18} className="text-muted-foreground group-hover/client:text-tech-accent transition-colors duration-300" />
+                              </motion.div>
+                            </div>
+                          </motion.div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : exp.description ? (
+                    <ul className="space-y-3">
+                      {exp.description.map((item: DescriptionItem, idx: number) => (
+                        <motion.li
+                          key={idx}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+                          transition={{ duration: 0.4, delay: index * 0.2 + idx * 0.1 }}
+                        >
+                          {/* Main bullet point */}
+                          <motion.div
+                            className="flex items-start gap-2 group/item"
+                            whileHover={{ x: 5, transition: { duration: 0.2 } }}
+                          >
+                            <motion.div
+                              whileHover={{ scale: 1.2, rotate: 10 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Briefcase size={16} className="mt-1 flex-shrink-0 text-tech-accent" />
+                            </motion.div>
+                            <span className="text-muted-foreground group-hover/item:text-foreground transition-colors duration-300">
+                              {item.main}
+                            </span>
+                          </motion.div>
+                          {/* Sub-bullet points */}
+                          {item.subPoints && item.subPoints.length > 0 && (
+                            <ul className="ml-6 mt-2 space-y-2">
+                              {item.subPoints.map((subItem, subIdx) => (
+                                <motion.li
+                                  key={subIdx}
+                                  className="flex items-start gap-2 group/subitem"
+                                  initial={{ opacity: 0, x: -5 }}
+                                  animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
+                                  transition={{ duration: 0.3, delay: index * 0.2 + idx * 0.1 + subIdx * 0.05 }}
+                                  whileHover={{ x: 5, transition: { duration: 0.2 } }}
+                                >
+                                  <Circle size={8} className="mt-2 flex-shrink-0 text-tech-accent/60 group-hover/subitem:text-tech-accent transition-colors duration-300" />
+                                  <span className="text-muted-foreground text-sm group-hover/subitem:text-foreground transition-colors duration-300">
+                                    {subItem}
+                                  </span>
+                                </motion.li>
+                              ))}
+                            </ul>
+                          )}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               </motion.div>
             </motion.div>

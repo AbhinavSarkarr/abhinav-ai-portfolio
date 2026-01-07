@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ProjectDetail from "./pages/ProjectDetail";
+import ClientDetail from "./pages/ClientDetail";
 import NotFound from "./pages/NotFound";
 import { RecommenderProvider } from "@/context/RecommenderContext";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
@@ -20,6 +21,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/project/:id" element={<ProjectDetail />} />
+            <Route path="/client/:experienceId/:clientId" element={<ClientDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <ProjectRecommendation />

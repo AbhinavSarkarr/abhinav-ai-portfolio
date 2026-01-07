@@ -13,13 +13,25 @@ export type DescriptionItem = {
   subPoints?: string[];
 };
 
+export type ClientProject = {
+  id: string;
+  name: string;
+  domain: string;
+  shortDescription: string;
+  problemStatement: string;
+  solution: string;
+  techStack: string[];
+  contributions: string[];
+};
+
 export type ExperienceItem = {
   id: string;
   title: string;
   company: string;
   period: string;
   current: boolean;
-  description: DescriptionItem[];
+  description?: DescriptionItem[];
+  clients?: ClientProject[];
   certificateLink?: string;
 };
 
@@ -91,19 +103,48 @@ export const portfolioData = {
       company: "Jellyfish Technologies Pvt. Ltd.",
       period: "January 2025 – Present",
       current: true,
-      description: [
+      clients: [
         {
-          main: "Led delivery of GenAI systems for job matching, data quality, and platform safety, collaborating with cross-functional teams on candidate-facing and analytics workflows.",
-          subPoints: [
-            "Engineered content moderation and entity extraction system achieving 96% accuracy @ 75% match, ensuring reliable screening (110s P95) and structured population of candidate/job profiles.",
-            "Designed hybrid lexical + semantic recommendation engine for skill-based job matching, achieving sub-500ms retrieval latency and increasing apply-through on job postings."
+          id: "hiremeup",
+          name: "HireMeUp",
+          domain: "Recruitment & HR Tech",
+          shortDescription: "A short-video recruitment platform that recommends relevant openings based on candidate skills.",
+          problemStatement: "Traditional job search platforms rely on static text resumes and job descriptions, creating a disconnect between how candidates present themselves and how recruiters evaluate talent. HireMeUp envisioned a next-generation recruitment platform that combines the professional networking of LinkedIn with the engaging, swipe-based video experience of Instagram Reels. Job seekers would upload video introductions showcasing their personality and skills, while recruiters would post video job descriptions bringing company culture to life. The challenge was to build a complete AI infrastructure that could power intelligent job-candidate matching, ensure platform safety with user-generated video content, and extract structured data from unstructured recruiter inputs—all at scale with production-grade latency.",
+          solution: "Built an end-to-end AI service layer comprising three core systems:\n\n1. **Semantic Recommendation Engine** - An embedding-driven job matching system that understands candidate skills and job requirements beyond keyword matching, delivering personalized job feeds in the familiar reel-swipe format.\n\n2. **Content Moderation Pipeline** - An asynchronous video safety service that screens all uploaded content for inappropriate visuals and toxic speech before it reaches the platform.\n\n3. **Intelligent Entity Extraction** - A structured data extraction service that parses recruiter inputs (company profiles, job descriptions, Q&A responses) into normalized, searchable fields.",
+          techStack: ["Amazon Titan", "Amazon OpenSearch", "AWS Rekognition", "AWS Transcribe", "Amazon Bedrock", "Pydantic", "Python", "FastAPI"],
+          contributions: [
+            "Architected and built the embedding-driven recommendation engine using Amazon Titan for text embeddings and Amazon OpenSearch as the vector store, implementing location-first filtering, normalized seeker/job data scoring, and semantic similarity with capped boosts (≤30%) to prevent over-indexing on single factors—achieving sub-500ms average retrieval latency.",
+            "Developed the async content moderation service integrating AWS Rekognition for video safety analysis and AWS Transcribe for speech-to-text with toxicity detection, load-tested to sustain 1.5 RPS with 0% failure rate and 110s P95 latency.",
+            "Built the entity extraction service using Pydantic data models and Amazon Bedrock, enabling structured population of company profiles, job description fields, and recruiter Q&A—achieving 96% extraction precision at a 75% partial-match threshold."
           ]
         },
         {
-          main: "Spearheaded lead quality by designing dual-agent AI workflow, enabling context-aware hand-off from data capture to guided sales across 12+ tools using shared memory and persistent sessions."
+          id: "biofi",
+          name: "BioFi Algos",
+          domain: "Healthcare & MedTech",
+          shortDescription: "Contactless patient vital signs monitoring system using radar-based ML models for healthcare facilities.",
+          problemStatement: "Healthcare facilities require continuous vital signs monitoring for patients, but traditional methods involve wired sensors, physical contact, and manual check-ups—creating discomfort for patients and limiting scalability. BioFi needed a contactless patient monitoring solution that could track vital signs (heart rate, respiration rate, motion, bed occupancy) using radar sensors placed beneath hospital beds. The challenge was threefold: develop accurate ML models that could extract physiological signals from noisy radar data, handle real-world interference like patient movement, and scale the system from a pilot deployment to thousands of concurrent devices while keeping infrastructure costs manageable.",
+          solution: "Built a comprehensive contactless vital monitoring platform powered by radar-based ML models:\n\n1. **Vital Signs ML Pipeline** - Deep learning models (ShuffleNet-V2) trained on radar signal data to predict heart rate and respiration rate with clinical-grade accuracy, optimized for real-time edge inference.\n\n2. **Motion-Resilient Signal Processing** - Advanced signal processing pipeline combining FFT analysis, band-pass filtering, and temporal smoothing to maintain accuracy even when patients move.\n\n3. **Scalable Multi-Device Architecture** - Distributed streaming infrastructure supporting concurrent monitoring of thousands of beds with automated occupancy detection and intelligent data capture.",
+          techStack: ["PyTorch", "ShuffleNet-V2", "PyTorch JIT", "FFT", "Elliptic IIR Filters", "Viterbi Algorithm", "SVM", "MQTT", "UDP", "Edge Computing", "Radar Signal Processing"],
+          contributions: [
+            "Developed the heart rate prediction model using ShuffleNet-V2 architecture on radar data, achieving ±5 BPM accuracy across 222K samples, with PyTorch JIT optimization for low-latency edge inference.",
+            "Engineered motion-artifact resilience by implementing FFT-based periodicity bin selection across 30 radar frequency bins, elliptic IIR band-pass filtering for noise rejection, and Viterbi-style temporal smoothing for consistent predictions.",
+            "Scaled the monitoring infrastructure from 200 to 10,000+ concurrent devices by designing an MQTT + UDP streaming pipeline with automated bed-occupancy detection (SVM-based) and trigger-based data capture—reducing inference costs by 60%."
+          ]
         },
         {
-          main: "Pioneered audio-based multimodal RAG search system for sales workflows, translating customer queries into precise service/product retrieval across 9,000+ indexed offerings."
+          id: "1n20",
+          name: "1N20 Home Services",
+          domain: "Home Services & Sales",
+          shortDescription: "AI-powered voice sales assistant for a door and window manufacturer with multimodal product discovery.",
+          problemStatement: "1N20 Home Services, a door and window manufacturer, wanted to transform their website into an intelligent sales channel. Their sales team was overwhelmed with repetitive qualification calls, and customers browsing the website had no way to get instant, personalized guidance on products. The vision was an AI-powered sales assistant that could engage customers through natural voice conversation, capture their requirements, present relevant products with visuals, and seamlessly hand off qualified leads to human sales representatives—essentially an always-available sales agent that could handle the entire top-of-funnel process while maintaining the personalized touch customers expect.",
+          solution: "Built an end-to-end voice-enabled AI sales assistant with three integrated capabilities:\n\n1. **Dual-Agent Orchestration System** - An agentic architecture using OpenAI Agents SDK where one agent handles customer data capture (requirements, preferences, contact info) and intelligently hands off to a guided sales agent equipped with 12+ specialized tools, shared memory context, and persistent session management.\n\n2. **Multimodal Product Discovery Engine** - A RAG-based semantic search system that retrieves relevant products from 9,000+ indexed offerings and presents answers alongside product images, enabling visual product presentations during the conversation.\n\n3. **Real-Time Voice Interface** - A low-latency streaming pipeline enabling natural voice conversations with customers, complete with automated lead capture and follow-up workflows.",
+          techStack: ["OpenAI Agents SDK", "GPT-4o-mini", "text-embedding-3-large", "Pinecone", "WebSocket", "Pydantic", "MongoDB", "STT/TTS", "Python", "FastAPI"],
+          contributions: [
+            "Architected the dual-agent system using OpenAI Agents SDK, implementing context-aware handoff from data capture agent to guided sales agent with 12+ integrated tools, shared memory for conversation continuity, and persistent sessions for multi-visit customers.",
+            "Built the multimodal RAG-based semantic search pipeline using Pinecone and text-embedding-3-large, enabling precise product/service retrieval across 9,000+ indexed chunks with relevant product images returned alongside text responses.",
+            "Developed the real-time voice sales interface with low-latency streaming WebSocket pipeline, GPT-4o-mini for STT/TTS, Pydantic response schemas for structured outputs, and a lead-ingestion pipeline persisting qualified leads to MongoDB with automated follow-up emails."
+          ]
         }
       ]
     },
@@ -113,25 +154,60 @@ export const portfolioData = {
       company: "Jellyfish Technologies Pvt. Ltd.",
       period: "February 2024 – December 2024",
       current: false,
-      description: [
+      clients: [
         {
-          main: "Spearheaded AI-driven support automation, partnering with 3-member engineering team to improve ticket triage accuracy and response reliability.",
-          subPoints: [
-            "Architected email query extraction and escalation pipeline achieving 94% escalation precision and 92% extraction accuracy, reducing manual triage by 40%.",
-            "Developed and documented RAG support response system, achieving 87% context precision with P99 latency of 13.64s, improving automated reply reliability."
+          id: "levett",
+          name: "Levett Consultancy",
+          domain: "Education & IT Services",
+          shortDescription: "AI-powered IT support automation system for schools with multi-source RAG and intelligent ticket triage.",
+          problemStatement: "Levett Consultancy provides tiered IT support services (Bronze, Gold, Platinum) to schools across the region. Their Platinum tier allows unlimited support queries, but the support team was drowning in repetitive L1 tickets—questions whose answers already existed in their 15-year-old knowledge base or in official Google/Microsoft support documentation. Engineers were spending hours on routine queries instead of complex L2/L3 issues. The challenge was to build an intelligent support automation system that could understand incoming email queries, automatically respond to L1 tickets using existing knowledge sources, properly log time and update ticket statuses, and intelligently escalate complex issues to the Service Management Group—all while maintaining the accuracy and compliance standards expected in educational IT support.",
+          solution: "Built an end-to-end AI-powered support automation platform with three core capabilities:\n\n1. **Intelligent Email Triage Pipeline** - An automated workflow that extracts query intent from incoming support emails, classifies ticket complexity, and routes L1 queries for auto-response while escalating L2/L3 issues to human engineers with proper context.\n\n2. **Multi-Source RAG Response System** - A retrieval-augmented generation pipeline that searches across the client's 15-year internal knowledge base and official Google/Microsoft support documentation to generate accurate, contextual responses for L1 queries.\n\n3. **Compliance & Safety Guardrails** - A validation layer ensuring all auto-generated responses are grounded in retrieved context and safe to send, preventing hallucinations and maintaining support quality standards.",
+          techStack: ["Vertex AI", "RAG", "Google Cloud", "LangChain", "Vector Databases", "Email APIs", "Workflow Automation", "Guardrails AI", "Python"],
+          contributions: [
+            "Built the automated email query extraction and escalation pipeline using workflow orchestration, achieving 94% escalation precision (correctly identifying L2/L3 tickets) and 92% extraction accuracy for query intent classification—reducing manual triage overhead significantly.",
+            "Developed the RAG-based response generation pipeline using Vertex AI, integrating the client's 15-year knowledge base with Google/Microsoft support documentation, achieving 87% context precision with P99 latency of 13.64 seconds for first-response generation.",
+            "Implemented Guardrails enforcement layer ensuring all auto-generated responses are context-grounded and safe-to-ship, reducing support errors and minimizing manual override interventions for compliance."
           ]
         },
         {
-          main: "Fine-tuned Mistral-7B on 18GB Indian legal corpus using DAPT + SFT with 760K+ instruction pairs, reducing perplexity from 18.2 to 10.5 and achieving 83% accuracy on 5K legal QA set.",
-          subPoints: [
-            "Trained with DDP across 4×H100 GPUs, achieving 3× throughput and 87% scaling efficiency, reducing training time from 6 to 2 days."
+          id: "retailstack",
+          name: "RetailStack Analytics",
+          domain: "Retail & Supply Chain",
+          shortDescription: "ML-powered inventory forecasting system for retail malls with stock-level predictions across 1,450+ SKUs.",
+          problemStatement: "Retail shopping malls face significant financial losses due to inefficient inventory management. Overstocking ties up capital, increases storage costs, and leads to product spoilage, while understocking results in lost sales and customer dissatisfaction—with an estimated 8-10% revenue loss from stockouts and 25-30% excess inventory carrying costs annually. Traditional inventory management relies on manual estimation and static reorder points, which fail to account for hourly demand fluctuations across 1,450+ product SKUs, environmental factors like storage temperature affecting stock viability, and sparse sales transaction data with 71.8% missing values. The challenge was to build an intelligent forecasting system that could unify multi-source data streams from IoT sensors, POS systems, and environmental monitors—each operating at different granularities—into accurate, actionable stock-level predictions.",
+          solution: "Built an end-to-end ML-powered inventory forecasting system that predicts stock levels with hourly granularity, enabling proactive replenishment decisions:\n\n1. **Multi-Model Ensemble Forecasting** - Combined XGBoost and Prophet models with temporal lag features capturing 1-24 hour demand patterns, providing both point predictions and uncertainty intervals for risk-aware decision making.\n\n2. **Unified Data Fusion Pipeline** - SQL-based ETL consolidating heterogeneous data sources (IoT sensor readings, POS transactions, temperature monitors) into a unified hourly time-series through schema-agnostic ingestion and intelligent temporal alignment.\n\n3. **Production ML Infrastructure** - End-to-end cloud deployment on AWS with real-time inference API, automated prediction distribution, and comprehensive MLOps for continuous model improvement.\n\n4. **Stakeholder Intelligence Layer** - Automated reporting via Google Sheets integration and Looker Studio dashboards for real-time KPI monitoring by non-technical stakeholders.",
+          techStack: ["XGBoost", "Prophet", "Random Forest", "Python", "AWS (EC2, RDS, S3)", "Flask", "MySQL", "MLflow", "Optuna", "Jenkins CI/CD", "boto3", "Google Sheets API", "Looker Studio", "Pandas", "scikit-learn"],
+          contributions: [
+            "Developed ensemble inventory forecasting models (XGBoost, Prophet, Random Forest) on hourly retail data, achieving RMSE 0.264 on stock-level prediction across 1,450+ products using 6 lagged features (1,2,3,6,12,24h) and datetime decomposition for temporal pattern capture.",
+            "Engineered schema-agnostic CSV-to-MySQL data loader with dynamic SQL type mapping, enabling rapid multi-source ingestion from IoT sensors (23K temperature readings, 15K stock levels) and POS transactions (7.8K sales records) with LEFT OUTER JOINs aligning heterogeneous data to hourly buckets.",
+            "Architected end-to-end ML pipeline on AWS (EC2/RDS/S3) with Jenkins CI/CD, MLflow experiment tracking, Optuna hyperparameter tuning, and real-time prediction distribution via Flask API and Google Sheets integration—reducing manual forecasting effort and enabling data-driven purchasing decisions."
           ]
         },
         {
-          main: "Built radar-based vital-sign prediction models achieving ±5 BPM heart-rate accuracy across 222K samples and breathing-rate detection across 119K samples, optimized for edge inference via PyTorch JIT."
+          id: "patra",
+          name: "Patra Corporation",
+          domain: "Insurance & InsurTech",
+          shortDescription: "AI-powered insurance document verification system using knowledge graphs for entity relationship modeling.",
+          problemStatement: "Patra Corporation provides backend support services to insurance companies and brokers worldwide. One critical service involves verifying insurance document renewals—ensuring that renewed policy documents accurately match the original documents by cross-referencing key fields like coverage amounts, policy terms, beneficiaries, and endorsements. Previously, a dedicated backend team manually reviewed each renewal document against historical records, a process that was time-consuming, error-prone, and didn't scale. The challenge was compounded by the fact that insurance documents come in vastly different formats, layouts, and lengths across carriers—making simple template-based extraction unreliable. Patra needed an intelligent document verification system that could understand document structure regardless of format, extract relevant entities accurately, and automatically flag discrepancies for human review.",
+          solution: "Built an AI-powered insurance document verification system leveraging knowledge graphs for intelligent entity relationship modeling:\n\n1. **Intelligent Document Processing Pipeline** - An extraction system using AWS Textract for OCR and document parsing, combined with Amazon Bedrock for contextual entity extraction that handles varying document formats and lengths.\n\n2. **Knowledge Graph Entity Modeling** - A Neo4j-based knowledge graph that models relationships between extracted entities (policy holders, coverage types, amounts, dates, endorsements), enabling semantic comparison between renewal and original documents.\n\n3. **Automated Verification Engine** - A comparison system that traverses the knowledge graph to identify matches, mismatches, and anomalies between document versions, surfacing discrepancies for human review.",
+          techStack: ["Neo4j", "AWS Textract", "Amazon Bedrock", "Knowledge Graphs", "Python", "Entity Extraction", "Document Processing", "Graph Databases"],
+          contributions: [
+            "Built the Neo4j knowledge-graph pipeline using AWS Textract for document parsing and Amazon Bedrock for intelligent entity extraction, modeling complex entity relationships across insurance documents of varying formats and lengths.",
+            "Engineered the high-precision entity extraction system leveraging knowledge graphs for contextual understanding, achieving 91% precision at 60% partial-match threshold—significantly improving verification accuracy over manual review processes."
+          ]
         },
         {
-          main: "Resolved heart-rate inference issues under motion via FFT-based periodicity analysis across 30 radar bins, IIR band-pass filtering, and Viterbi-style temporal smoothing."
+          id: "nyaya",
+          name: "Nyaya LLM",
+          domain: "Legal Tech",
+          shortDescription: "Domain-adapted legal LLM fine-tuned on Indian legal corpus for democratizing access to legal knowledge.",
+          problemStatement: "India's legal system is one of the most complex in the world, encompassing the Indian Penal Code (IPC), Code of Civil Procedure (CPC), Code of Criminal Procedure (CrPC), Constitution of India, and thousands of acts, amendments, and case law precedents spanning over 150 years. Legal assistance remains inaccessible to millions due to high costs and shortage of lawyers, while existing general-purpose LLMs lack the domain-specific knowledge to accurately interpret Indian legal terminology, statutes, and judicial reasoning. The challenge was to build a specialized legal language model trained on authentic Indian legal corpora that could accurately answer legal queries, understand statute references, and provide contextually relevant legal information—democratizing access to legal knowledge for citizens, law students, and paralegal professionals.",
+          solution: "Built a domain-adapted large language model specialized for Indian legal understanding through comprehensive pre-training and instruction tuning:\n\n1. **Domain-Adaptive Pre-Training (DAPT)** - Continued pre-training of Mistral-7B on 18GB of Indian legal corpus covering IPC, CPC, CrPC, Constitution, landmark judgments, and statutory interpretations to build deep legal domain understanding.\n\n2. **Supervised Fine-Tuning (SFT)** - Instruction-tuned the model on 760K+ curated legal question-answer pairs covering statute interpretation, case law queries, procedural questions, and legal reasoning tasks.\n\n3. **Distributed Training Infrastructure** - Scaled training across multiple high-performance GPUs using PyTorch DDP for efficient large-scale model training with optimal resource utilization.",
+          techStack: ["Mistral-7B", "PyTorch", "Distributed Data Parallel (DDP)", "H100 GPUs", "Transformers", "PEFT", "DeepSpeed", "Mixed Precision Training", "Hugging Face", "DAPT", "SFT"],
+          contributions: [
+            "Fine-tuned Mistral-7B on 18GB Indian legal corpus (IPC, CPC, CrPC, Constitution, case law) using Domain-Adaptive Pre-Training (DAPT) followed by Supervised Fine-Tuning (SFT) with 760K+ instruction pairs, reducing perplexity from 18.2 to 10.5 and achieving 83% accuracy on a 5K legal QA evaluation set.",
+            "Engineered distributed training pipeline using PyTorch DDP across 4×H100 GPUs, achieving 3× throughput improvement and 87% scaling efficiency—reducing total training time from 6 days to 2 days."
+          ]
         }
       ]
     },
