@@ -210,22 +210,6 @@ export const portfolioData = {
           ]
         }
       ]
-    },
-    {
-      id: "exp3",
-      title: "Deep Learning Engineer",
-      company: "AI Zoned",
-      period: "June – September 2023",
-      current: false,
-      description: [
-        {
-          main: "Designed and executed a zero-shot classification system using bart-large-mnli 1.0 to categorize individuals based on their preferences, work experience, and career aspirations with predefined categories."
-        },
-        {
-          main: "Developed predictive modules for financial forecasting, utilizing XGBoost Regressor to predict corporate maintenance expenditures and contractor profits based on projected workload for branch operations."
-        }
-      ],
-      certificateLink: "https://drive.google.com/file/d/1Izrznc1wU2PE8EEQo2YMWLBPYWW12QV7/view?usp=sharing"
     }
   ],
   projects: [
