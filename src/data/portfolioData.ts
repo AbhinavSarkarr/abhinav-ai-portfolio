@@ -94,7 +94,7 @@ export const portfolioData = {
     title: "AI-ML Engineer",
     description: "AI-ML Engineer with ~2 years of experience building production ML systems, from classical models to deep learning and GenAI. Skilled in end-to-end ML pipelines: data engineering, feature stores, model training, MLOps, and deployment. Focused on delivering scalable, reliable AI solutions with measurable business impact.",
     image: "/lovable-uploads/0f976acc-d38b-4ac7-96a7-02ccc53846b5.png",
-    resumeLink: "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
+    resumeLink: "https://drive.google.com/file/d/1ZyA0fzIfQ_pH0d_CRoXiuUmplwI1Pb_J/view?usp=sharing"
   },
   experiences: [
     {
@@ -629,6 +629,6 @@ export const portfolioData = {
     linkedin: "https://www.linkedin.com/in/abhinavsarkarrr",
     huggingface: "https://huggingface.co/abhinavsarkar",
     portfolio: "https://abhinav-ai-portfolio.lovable.app/",
-    resume: "https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
+    resume: "https://drive.google.com/file/d/1ZyA0fzIfQ_pH0d_CRoXiuUmplwI1Pb_J/view?usp=sharing"
   }
 };

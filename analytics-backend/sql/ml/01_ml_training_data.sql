@@ -1,5 +1,6 @@
--- ML Training Data View
+-- ML Training Data View (UPDATED)
 -- Comprehensive feature set for training recommendation models
+-- Includes client work, recommendations, and certification features
 -- Dataset: portfolio-483605.analytics_processed
 
 CREATE OR REPLACE VIEW `portfolio-483605.analytics_processed.ml_training_data` AS
@@ -103,6 +104,82 @@ skill_interests AS (
     STRING_AGG(DISTINCT skill_category, ',' ORDER BY skill_category) AS skill_categories_list
 
   FROM `portfolio-483605.analytics_processed.v_skill_events`
+  GROUP BY user_pseudo_id, session_id
+),
+
+-- NEW: Client/Experience interactions
+client_interactions AS (
+  SELECT
+    user_pseudo_id,
+    session_id,
+
+    -- Client work engagement
+    COUNT(DISTINCT client_id) AS unique_clients_viewed,
+    COUNTIF(event_name = 'client_view') AS client_views,
+    COUNTIF(event_name = 'client_click') AS client_clicks,
+    COUNTIF(event_name = 'client_case_study_open') AS case_study_opens,
+    COUNTIF(event_name = 'client_case_study_engagement') AS case_study_engagements,
+
+    -- Domain interests
+    COUNT(DISTINCT domain) AS unique_domains_explored,
+    COUNTIF(event_name = 'domain_interest') AS domain_interest_signals,
+    STRING_AGG(DISTINCT domain IGNORE NULLS, ',' ORDER BY domain) AS domains_explored,
+
+    -- Content reading patterns
+    COUNTIF(event_name = 'problem_statement_read') AS problem_reads,
+    COUNTIF(event_name = 'solution_read') AS solution_reads,
+    AVG(CASE WHEN event_name = 'problem_statement_read' THEN read_time_seconds END) AS avg_problem_read_time,
+    AVG(CASE WHEN event_name = 'solution_read' THEN read_time_seconds END) AS avg_solution_read_time,
+
+    -- Contribution viewing
+    COUNTIF(event_name = 'contribution_view') AS contribution_views,
+
+    -- Tech stack interest from client work
+    COUNTIF(event_name = 'client_tech_stack_click') AS client_tech_clicks,
+    STRING_AGG(DISTINCT technology IGNORE NULLS, ',' ORDER BY technology) AS client_technologies_clicked,
+
+    -- Experience/role interest
+    COUNTIF(event_name = 'experience_level_interest') AS experience_interest_signals
+
+  FROM `portfolio-483605.analytics_processed.v_client_events`
+  GROUP BY user_pseudo_id, session_id
+),
+
+-- NEW: Recommendation interactions
+recommendation_interactions AS (
+  SELECT
+    user_pseudo_id,
+    session_id,
+
+    -- Recommendation engagement
+    COUNTIF(event_name = 'recommendation_shown') AS recs_shown,
+    COUNTIF(event_name = 'recommendation_click') AS recs_clicked,
+
+    -- Position analysis
+    AVG(CASE WHEN event_name = 'recommendation_click' THEN position END) AS avg_clicked_position,
+    MIN(CASE WHEN event_name = 'recommendation_click' THEN position END) AS first_clicked_position,
+
+    -- Unique projects recommended vs clicked
+    COUNT(DISTINCT CASE WHEN event_name = 'recommendation_shown' THEN recommended_project_id END) AS unique_recs_shown,
+    COUNT(DISTINCT CASE WHEN event_name = 'recommendation_click' THEN recommended_project_id END) AS unique_recs_clicked
+
+  FROM `portfolio-483605.analytics_processed.v_recommendation_events`
+  GROUP BY user_pseudo_id, session_id
+),
+
+-- NEW: Certification interactions
+certification_interactions AS (
+  SELECT
+    user_pseudo_id,
+    session_id,
+
+    -- Certification engagement
+    COUNT(*) AS cert_clicks,
+    COUNT(DISTINCT cert_title) AS unique_certs_clicked,
+    COUNT(DISTINCT cert_issuer) AS unique_issuers_clicked,
+    STRING_AGG(DISTINCT cert_title, ',' ORDER BY cert_title) AS certs_clicked
+
+  FROM `portfolio-483605.analytics_processed.v_certification_events`
   GROUP BY user_pseudo_id, session_id
 ),
 
@@ -218,6 +295,43 @@ SELECT
   si.skills_clicked_list,
   si.skill_categories_list,
 
+  -- NEW: Client/Experience features
+  COALESCE(ci.unique_clients_viewed, 0) AS unique_clients_viewed,
+  COALESCE(ci.client_views, 0) AS client_views,
+  COALESCE(ci.client_clicks, 0) AS client_clicks,
+  COALESCE(ci.case_study_opens, 0) AS case_study_opens,
+  COALESCE(ci.case_study_engagements, 0) AS case_study_engagements,
+  COALESCE(ci.unique_domains_explored, 0) AS unique_domains_explored,
+  COALESCE(ci.domain_interest_signals, 0) AS domain_interest_signals,
+  ci.domains_explored,
+  COALESCE(ci.problem_reads, 0) AS problem_reads,
+  COALESCE(ci.solution_reads, 0) AS solution_reads,
+  COALESCE(ci.avg_problem_read_time, 0) AS avg_problem_read_time,
+  COALESCE(ci.avg_solution_read_time, 0) AS avg_solution_read_time,
+  COALESCE(ci.contribution_views, 0) AS contribution_views,
+  COALESCE(ci.client_tech_clicks, 0) AS client_tech_clicks,
+  ci.client_technologies_clicked,
+  COALESCE(ci.experience_interest_signals, 0) AS experience_interest_signals,
+
+  -- NEW: Recommendation features
+  COALESCE(ri.recs_shown, 0) AS recs_shown,
+  COALESCE(ri.recs_clicked, 0) AS recs_clicked,
+  ri.avg_clicked_position,
+  ri.first_clicked_position,
+  COALESCE(ri.unique_recs_shown, 0) AS unique_recs_shown,
+  COALESCE(ri.unique_recs_clicked, 0) AS unique_recs_clicked,
+  -- Recommendation CTR
+  CASE
+    WHEN COALESCE(ri.recs_shown, 0) > 0
+    THEN ROUND(COALESCE(ri.recs_clicked, 0) * 100.0 / ri.recs_shown, 2)
+    ELSE 0
+  END AS recommendation_ctr,
+
+  -- NEW: Certification features
+  COALESCE(cert.cert_clicks, 0) AS cert_clicks,
+  COALESCE(cert.unique_certs_clicked, 0) AS unique_certs_clicked,
+  cert.certs_clicked,
+
   -- Conversion features
   COALESCE(cs.cta_clicks, 0) AS cta_clicks,
   COALESCE(cs.form_starts, 0) AS form_starts,
@@ -228,7 +342,11 @@ SELECT
   COALESCE(cs.content_copies, 0) AS content_copies,
   COALESCE(cs.exit_intents, 0) AS exit_intents,
 
-  -- Target variables
+  -- =============================================
+  -- TARGET VARIABLES
+  -- =============================================
+
+  -- Binary targets
   COALESCE(cs.converted_contact, 0) AS target_contact_conversion,
   COALESCE(cs.converted_resume, 0) AS target_resume_conversion,
   COALESCE(cs.converted_external, 0) AS target_external_conversion,
@@ -240,6 +358,9 @@ SELECT
     COALESCE(sps.total_project_clicks, 0) * 5 +
     COALESCE(sps.total_project_expands, 0) * 10 +
     COALESCE(sps.total_project_link_clicks, 0) * 15 +
+    COALESCE(ci.case_study_opens, 0) * 8 +
+    COALESCE(ci.case_study_engagements, 0) * 12 +
+    COALESCE(ri.recs_clicked, 0) * 6 +
     COALESCE(cs.form_submissions, 0) * 50 +
     COALESCE(cs.resume_downloads, 0) * 40 +
     COALESCE(cs.social_clicks, 0) * 10
@@ -249,9 +370,26 @@ SELECT
   CASE
     WHEN COALESCE(cs.form_submissions, 0) > 0 OR COALESCE(cs.resume_downloads, 0) > 0 THEN 1
     WHEN COALESCE(sps.high_interest_projects, 0) >= 2 THEN 1
+    WHEN COALESCE(ci.case_study_engagements, 0) >= 1 THEN 1
     WHEN sf.is_engaged = TRUE AND COALESCE(sps.projects_viewed, 0) >= 3 THEN 1
     ELSE 0
-  END AS target_high_value_visitor
+  END AS target_high_value_visitor,
+
+  -- NEW: Recruiter likelihood (binary target)
+  CASE
+    WHEN COALESCE(ci.experience_interest_signals, 0) > 0 THEN 1
+    WHEN COALESCE(ci.unique_domains_explored, 0) >= 2 AND COALESCE(cs.resume_downloads, 0) > 0 THEN 1
+    WHEN COALESCE(ci.case_study_opens, 0) >= 2 AND COALESCE(ci.problem_reads, 0) > 0 THEN 1
+    ELSE 0
+  END AS target_likely_recruiter,
+
+  -- NEW: Deep explorer (binary target)
+  CASE
+    WHEN COALESCE(ci.problem_reads, 0) > 0 AND COALESCE(ci.solution_reads, 0) > 0 THEN 1
+    WHEN COALESCE(sps.total_project_expands, 0) >= 2 THEN 1
+    WHEN COALESCE(sss.max_scroll_depth, 0) >= 75 AND COALESCE(sf.session_duration_seconds, 0) > 180 THEN 1
+    ELSE 0
+  END AS target_deep_explorer
 
 FROM session_features sf
 LEFT JOIN session_project_summary sps
@@ -260,6 +398,12 @@ LEFT JOIN session_section_summary sss
   ON sf.user_pseudo_id = sss.user_pseudo_id AND sf.session_id = sss.session_id
 LEFT JOIN skill_interests si
   ON sf.user_pseudo_id = si.user_pseudo_id AND sf.session_id = si.session_id
+LEFT JOIN client_interactions ci
+  ON sf.user_pseudo_id = ci.user_pseudo_id AND sf.session_id = ci.session_id
+LEFT JOIN recommendation_interactions ri
+  ON sf.user_pseudo_id = ri.user_pseudo_id AND sf.session_id = ri.session_id
+LEFT JOIN certification_interactions cert
+  ON sf.user_pseudo_id = cert.user_pseudo_id AND sf.session_id = cert.session_id
 LEFT JOIN conversion_signals cs
   ON sf.user_pseudo_id = cs.user_pseudo_id AND sf.session_id = cs.session_id
 
