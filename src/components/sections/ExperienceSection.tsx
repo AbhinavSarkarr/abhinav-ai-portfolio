@@ -226,18 +226,18 @@ export function ExperienceSection() {
                           >
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
+                                <div className="flex items-center gap-2 mb-2">
                                   <Building2 size={16} className="text-tech-accent flex-shrink-0" />
                                   <h4 className="font-semibold text-foreground group-hover/client:text-tech-accent transition-colors duration-300">
                                     {client.name}
                                   </h4>
-                                  <span className="px-2 py-0.5 text-xs rounded-full bg-tech-accent/10 text-tech-accent border border-tech-accent/20">
-                                    {client.domain}
-                                  </span>
                                 </div>
-                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                <p className="text-sm text-muted-foreground mb-2">
                                   {client.shortDescription}
                                 </p>
+                                <span className="inline-block px-2.5 py-1 text-xs rounded-full bg-gradient-to-r from-tech-neon/10 to-tech-accent/10 text-tech-accent border border-tech-accent/20">
+                                  {client.domain}
+                                </span>
                               </div>
                               <motion.div
                                 className="flex-shrink-0 mt-1"
