@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { portfolioData } from '@/data/portfolioData';
+import { trackSkillClick, trackCTAClick } from '@/hooks/useAnalytics';
 import {
   staggerContainer,
   staggerItem,
@@ -142,8 +143,9 @@ export function SkillsSection() {
                       <motion.div
                         key={idx}
                         variants={skillItemVariants}
-                        className="flex items-center gap-2 group/skill"
+                        className="flex items-center gap-2 group/skill cursor-pointer"
                         whileHover={{ x: 8, transition: { duration: 0.2 } }}
+                        onClick={() => trackSkillClick(skill, category.name)}
                       >
                         <motion.div
                           className="w-1.5 h-1.5 rounded-full bg-tech-accent/60 group-hover/skill:bg-tech-accent transition-colors duration-300"
@@ -212,6 +214,7 @@ export function SkillsSection() {
               className="tech-btn inline-block"
               whileHover={buttonHover}
               whileTap={buttonTap}
+              onClick={() => trackCTAClick('Get in touch', 'Skills Section')}
             >
               Get in touch
             </motion.a>

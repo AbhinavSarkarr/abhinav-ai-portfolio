@@ -368,6 +368,112 @@ export function trackPublicationClick(pubTitle: string) {
 }
 
 // ============================================
+// SKILL & INTEREST TRACKING
+// ============================================
+
+export function trackSkillClick(skillName: string, category: string) {
+  trackEvent('skill_click', {
+    event_category: 'Skills',
+    event_label: skillName,
+    skill_name: skillName,
+    skill_category: category,
+  });
+}
+
+export function trackSkillCategoryView(category: string) {
+  trackEvent('skill_category_view', {
+    event_category: 'Skills',
+    event_label: category,
+    skill_category: category,
+  });
+}
+
+export function trackTechnologyInterest(technology: string, projectId: string) {
+  trackEvent('technology_interest', {
+    event_category: 'Interest',
+    event_label: technology,
+    technology: technology,
+    source_project: projectId,
+  });
+}
+
+export function trackProjectCategoryInterest(category: string) {
+  trackEvent('project_category_interest', {
+    event_category: 'Interest',
+    event_label: category,
+    project_category: category,
+  });
+}
+
+// ============================================
+// OUTBOUND & EXIT TRACKING
+// ============================================
+
+export function trackOutboundLink(url: string, linkText: string, context: string) {
+  trackEvent('outbound_link', {
+    event_category: 'Outbound',
+    event_label: linkText,
+    outbound_url: url,
+    link_text: linkText,
+    context: context,
+  });
+}
+
+export function trackExitIntent(lastSection: string, timeOnPage: number, scrollDepth: number) {
+  trackEvent('exit_intent', {
+    event_category: 'Engagement',
+    event_label: lastSection,
+    last_section: lastSection,
+    time_on_page_seconds: Math.round(timeOnPage),
+    scroll_depth_percent: Math.round(scrollDepth),
+  });
+}
+
+// ============================================
+// CTA & ENGAGEMENT TRACKING
+// ============================================
+
+export function trackCTAView(ctaName: string, ctaLocation: string) {
+  trackEvent('cta_view', {
+    event_category: 'CTA',
+    event_label: ctaName,
+    cta_name: ctaName,
+    cta_location: ctaLocation,
+  });
+}
+
+export function trackScrollMilestone(milestone: number, sectionId?: string) {
+  trackEvent('scroll_milestone', {
+    event_category: 'Engagement',
+    event_label: `${milestone}%`,
+    scroll_milestone: milestone,
+    section_id: sectionId,
+  });
+}
+
+// ============================================
+// CONTENT QUALITY SIGNALS
+// ============================================
+
+export function trackContentCopy(contentType: string, contentSnippet: string) {
+  trackEvent('content_copy', {
+    event_category: 'Engagement',
+    event_label: contentType,
+    content_type: contentType,
+    content_snippet: contentSnippet.substring(0, 50),
+  });
+}
+
+export function trackTimeThreshold(section: string, threshold: number) {
+  trackEvent('time_threshold', {
+    event_category: 'Engagement',
+    event_label: `${section} - ${threshold}s`,
+    section: section,
+    threshold_seconds: threshold,
+  });
+}
+
+// ============================================
 // SESSION TRACKING
 // ============================================
 

@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { BookOpen, ExternalLink, Clock } from 'lucide-react';
 import { portfolioData } from '@/data/portfolioData';
+import { trackPublicationClick } from '@/hooks/useAnalytics';
 import {
   staggerContainer,
   sectionHeading,
@@ -155,6 +156,7 @@ export function PublicationsSection() {
                       className="inline-flex items-center gap-1.5 text-tech-accent hover:text-tech-neon transition-colors duration-300"
                       whileHover={{ x: 5 }}
                       whileTap={{ scale: 0.98 }}
+                      onClick={() => trackPublicationClick(pub.title)}
                     >
                       Read Publication
                       <motion.span
