@@ -48,13 +48,13 @@ export function initGA4() {
 
   // Initialize dataLayer
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function gtag(...args: any[]) {
-    window.dataLayer.push(args);
+  window.gtag = function(...args: any[]) {
+    window.dataLayer.push(arguments);
   };
 
   window.gtag('js', new Date());
   window.gtag('config', GA_MEASUREMENT_ID, {
-    send_page_view: false, // We'll send manually for SPA
+    send_page_view: true,
     cookie_flags: 'SameSite=None;Secure',
   });
 
