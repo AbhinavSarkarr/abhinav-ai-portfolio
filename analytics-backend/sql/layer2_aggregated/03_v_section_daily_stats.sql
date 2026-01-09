@@ -13,22 +13,20 @@ SELECT
   COUNT(DISTINCT session_id) AS unique_sessions,
 
   -- Engagement metrics
-  COUNTIF(event_name = 'section_engaged') AS engaged_views,
+  COUNTIF(event_name = 'section_engagement') AS engaged_views,
   ROUND(
-    COUNTIF(event_name = 'section_engaged') * 100.0 /
+    COUNTIF(event_name = 'section_engagement') * 100.0 /
     NULLIF(COUNTIF(event_name = 'section_view'), 0),
     2
   ) AS engagement_rate,
 
   -- Time spent
-  AVG(view_duration_ms) AS avg_view_duration_ms,
-  AVG(visible_time_ms) AS avg_visible_time_ms,
+  AVG(time_spent_seconds) AS avg_time_spent_seconds,
   MAX(time_threshold_sec) AS max_time_threshold_reached,
 
   -- Scroll depth
-  AVG(scroll_depth) AS avg_scroll_depth,
+  AVG(scroll_depth_percent) AS avg_scroll_depth_percent,
   MAX(scroll_milestone) AS max_scroll_milestone,
-  AVG(visibility_percentage) AS avg_visibility_percentage,
 
   -- Exit rate from this section
   COUNTIF(event_name = 'section_exit') AS exits,

@@ -1,0 +1,145 @@
+# BigQuery Analytics Materialization
+# Runs daily at 2:00 PM IST (8:30 UTC) to materialize analytics views into tables
+# This makes Looker dashboards faster and creates daily snapshots
+
+name: Materialize BigQuery Analytics
+
+on:
+  schedule:
+    # Runs at 2:00 PM IST (8:30 UTC) daily
+    - cron: '30 8 * * *'
+
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  materialize:
+    name: Materialize Analytics Tables
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: portfolio-483605
+
+      - name: Create materialized dataset if not exists
+        run: |
+          bq mk --dataset --location=US portfolio-483605:analytics_materialized || true
+
+      - name: Materialize Section Rankings
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.section_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_section_rankings`
+          '
+          echo "Section rankings materialized"
+
+      - name: Materialize Project Rankings
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.project_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_project_rankings`
+          '
+          echo "Project rankings materialized"
+
+      - name: Materialize Skill Rankings
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.skill_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_skill_rankings`
+          '
+          echo "Skill rankings materialized"
+
+      - name: Materialize Client Rankings
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.client_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_client_rankings`
+          '
+          echo "Client rankings materialized"
+
+      - name: Materialize Domain Rankings
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.domain_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_domain_rankings`
+          '
+          echo "Domain rankings materialized"
+
+      - name: Materialize Experience Rankings
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.experience_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_experience_rankings`
+          '
+          echo "Experience rankings materialized"
+
+      - name: Materialize Tech Demand Insights
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.tech_demand_insights` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_tech_demand_insights`
+          '
+          echo "Tech demand insights materialized"
+
+      - name: Materialize Visitor Insights
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.visitor_insights` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_visitor_insights`
+          '
+          echo "Visitor insights materialized"
+
+      - name: Materialize Conversion Funnel
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.conversion_funnel` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
+          '
+          echo "Conversion funnel materialized"
+
+      - name: Materialize Recommendation Performance
+        run: |
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.recommendation_performance` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_recommendation_performance`
+          '
+          echo "Recommendation performance materialized"
+
+      - name: Summary
+        run: |
+          echo "========================================"
+          echo "Materialization Complete!"
+          echo "========================================"
+          echo "Tables updated in analytics_materialized:"
+          echo "  - section_rankings"
+          echo "  - project_rankings"
+          echo "  - skill_rankings"
+          echo "  - client_rankings"
+          echo "  - domain_rankings"
+          echo "  - experience_rankings"
+          echo "  - tech_demand_insights"
+          echo "  - visitor_insights"
+          echo "  - conversion_funnel"
+          echo "  - recommendation_performance"
+          echo "========================================"
+          echo "Timestamp: $(date)"

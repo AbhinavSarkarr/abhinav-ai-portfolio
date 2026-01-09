@@ -16,8 +16,9 @@ SELECT
 
   -- Click metrics
   COUNTIF(event_name = 'project_click') AS clicks,
-  COUNTIF(event_name = 'project_expand') AS expands,
+  COUNTIF(event_name IN ('project_expand', 'case_study_open')) AS expands,
   COUNTIF(event_name = 'project_link_click') AS link_clicks,
+  COUNTIF(event_name = 'case_study_engagement') AS case_study_engagements,
 
   -- Engagement
   AVG(view_duration_ms) AS avg_view_duration_ms,
@@ -25,7 +26,7 @@ SELECT
 
   -- Click-through rate
   ROUND(
-    COUNTIF(event_name IN ('project_click', 'project_expand', 'project_link_click')) * 100.0 /
+    COUNTIF(event_name IN ('project_click', 'project_expand', 'case_study_open', 'project_link_click')) * 100.0 /
     NULLIF(COUNTIF(event_name = 'project_view'), 0),
     2
   ) AS click_through_rate,

@@ -11,12 +11,12 @@ WITH visitor_project_affinity AS (
     project_id,
     SUM(CASE WHEN event_name = 'project_view' THEN 1 ELSE 0 END) AS views,
     SUM(CASE WHEN event_name = 'project_click' THEN 3 ELSE 0 END) AS clicks,
-    SUM(CASE WHEN event_name = 'project_expand' THEN 5 ELSE 0 END) AS expands,
+    SUM(CASE WHEN event_name IN ('project_expand', 'case_study_open') THEN 5 ELSE 0 END) AS expands,
     SUM(CASE WHEN event_name = 'project_link_click' THEN 7 ELSE 0 END) AS link_clicks,
     -- Affinity score
     (SUM(CASE WHEN event_name = 'project_view' THEN 1 ELSE 0 END) +
      SUM(CASE WHEN event_name = 'project_click' THEN 3 ELSE 0 END) +
-     SUM(CASE WHEN event_name = 'project_expand' THEN 5 ELSE 0 END) +
+     SUM(CASE WHEN event_name IN ('project_expand', 'case_study_open') THEN 5 ELSE 0 END) +
      SUM(CASE WHEN event_name = 'project_link_click' THEN 7 ELSE 0 END)) AS affinity_score
 
   FROM `portfolio-483605.analytics_processed.v_project_events`

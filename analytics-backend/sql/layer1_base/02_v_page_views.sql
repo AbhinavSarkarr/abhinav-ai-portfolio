@@ -37,6 +37,6 @@ SELECT
   traffic_source.source AS traffic_source,
   traffic_source.medium AS traffic_medium
 
-FROM `portfolio-483605.analytics_*.events_*`
+FROM `portfolio-483605.analytics_518701756.events_*`
 WHERE event_name = 'page_view'
   AND _TABLE_SUFFIX >= FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY));

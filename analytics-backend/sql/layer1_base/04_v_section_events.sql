@@ -14,13 +14,12 @@ SELECT
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'section_id') AS section_id,
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'section_name') AS section_name,
 
-  -- Engagement metrics
-  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'view_duration') AS view_duration_ms,
-  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_threshold') AS time_threshold_sec,
-  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'scroll_depth') AS scroll_depth,
+  -- Engagement metrics (keys match actual GA4 data)
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_spent_seconds') AS time_spent_seconds,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'scroll_depth_percent') AS scroll_depth_percent,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'value') AS engagement_value,
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'scroll_milestone') AS scroll_milestone,
-  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'visible_time') AS visible_time_ms,
-  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'visibility_percentage') AS visibility_percentage,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_threshold') AS time_threshold_sec,
 
   -- Navigation context
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'from_section') AS from_section,
@@ -34,12 +33,14 @@ SELECT
   -- Geo
   geo.country AS country
 
-FROM `portfolio-483605.analytics_*.events_*`
+FROM `portfolio-483605.analytics_518701756.events_*`
 WHERE event_name IN (
   'section_view',
-  'section_engaged',
+  'section_engagement',
   'section_exit',
+  'scroll',
   'scroll_milestone',
+  'scroll_depth',
   'time_threshold',
   'navigation'
 )

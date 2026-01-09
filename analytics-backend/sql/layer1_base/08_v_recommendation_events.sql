@@ -26,7 +26,7 @@ SELECT
   -- Traffic
   traffic_source.source AS traffic_source
 
-FROM `portfolio-483605.analytics_*.events_*`
+FROM `portfolio-483605.analytics_518701756.events_*`
 WHERE event_name IN (
   'recommendation_shown',
   'recommendation_click'

@@ -50,7 +50,7 @@ WITH session_data AS (
         THEN (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'page_location')
         END) AS exit_page
 
-  FROM `portfolio-483605.analytics_*.events_*`
+  FROM `portfolio-483605.analytics_518701756.events_*`
   WHERE _TABLE_SUFFIX >= FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY))
   GROUP BY
     user_pseudo_id,

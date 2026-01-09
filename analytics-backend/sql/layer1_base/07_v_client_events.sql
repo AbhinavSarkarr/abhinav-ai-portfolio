@@ -43,7 +43,7 @@ SELECT
   traffic_source.source AS traffic_source,
   traffic_source.medium AS traffic_medium
 
-FROM `portfolio-483605.analytics_*.events_*`
+FROM `portfolio-483605.analytics_518701756.events_*`
 WHERE event_name IN (
   'client_view',
   'client_click',

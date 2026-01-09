@@ -71,22 +71,13 @@ GA4 (Google Analytics 4)
 - BigQuery project: `portfolio-483605`
 - Wait 24-48 hours for first data export
 
-### Step 1: Find Your Dataset Name
-After GA4 exports data, check BigQuery console for a dataset named:
-```
-analytics_XXXXXXXXX
-```
-Where `XXXXXXXXX` is your GA4 property ID.
+### Dataset Information
+- **Project**: `portfolio-483605`
+- **GA4 Property ID**: `518701756`
+- **Raw Data Dataset**: `analytics_518701756`
+- **Processed Dataset**: `analytics_processed`
 
-### Step 2: Update SQL Files
-Replace `analytics_*` in all SQL files with your actual dataset name:
-```sql
--- Change this:
-FROM `portfolio-483605.analytics_*.events_*`
-
--- To this (example):
-FROM `portfolio-483605.analytics_123456789.events_*`
-```
+All SQL files have been pre-configured with the correct dataset name.
 
 ### Step 3: Create Views
 Run SQL files in order:

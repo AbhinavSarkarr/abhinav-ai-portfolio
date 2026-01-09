@@ -12,8 +12,8 @@ WITH section_7day AS (
     SUM(unique_viewers) AS total_unique_viewers,
     SUM(engaged_views) AS total_engaged_views,
     AVG(engagement_rate) AS avg_engagement_rate,
-    AVG(avg_view_duration_ms) AS avg_view_duration_ms,
-    AVG(avg_scroll_depth) AS avg_scroll_depth,
+    AVG(avg_time_spent_seconds) AS avg_time_spent_seconds,
+    AVG(avg_scroll_depth_percent) AS avg_scroll_depth_percent,
     MAX(max_scroll_milestone) AS max_scroll_milestone,
     SUM(exits) AS total_exits,
     AVG(exit_rate) AS avg_exit_rate,
@@ -32,7 +32,7 @@ scored AS (
     -- Section health score
     (
       (avg_engagement_rate * 2) +  -- High engagement is good
-      (avg_scroll_depth * 0.5) +   -- Scroll depth matters
+      (avg_scroll_depth_percent * 0.5) +   -- Scroll depth matters
       (100 - avg_exit_rate) * 0.3  -- Low exit rate is good
     ) AS health_score
 
@@ -47,8 +47,8 @@ SELECT
   total_unique_viewers,
   total_engaged_views,
   ROUND(avg_engagement_rate, 2) AS avg_engagement_rate,
-  ROUND(avg_view_duration_ms / 1000.0, 2) AS avg_view_duration_sec,
-  ROUND(avg_scroll_depth, 2) AS avg_scroll_depth,
+  ROUND(avg_time_spent_seconds, 2) AS avg_time_spent_seconds,
+  ROUND(avg_scroll_depth_percent, 2) AS avg_scroll_depth_percent,
   max_scroll_milestone,
   total_exits,
   ROUND(avg_exit_rate, 2) AS avg_exit_rate,
@@ -80,8 +80,8 @@ SELECT
   CASE
     WHEN avg_engagement_rate < 30 AND total_views > 100 THEN 'improve_content'
     WHEN avg_exit_rate > 50 THEN 'add_cta_or_navigation'
-    WHEN avg_scroll_depth < 50 THEN 'hook_earlier'
-    WHEN avg_view_duration_ms < 3000 THEN 'make_more_engaging'
+    WHEN avg_scroll_depth_percent < 50 THEN 'hook_earlier'
+    WHEN avg_time_spent_seconds < 3 THEN 'make_more_engaging'
     ELSE 'performing_well'
   END AS optimization_hint,
 

@@ -53,7 +53,7 @@ project_interactions AS (
     -- Interaction features per project
     SUM(CASE WHEN event_name = 'project_view' THEN 1 ELSE 0 END) AS project_views,
     SUM(CASE WHEN event_name = 'project_click' THEN 1 ELSE 0 END) AS project_clicks,
-    SUM(CASE WHEN event_name = 'project_expand' THEN 1 ELSE 0 END) AS project_expands,
+    SUM(CASE WHEN event_name IN ('project_expand', 'case_study_open') THEN 1 ELSE 0 END) AS project_expands,
     SUM(CASE WHEN event_name = 'project_link_click' THEN 1 ELSE 0 END) AS project_link_clicks,
     MAX(view_duration_ms) AS max_view_duration_ms,
     AVG(display_position) AS avg_display_position,
@@ -61,12 +61,12 @@ project_interactions AS (
     -- Engagement score for this project
     (SUM(CASE WHEN event_name = 'project_view' THEN 1 ELSE 0 END) * 1 +
      SUM(CASE WHEN event_name = 'project_click' THEN 1 ELSE 0 END) * 3 +
-     SUM(CASE WHEN event_name = 'project_expand' THEN 1 ELSE 0 END) * 5 +
+     SUM(CASE WHEN event_name IN ('project_expand', 'case_study_open') THEN 1 ELSE 0 END) * 5 +
      SUM(CASE WHEN event_name = 'project_link_click' THEN 1 ELSE 0 END) * 7) AS project_engagement_score,
 
     -- Binary target: did user show strong interest?
     CASE
-      WHEN SUM(CASE WHEN event_name IN ('project_expand', 'project_link_click') THEN 1 ELSE 0 END) > 0 THEN 1
+      WHEN SUM(CASE WHEN event_name IN ('project_expand', 'case_study_open', 'project_link_click') THEN 1 ELSE 0 END) > 0 THEN 1
       ELSE 0
     END AS high_interest_flag
 
@@ -83,9 +83,9 @@ section_engagement AS (
     -- Section engagement features
     COUNT(*) AS section_events,
     SUM(CASE WHEN event_name = 'section_view' THEN 1 ELSE 0 END) AS section_views,
-    SUM(CASE WHEN event_name = 'section_engaged' THEN 1 ELSE 0 END) AS section_engaged,
-    MAX(view_duration_ms) AS max_section_duration_ms,
-    MAX(scroll_depth) AS max_scroll_depth,
+    SUM(CASE WHEN event_name = 'section_engagement' THEN 1 ELSE 0 END) AS section_engaged,
+    MAX(time_spent_seconds) AS max_time_spent_seconds,
+    MAX(scroll_depth_percent) AS max_scroll_depth_percent,
     MAX(scroll_milestone) AS max_scroll_milestone
 
   FROM `portfolio-483605.analytics_processed.v_section_events`
@@ -233,8 +233,8 @@ session_section_summary AS (
     COUNT(DISTINCT section_id) AS sections_viewed,
     SUM(section_views) AS total_section_views,
     SUM(section_engaged) AS total_sections_engaged,
-    AVG(max_section_duration_ms) AS avg_section_duration_ms,
-    MAX(max_scroll_depth) AS max_scroll_depth,
+    AVG(max_time_spent_seconds) AS avg_time_spent_seconds,
+    MAX(max_scroll_depth_percent) AS max_scroll_depth_percent,
     MAX(max_scroll_milestone) AS max_scroll_milestone
 
   FROM section_engagement
@@ -285,8 +285,8 @@ SELECT
   COALESCE(sss.sections_viewed, 0) AS sections_viewed,
   COALESCE(sss.total_section_views, 0) AS total_section_views,
   COALESCE(sss.total_sections_engaged, 0) AS total_sections_engaged,
-  COALESCE(sss.avg_section_duration_ms, 0) AS avg_section_duration_ms,
-  COALESCE(sss.max_scroll_depth, 0) AS max_scroll_depth,
+  COALESCE(sss.avg_time_spent_seconds, 0) AS avg_time_spent_seconds,
+  COALESCE(sss.max_scroll_depth_percent, 0) AS max_scroll_depth_percent,
   COALESCE(sss.max_scroll_milestone, 0) AS max_scroll_milestone,
 
   -- Skill interest features
@@ -387,7 +387,7 @@ SELECT
   CASE
     WHEN COALESCE(ci.problem_reads, 0) > 0 AND COALESCE(ci.solution_reads, 0) > 0 THEN 1
     WHEN COALESCE(sps.total_project_expands, 0) >= 2 THEN 1
-    WHEN COALESCE(sss.max_scroll_depth, 0) >= 75 AND COALESCE(sf.session_duration_seconds, 0) > 180 THEN 1
+    WHEN COALESCE(sss.max_scroll_depth_percent, 0) >= 75 AND COALESCE(sf.session_duration_seconds, 0) > 180 THEN 1
     ELSE 0
   END AS target_deep_explorer
 

@@ -38,12 +38,14 @@ SELECT
   traffic_source.source AS traffic_source,
   traffic_source.medium AS traffic_medium
 
-FROM `portfolio-483605.analytics_*.events_*`
+FROM `portfolio-483605.analytics_518701756.events_*`
 WHERE event_name IN (
   'project_view',
   'project_click',
   'project_expand',
   'project_link_click',
+  'case_study_open',
+  'case_study_engagement',
   'technology_interest',
   'project_category_interest'
 )
