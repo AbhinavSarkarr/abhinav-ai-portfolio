@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 
+// GitHub Gist URL for rankings data
+const GIST_URL = 'https://gist.githubusercontent.com/AbhinavSarkarr/7983bb85c69ec4cc45fe37b6a8d2d391/raw/skill-rankings.json';
+
 export type SkillRanking = {
   skill_name: string;
   skill_category: string;
@@ -7,6 +10,13 @@ export type SkillRanking = {
   demand_rank: number;
   demand_tier: 'high_demand' | 'moderate_demand' | 'emerging' | 'niche';
   learning_priority: string;
+};
+
+type RankingsResponse = {
+  skills: SkillRanking[];
+  projects: unknown[];
+  sections: unknown[];
+  updated_at: string;
 };
 
 type SkillRankingsData = {
@@ -25,27 +35,25 @@ export function useSkillRankings(): SkillRankingsData {
   useEffect(() => {
     async function fetchRankings() {
       try {
-        const [rankingsRes, metaRes] = await Promise.all([
-          fetch('/data/skill-rankings.json'),
-          fetch('/data/rankings-meta.json'),
-        ]);
+        // Add cache-busting to get fresh data
+        const response = await fetch(`${GIST_URL}?t=${Date.now()}`);
 
-        if (rankingsRes.ok) {
-          const data: SkillRanking[] = await rankingsRes.json();
+        if (response.ok) {
+          const data: RankingsResponse = await response.json();
           const rankingsMap = new Map<string, SkillRanking>();
 
-          data.forEach((skill) => {
-            // Normalize skill name for matching (lowercase, no special chars)
-            const normalizedName = skill.skill_name.toLowerCase().trim();
-            rankingsMap.set(normalizedName, skill);
-          });
+          if (data.skills && Array.isArray(data.skills)) {
+            data.skills.forEach((skill) => {
+              // Normalize skill name for matching (lowercase, no special chars)
+              const normalizedName = skill.skill_name?.toLowerCase().trim();
+              if (normalizedName) {
+                rankingsMap.set(normalizedName, skill);
+              }
+            });
+          }
 
           setRankings(rankingsMap);
-        }
-
-        if (metaRes.ok) {
-          const meta = await metaRes.json();
-          setUpdatedAt(meta.updated_at);
+          setUpdatedAt(data.updated_at || null);
         }
       } catch (err) {
         // Don't set error - just use default ordering if fetch fails
