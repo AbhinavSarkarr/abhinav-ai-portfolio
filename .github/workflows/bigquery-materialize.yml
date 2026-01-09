@@ -126,6 +126,7 @@ jobs:
           echo "Recommendation performance materialized"
 
       # Export rankings to JSON and update GitHub Gist
+      # Use || echo '[]' to handle empty results gracefully
       - name: Export Skill Rankings to JSON
         run: |
           bq query --use_legacy_sql=false --format=json --location=US '
@@ -138,8 +139,8 @@ jobs:
               learning_priority
             FROM `portfolio-483605.analytics_materialized.tech_demand_insights`
             ORDER BY demand_rank
-          ' > /tmp/skill-rankings.json
-          echo "Skill rankings exported"
+          ' > /tmp/skill-rankings.json || echo '[]' > /tmp/skill-rankings.json
+          echo "Skill rankings exported: $(cat /tmp/skill-rankings.json | head -c 100)"
 
       - name: Export Project Rankings to JSON
         run: |
@@ -154,8 +155,8 @@ jobs:
               recommended_position
             FROM `portfolio-483605.analytics_materialized.project_rankings`
             ORDER BY overall_rank
-          ' > /tmp/project-rankings.json
-          echo "Project rankings exported"
+          ' > /tmp/project-rankings.json || echo '[]' > /tmp/project-rankings.json
+          echo "Project rankings exported: $(cat /tmp/project-rankings.json | head -c 100)"
 
       - name: Export Section Rankings to JSON
         run: |
@@ -168,8 +169,8 @@ jobs:
               optimization_hint
             FROM `portfolio-483605.analytics_materialized.section_rankings`
             ORDER BY engagement_rank
-          ' > /tmp/section-rankings.json
-          echo "Section rankings exported"
+          ' > /tmp/section-rankings.json || echo '[]' > /tmp/section-rankings.json
+          echo "Section rankings exported: $(cat /tmp/section-rankings.json | head -c 100)"
 
       - name: Export Client Rankings to JSON
         run: |
@@ -184,13 +185,20 @@ jobs:
               total_clicks
             FROM `portfolio-483605.analytics_materialized.client_rankings`
             ORDER BY experience_id, engagement_rank
-          ' > /tmp/client-rankings.json
-          echo "Client rankings exported"
+          ' > /tmp/client-rankings.json || echo '[]' > /tmp/client-rankings.json
+          echo "Client rankings exported: $(cat /tmp/client-rankings.json | head -c 100)"
 
       - name: Update GitHub Gist with rankings data
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
+          # Ensure all files have valid JSON (default to empty array if invalid)
+          for f in /tmp/skill-rankings.json /tmp/project-rankings.json /tmp/section-rankings.json /tmp/client-rankings.json; do
+            if ! jq empty "$f" 2>/dev/null; then
+              echo '[]' > "$f"
+            fi
+          done
+
           # Combine all rankings into one JSON file
           jq -n \
             --argjson skills "$(cat /tmp/skill-rankings.json)" \
@@ -206,14 +214,25 @@ jobs:
               updated_at: $updated_at
             }' > /tmp/rankings.json
 
+          echo "Combined rankings JSON:"
+          cat /tmp/rankings.json
+
           # Update Gist via GitHub API
-          curl -X PATCH \
+          RESPONSE=$(curl -s -X PATCH \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/gists/7983bb85c69ec4cc45fe37b6a8d2d391 \
-            -d "$(jq -n --arg content "$(cat /tmp/rankings.json)" '{files: {"skill-rankings.json": {content: $content}}}')"
+            -d "$(jq -n --arg content "$(cat /tmp/rankings.json)" '{files: {"skill-rankings.json": {content: $content}}}')")
 
-          echo "Gist updated successfully"
+          echo "Gist API Response:"
+          echo "$RESPONSE" | head -20
+
+          if echo "$RESPONSE" | grep -q '"id"'; then
+            echo "Gist updated successfully!"
+          else
+            echo "Warning: Gist update may have failed"
+            exit 1
+          fi
 
       - name: Summary
         run: |
