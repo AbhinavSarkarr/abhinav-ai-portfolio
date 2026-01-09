@@ -1,11 +1,17 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
-import { Github, Globe, ArrowUpRight, MessageSquare } from 'lucide-react';
+import { Github, Globe, ArrowUpRight, MessageSquare, TrendingUp, Eye } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { portfolioData } from '@/data/portfolioData';
 import { useRecommender } from '@/context/RecommenderContext';
 import { useAnalyticsContext } from '@/context/AnalyticsContext';
+import {
+  useAnalyticsRankings,
+  sortProjectsByRanking,
+  getProjectBadge,
+  getProjectStats,
+} from '@/hooks/useAnalyticsRankings';
 import {
   staggerContainer,
   sectionHeading,
@@ -14,7 +20,14 @@ import {
 
 export function ProjectsSection() {
   const { projects } = portfolioData;
+  const { projectRankings } = useAnalyticsRankings();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  // Sort projects by engagement ranking (globally)
+  const sortedProjects = useMemo(() => {
+    if (projectRankings.size === 0) return projects;
+    return sortProjectsByRanking(projects, projectRankings);
+  }, [projects, projectRankings]);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
   const { trackHoverStart, trackHoverEnd, trackLongPressStart, trackLongPressEnd } = useRecommender();
@@ -112,7 +125,11 @@ export function ProjectsSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {projects.map((project, index) => (
+          {sortedProjects.map((project, index) => {
+            const badge = getProjectBadge(project.id, projectRankings);
+            const stats = getProjectStats(project.id, projectRankings);
+
+            return (
             <motion.div
               key={project.id}
               custom={index}
@@ -149,6 +166,29 @@ export function ProjectsSection() {
                   className="h-full glass border-tech-neon/20 overflow-hidden group relative cursor-pointer"
                   onClick={() => handleProjectClick(project.id)}
                 >
+                  {/* Analytics Badge */}
+                  {badge.type && (
+                    <div className="absolute top-4 left-4 z-20">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
+                          badge.type === 'popular'
+                            ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                            : badge.type === 'trending'
+                            ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                            : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                        }`}
+                      >
+                        {badge.type === 'popular' ? (
+                          <Eye size={12} />
+                        ) : (
+                          <TrendingUp size={12} />
+                        )}
+                        {badge.label}
+                      </motion.div>
+                    </div>
+                  )}
                   {/* Hover glow effect */}
                   <motion.div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"

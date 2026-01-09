@@ -3,11 +3,11 @@ import { motion, useInView } from 'framer-motion';
 import { portfolioData } from '@/data/portfolioData';
 import { trackSkillClick, trackCTAClick } from '@/hooks/useAnalytics';
 import {
-  useSkillRankings,
+  useAnalyticsRankings,
   sortSkillsByRanking,
-  isHighDemand,
-  getDemandTier,
-} from '@/hooks/useSkillRankings';
+  isHighDemandSkill,
+  getSkillDemandTier,
+} from '@/hooks/useAnalyticsRankings';
 import {
   staggerContainer,
   staggerItem,
@@ -20,17 +20,17 @@ import {
 
 export function SkillsSection() {
   const { skills } = portfolioData;
-  const { rankings, isLoading: rankingsLoading } = useSkillRankings();
+  const { skillRankings } = useAnalyticsRankings();
 
   // Sort skills within each category by demand ranking
   const sortedSkills = useMemo(() => {
-    if (!skills || rankings.size === 0) return skills;
+    if (!skills || skillRankings.size === 0) return skills;
 
     return skills.map((category) => ({
       ...category,
-      skills: sortSkillsByRanking(category.skills, rankings),
+      skills: sortSkillsByRanking(category.skills, skillRankings),
     }));
-  }, [skills, rankings]);
+  }, [skills, skillRankings]);
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -157,8 +157,8 @@ export function SkillsSection() {
                     animate={isInView ? 'visible' : 'hidden'}
                   >
                     {category.skills.map((skill, idx) => {
-                      const highDemand = isHighDemand(skill, rankings);
-                      const demandTier = getDemandTier(skill, rankings);
+                      const highDemand = isHighDemandSkill(skill, skillRankings);
+                      const demandTier = getSkillDemandTier(skill, skillRankings);
 
                       return (
                         <motion.div
