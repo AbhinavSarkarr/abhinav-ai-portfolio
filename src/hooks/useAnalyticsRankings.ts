@@ -33,11 +33,23 @@ export type SectionRanking = {
   optimization_hint: string;
 };
 
+// Client ranking types
+export type ClientRanking = {
+  client_id: string;
+  client_name: string;
+  experience_id: string;
+  domain: string;
+  engagement_rank: number;
+  total_views: number;
+  total_clicks: number;
+};
+
 // Full response type
 type RankingsResponse = {
   skills: SkillRanking[];
   projects: ProjectRanking[];
   sections: SectionRanking[];
+  clients: ClientRanking[];
   updated_at: string;
 };
 
@@ -46,6 +58,7 @@ type AnalyticsRankingsData = {
   skillRankings: Map<string, SkillRanking>;
   projectRankings: Map<string, ProjectRanking>;
   sectionRankings: Map<string, SectionRanking>;
+  clientRankings: Map<string, ClientRanking>;
   isLoading: boolean;
   error: Error | null;
   updatedAt: string | null;
@@ -55,6 +68,7 @@ export function useAnalyticsRankings(): AnalyticsRankingsData {
   const [skillRankings, setSkillRankings] = useState<Map<string, SkillRanking>>(new Map());
   const [projectRankings, setProjectRankings] = useState<Map<string, ProjectRanking>>(new Map());
   const [sectionRankings, setSectionRankings] = useState<Map<string, SectionRanking>>(new Map());
+  const [clientRankings, setClientRankings] = useState<Map<string, ClientRanking>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
@@ -102,6 +116,17 @@ export function useAnalyticsRankings(): AnalyticsRankingsData {
             setSectionRankings(sectionsMap);
           }
 
+          // Process client rankings
+          if (data.clients && Array.isArray(data.clients)) {
+            const clientsMap = new Map<string, ClientRanking>();
+            data.clients.forEach((client) => {
+              if (client.client_id) {
+                clientsMap.set(client.client_id, client);
+              }
+            });
+            setClientRankings(clientsMap);
+          }
+
           setUpdatedAt(data.updated_at || null);
         }
       } catch (err) {
@@ -114,7 +139,7 @@ export function useAnalyticsRankings(): AnalyticsRankingsData {
     fetchRankings();
   }, []);
 
-  return { skillRankings, projectRankings, sectionRankings, isLoading, error, updatedAt };
+  return { skillRankings, projectRankings, sectionRankings, clientRankings, isLoading, error, updatedAt };
 }
 
 // ==================== SKILL HELPERS ====================
@@ -219,7 +244,7 @@ export function getProjectStats(
 // For sorting clients within an experience
 export function sortClientsByEngagement<T extends { id: string }>(
   clients: T[],
-  clientRankings: Map<string, { engagement_rank: number }>
+  clientRankings: Map<string, ClientRanking>
 ): T[] {
   if (clientRankings.size === 0) return clients;
 
@@ -234,4 +259,26 @@ export function sortClientsByEngagement<T extends { id: string }>(
     if (rankB) return 1;
     return 0;
   });
+}
+
+// Get client badge based on engagement
+export function getClientBadge(
+  clientId: string,
+  rankings: Map<string, ClientRanking>
+): { label: string; type: 'popular' | 'trending' | null } {
+  const ranking = rankings.get(clientId);
+
+  if (!ranking) return { label: '', type: null };
+
+  // Top ranked client in their experience
+  if (ranking.engagement_rank === 1) {
+    return { label: 'Most Viewed', type: 'popular' };
+  }
+
+  // Top 3 within experience
+  if (ranking.engagement_rank <= 3 && ranking.total_views > 0) {
+    return { label: 'Popular', type: 'trending' };
+  }
+
+  return { label: '', type: null };
 }

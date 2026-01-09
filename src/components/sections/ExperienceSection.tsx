@@ -1,7 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
-import { Briefcase, Calendar, Link, Circle, Building2, ArrowRight } from 'lucide-react';
+import { Briefcase, Calendar, Link, Circle, Building2, ArrowRight, Eye, TrendingUp } from 'lucide-react';
 import { portfolioData, DescriptionItem } from '@/data/portfolioData';
 import {
   staggerContainer,
@@ -9,11 +9,29 @@ import {
   sectionSubheading,
 } from '@/lib/animations';
 import { useAnalyticsContext } from '@/context/AnalyticsContext';
+import {
+  useAnalyticsRankings,
+  sortClientsByEngagement,
+  getClientBadge,
+} from '@/hooks/useAnalyticsRankings';
 
 export function ExperienceSection() {
   const { experiences } = portfolioData;
+  const { clientRankings } = useAnalyticsRankings();
   const navigate = useNavigate();
   const analytics = useAnalyticsContext();
+
+  // Sort clients within each experience by engagement ranking
+  const sortedExperiences = useMemo(() => {
+    if (clientRankings.size === 0) return experiences;
+
+    return experiences.map((exp) => ({
+      ...exp,
+      clients: exp.clients
+        ? sortClientsByEngagement(exp.clients, clientRankings)
+        : exp.clients,
+    }));
+  }, [experiences, clientRankings]);
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -94,7 +112,7 @@ export function ExperienceSection() {
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
-          {experiences.map((exp, index) => (
+          {sortedExperiences.map((exp, index) => (
             <motion.div
               key={exp.id}
               custom={index}
@@ -207,7 +225,10 @@ export function ExperienceSection() {
                   {/* Render clients if available, otherwise render description */}
                   {exp.clients && exp.clients.length > 0 ? (
                     <div className="grid gap-3">
-                      {exp.clients.map((client, idx) => (
+                      {exp.clients.map((client, idx) => {
+                        const badge = getClientBadge(client.id, clientRankings);
+
+                        return (
                         <motion.div
                           key={client.id}
                           initial={{ opacity: 0, x: -10 }}
@@ -221,9 +242,28 @@ export function ExperienceSection() {
                           }}
                         >
                           <motion.div
-                            className="p-4 rounded-lg bg-tech-glass/50 border border-tech-accent/10 hover:border-tech-accent/30 transition-all duration-300"
+                            className="p-4 rounded-lg bg-tech-glass/50 border border-tech-accent/10 hover:border-tech-accent/30 transition-all duration-300 relative"
                             whileHover={{ x: 5, backgroundColor: 'rgba(var(--tech-accent-rgb), 0.05)' }}
                           >
+                            {/* Client Badge */}
+                            {badge.type && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium backdrop-blur-sm border ${
+                                  badge.type === 'popular'
+                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                    : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                                }`}
+                              >
+                                {badge.type === 'popular' ? (
+                                  <Eye size={10} />
+                                ) : (
+                                  <TrendingUp size={10} />
+                                )}
+                                {badge.label}
+                              </motion.div>
+                            )}
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-2">
@@ -249,7 +289,7 @@ export function ExperienceSection() {
                             </div>
                           </motion.div>
                         </motion.div>
-                      ))}
+                      )})}
                     </div>
                   ) : exp.description ? (
                     <ul className="space-y-3">

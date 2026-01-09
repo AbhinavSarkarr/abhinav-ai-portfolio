@@ -171,6 +171,22 @@ jobs:
           ' > /tmp/section-rankings.json
           echo "Section rankings exported"
 
+      - name: Export Client Rankings to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              client_id,
+              client_name,
+              experience_id,
+              domain,
+              engagement_rank,
+              total_views,
+              total_clicks
+            FROM `portfolio-483605.analytics_materialized.client_rankings`
+            ORDER BY experience_id, engagement_rank
+          ' > /tmp/client-rankings.json
+          echo "Client rankings exported"
+
       - name: Update GitHub Gist with rankings data
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
@@ -180,11 +196,13 @@ jobs:
             --argjson skills "$(cat /tmp/skill-rankings.json)" \
             --argjson projects "$(cat /tmp/project-rankings.json)" \
             --argjson sections "$(cat /tmp/section-rankings.json)" \
+            --argjson clients "$(cat /tmp/client-rankings.json)" \
             --arg updated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             '{
               skills: $skills,
               projects: $projects,
               sections: $sections,
+              clients: $clients,
               updated_at: $updated_at
             }' > /tmp/rankings.json
 

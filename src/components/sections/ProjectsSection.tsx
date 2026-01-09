@@ -343,7 +343,8 @@ export function ProjectsSection() {
                 </Card>
               </motion.div>
             </motion.div>
-          ))}
+          );
+          })}
         </div>
       </div>
     </section>
