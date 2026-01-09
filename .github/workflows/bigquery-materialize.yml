@@ -125,6 +125,67 @@ jobs:
           '
           echo "Recommendation performance materialized"
 
+      # Export rankings to JSON for frontend consumption
+      - name: Create data directory
+        run: mkdir -p public/data
+
+      - name: Export Skill Rankings to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              technology as skill_name,
+              skill_category,
+              total_interest_signals as clicks,
+              demand_rank,
+              demand_tier,
+              learning_priority
+            FROM `portfolio-483605.analytics_materialized.tech_demand_insights`
+            ORDER BY demand_rank
+          ' > public/data/skill-rankings.json
+          echo "Skill rankings exported to JSON"
+
+      - name: Export Project Rankings to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              project_id,
+              project_title,
+              overall_rank,
+              total_views,
+              total_clicks,
+              engagement_score,
+              recommended_position
+            FROM `portfolio-483605.analytics_materialized.project_rankings`
+            ORDER BY overall_rank
+          ' > public/data/project-rankings.json
+          echo "Project rankings exported to JSON"
+
+      - name: Export Section Rankings to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              section_id,
+              health_score,
+              engagement_rank,
+              health_tier,
+              optimization_hint
+            FROM `portfolio-483605.analytics_materialized.section_rankings`
+            ORDER BY engagement_rank
+          ' > public/data/section-rankings.json
+          echo "Section rankings exported to JSON"
+
+      - name: Add timestamp to rankings
+        run: |
+          echo "{\"updated_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > public/data/rankings-meta.json
+
+      - name: Commit and push rankings data
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add public/data/*.json
+          git diff --staged --quiet || git commit -m "Update analytics rankings data [skip ci]"
+          git push
+
       - name: Summary
         run: |
           echo "========================================"
@@ -141,5 +202,11 @@ jobs:
           echo "  - visitor_insights"
           echo "  - conversion_funnel"
           echo "  - recommendation_performance"
+          echo ""
+          echo "JSON files exported to public/data/:"
+          echo "  - skill-rankings.json"
+          echo "  - project-rankings.json"
+          echo "  - section-rankings.json"
+          echo "  - rankings-meta.json"
           echo "========================================"
           echo "Timestamp: $(date)"

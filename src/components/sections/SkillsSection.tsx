@@ -1,7 +1,13 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { portfolioData } from '@/data/portfolioData';
 import { trackSkillClick, trackCTAClick } from '@/hooks/useAnalytics';
+import {
+  useSkillRankings,
+  sortSkillsByRanking,
+  isHighDemand,
+  getDemandTier,
+} from '@/hooks/useSkillRankings';
 import {
   staggerContainer,
   staggerItem,
@@ -14,6 +20,17 @@ import {
 
 export function SkillsSection() {
   const { skills } = portfolioData;
+  const { rankings, isLoading: rankingsLoading } = useSkillRankings();
+
+  // Sort skills within each category by demand ranking
+  const sortedSkills = useMemo(() => {
+    if (!skills || rankings.size === 0) return skills;
+
+    return skills.map((category) => ({
+      ...category,
+      skills: sortSkillsByRanking(category.skills, rankings),
+    }));
+  }, [skills, rankings]);
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, {
@@ -90,9 +107,9 @@ export function SkillsSection() {
           </motion.p>
         </motion.div>
 
-        {skills && skills.length > 0 ? (
+        {sortedSkills && sortedSkills.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {skills.map((category, index) => (
+            {sortedSkills.map((category, index) => (
               <motion.div
                 key={category.id}
                 custom={index}
@@ -139,23 +156,62 @@ export function SkillsSection() {
                     initial="hidden"
                     animate={isInView ? 'visible' : 'hidden'}
                   >
-                    {category.skills.map((skill, idx) => (
-                      <motion.div
-                        key={idx}
-                        variants={skillItemVariants}
-                        className="flex items-center gap-2 group/skill cursor-pointer"
-                        whileHover={{ x: 8, transition: { duration: 0.2 } }}
-                        onClick={() => trackSkillClick(skill, category.name)}
-                      >
+                    {category.skills.map((skill, idx) => {
+                      const highDemand = isHighDemand(skill, rankings);
+                      const demandTier = getDemandTier(skill, rankings);
+
+                      return (
                         <motion.div
-                          className="w-1.5 h-1.5 rounded-full bg-tech-accent/60 group-hover/skill:bg-tech-accent transition-colors duration-300"
-                          whileHover={{ scale: 1.5 }}
-                        />
-                        <span className="text-sm group-hover/skill:text-tech-accent transition-colors duration-300">
-                          {skill}
-                        </span>
-                      </motion.div>
-                    ))}
+                          key={idx}
+                          variants={skillItemVariants}
+                          className={`flex items-center gap-2 group/skill cursor-pointer ${
+                            highDemand ? 'relative' : ''
+                          }`}
+                          whileHover={{ x: 8, transition: { duration: 0.2 } }}
+                          onClick={() => trackSkillClick(skill, category.name)}
+                        >
+                          <motion.div
+                            className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+                              highDemand
+                                ? 'bg-green-400 group-hover/skill:bg-green-300'
+                                : 'bg-tech-accent/60 group-hover/skill:bg-tech-accent'
+                            }`}
+                            whileHover={{ scale: 1.5 }}
+                            animate={
+                              highDemand
+                                ? {
+                                    scale: [1, 1.3, 1],
+                                    opacity: [1, 0.8, 1],
+                                  }
+                                : {}
+                            }
+                            transition={
+                              highDemand
+                                ? {
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                  }
+                                : {}
+                            }
+                          />
+                          <span
+                            className={`text-sm transition-colors duration-300 ${
+                              highDemand
+                                ? 'text-green-400 font-medium group-hover/skill:text-green-300'
+                                : 'group-hover/skill:text-tech-accent'
+                            }`}
+                          >
+                            {skill}
+                          </span>
+                          {demandTier === 'high_demand' && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
+                              trending
+                            </span>
+                          )}
+                        </motion.div>
+                      );
+                    })}
                   </motion.div>
                 </div>
               </motion.div>
