@@ -53,6 +53,38 @@ type RankingsResponse = {
   updated_at: string;
 };
 
+// Module-level cache to prevent multiple fetches
+let cachedData: RankingsResponse | null = null;
+let fetchPromise: Promise<RankingsResponse | null> | null = null;
+
+// Shared fetch function that caches results
+async function fetchRankingsData(): Promise<RankingsResponse | null> {
+  // Return cached data if available
+  if (cachedData) return cachedData;
+
+  // If fetch is in progress, wait for it
+  if (fetchPromise) return fetchPromise;
+
+  // Start new fetch
+  fetchPromise = fetch(GIST_URL)
+    .then(response => {
+      if (!response.ok) throw new Error('Failed to fetch');
+      return response.json();
+    })
+    .then(data => {
+      cachedData = data;
+      return data;
+    })
+    .catch(() => {
+      return null;
+    })
+    .finally(() => {
+      fetchPromise = null;
+    });
+
+  return fetchPromise;
+}
+
 // Hook return type
 type AnalyticsRankingsData = {
   skillRankings: Map<string, SkillRanking>;
@@ -74,13 +106,11 @@ export function useAnalyticsRankings(): AnalyticsRankingsData {
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchRankings() {
+    async function loadRankings() {
       try {
-        // Add cache-busting to get fresh data
-        const response = await fetch(`${GIST_URL}?t=${Date.now()}`);
+        const data = await fetchRankingsData();
 
-        if (response.ok) {
-          const data: RankingsResponse = await response.json();
+        if (data) {
 
           // Process skill rankings
           if (data.skills && Array.isArray(data.skills)) {
@@ -136,7 +166,7 @@ export function useAnalyticsRankings(): AnalyticsRankingsData {
       }
     }
 
-    fetchRankings();
+    loadRankings();
   }, []);
 
   return { skillRankings, projectRankings, sectionRankings, clientRankings, isLoading, error, updatedAt };
