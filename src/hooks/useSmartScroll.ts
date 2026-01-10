@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 interface Section {
   id: string;
@@ -9,7 +9,14 @@ interface Section {
   fitsInViewport: boolean;
 }
 
+// Check if device is mobile based on viewport width
+const isMobileViewport = () => {
+  if (typeof window === 'undefined') return false;
+  return window.innerWidth < 768; // md breakpoint in Tailwind
+};
+
 export function useSmartScroll() {
+  const [isMobile, setIsMobile] = useState(isMobileViewport);
   const isLocked = useRef(false);
   const lockTimeout = useRef<NodeJS.Timeout | null>(null);
   const sections = useRef<Section[]>([]);
@@ -206,7 +213,22 @@ export function useSmartScroll() {
     }
   }, [updateSections, getCurrentSectionIndex, scrollToSectionStart]);
 
+  // Handle resize to update mobile state
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(isMobileViewport());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    // Skip smart scroll on mobile - let users scroll naturally
+    if (isMobile) {
+      return;
+    }
+
     updateSections();
 
     window.addEventListener('wheel', handleWheel, { passive: false });
@@ -221,7 +243,7 @@ export function useSmartScroll() {
       window.removeEventListener('resize', updateSections);
       if (lockTimeout.current) clearTimeout(lockTimeout.current);
     };
-  }, [handleWheel, handleTouchStart, handleTouchEnd, updateSections]);
+  }, [isMobile, handleWheel, handleTouchStart, handleTouchEnd, updateSections]);
 
   return null;
 }
