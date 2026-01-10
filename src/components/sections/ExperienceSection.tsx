@@ -242,35 +242,35 @@ export function ExperienceSection() {
                           }}
                         >
                           <motion.div
-                            className="p-4 rounded-lg bg-tech-glass/50 border border-tech-accent/10 hover:border-tech-accent/30 transition-all duration-300 relative"
+                            className="p-4 rounded-lg bg-tech-glass/50 border border-tech-accent/10 hover:border-tech-accent/30 transition-all duration-300"
                             whileHover={{ x: 5, backgroundColor: 'rgba(var(--tech-accent-rgb), 0.05)' }}
                           >
-                            {/* Client Badge */}
-                            {badge.type && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium backdrop-blur-sm border ${
-                                  badge.type === 'popular'
-                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                                    : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                                }`}
-                              >
-                                {badge.type === 'popular' ? (
-                                  <Eye size={10} />
-                                ) : (
-                                  <TrendingUp size={10} />
-                                )}
-                                {badge.label}
-                              </motion.div>
-                            )}
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
                                   <Building2 size={16} className="text-tech-accent flex-shrink-0" />
                                   <h4 className="font-semibold text-foreground group-hover/client:text-tech-accent transition-colors duration-300">
                                     {client.name}
                                   </h4>
+                                  {/* Client Badge - inline with name */}
+                                  {badge.type && (
+                                    <motion.span
+                                      initial={{ opacity: 0, scale: 0.8 }}
+                                      animate={{ opacity: 1, scale: 1 }}
+                                      className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                                        badge.type === 'popular'
+                                          ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                          : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                                      }`}
+                                    >
+                                      {badge.type === 'popular' ? (
+                                        <Eye size={10} />
+                                      ) : (
+                                        <TrendingUp size={10} />
+                                      )}
+                                      {badge.label}
+                                    </motion.span>
+                                  )}
                                 </div>
                                 <p className="text-sm text-muted-foreground mb-2">
                                   {client.shortDescription}
