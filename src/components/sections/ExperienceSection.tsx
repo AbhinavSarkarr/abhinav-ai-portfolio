@@ -66,7 +66,7 @@ export function ExperienceSection() {
   };
 
   return (
-    <section id="experience" className="relative py-24" ref={sectionRef}>
+    <section id="experience" className="relative py-8 sm:py-24" ref={sectionRef}>
       {/* Animated background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div
@@ -101,12 +101,12 @@ export function ExperienceSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-3xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading">
             Work Experience
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
+          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
             My professional journey in AI and machine learning
           </motion.p>
         </motion.div>
@@ -119,7 +119,7 @@ export function ExperienceSection() {
               variants={timelineVariants}
               initial="hidden"
               animate={isInView ? 'visible' : 'hidden'}
-              className="relative pl-8 pb-12 last:pb-0"
+              className="relative pl-6 sm:pl-8 pb-6 sm:pb-12 last:pb-0"
             >
               {/* Timeline line */}
               <motion.div
@@ -174,11 +174,11 @@ export function ExperienceSection() {
                 />
 
                 <div className="relative z-10">
-                  <div className="flex flex-wrap gap-4 items-start justify-between mb-4">
+                  <div className="flex flex-wrap gap-2 sm:gap-4 items-start justify-between mb-3 sm:mb-4">
                     <div>
                       <div className="flex items-center gap-2">
                         <motion.h3
-                          className="text-xl font-bold group-hover:text-tech-accent transition-colors duration-300"
+                          className="text-base sm:text-xl font-bold group-hover:text-tech-accent transition-colors duration-300"
                           whileHover={{ x: 3 }}
                         >
                           {exp.title}
@@ -242,14 +242,14 @@ export function ExperienceSection() {
                           }}
                         >
                           <motion.div
-                            className="p-4 rounded-lg bg-white/50 dark:bg-tech-glass/50 border border-purple-200 dark:border-tech-accent/10 hover:border-purple-400 dark:hover:border-tech-accent/30 transition-all duration-300 shadow-sm"
+                            className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-tech-glass/50 border border-purple-200 dark:border-tech-accent/10 hover:border-purple-400 dark:hover:border-tech-accent/30 transition-all duration-300 shadow-sm"
                             whileHover={{ x: 5 }}
                           >
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                  <Building2 size={16} className="text-tech-accent flex-shrink-0" />
-                                  <h4 className="font-semibold text-foreground group-hover/client:text-tech-accent transition-colors duration-300">
+                                <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 flex-wrap">
+                                  <Building2 size={14} className="text-tech-accent flex-shrink-0 sm:w-4 sm:h-4" />
+                                  <h4 className="font-semibold text-sm sm:text-base text-foreground group-hover/client:text-tech-accent transition-colors duration-300">
                                     {client.name}
                                   </h4>
                                   {/* Client Badge - inline with name */}
@@ -272,10 +272,10 @@ export function ExperienceSection() {
                                     </motion.span>
                                   )}
                                 </div>
-                                <p className="text-sm text-muted-foreground mb-2">
+                                <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                                   {client.shortDescription}
                                 </p>
-                                <span className="inline-block px-2.5 py-1 text-xs rounded-full bg-purple-100 dark:bg-white/5 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-400/30">
+                                <span className="inline-block px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded-full bg-purple-100 dark:bg-white/5 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-400/30">
                                   {client.domain}
                                 </span>
                               </div>

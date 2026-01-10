@@ -79,7 +79,7 @@ export function ProjectsSection() {
   };
 
   return (
-    <section id="projects" className="relative py-24" ref={sectionRef}>
+    <section id="projects" className="relative py-8 sm:py-24" ref={sectionRef}>
       {/* Animated background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div
@@ -114,17 +114,17 @@ export function ProjectsSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-3xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading">
             Projects
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
+          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
             Exploring the intersection of AI, language models, and practical applications
           </motion.p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
           {sortedProjects.map((project, index) => {
             const badge = getProjectBadge(project.id, projectRankings);
             const stats = getProjectStats(project.id, projectRankings);
@@ -174,7 +174,7 @@ export function ProjectsSection() {
                     }}
                   />
 
-                  <div className="relative h-48 overflow-hidden bg-tech-glass/20">
+                  <div className="relative h-36 sm:h-48 overflow-hidden bg-tech-glass/20">
                     <motion.img
                       src={project.image}
                       alt={project.title}
@@ -208,17 +208,17 @@ export function ProjectsSection() {
                     </motion.div>
                   </div>
 
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 flex-wrap">
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-base sm:text-xl">
                       <span className="group-hover:text-tech-accent transition-colors duration-300">
                         {project.title}
                       </span>
-                      {/* Analytics Badge - inline with title */}
+                      {/* Analytics Badge - desktop only (inline with title) */}
                       {badge.type && (
                         <motion.span
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                          className={`hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
                             badge.type === 'popular'
                               ? 'bg-green-500/20 text-green-400 border-green-500/30'
                               : badge.type === 'trending'
@@ -242,16 +242,37 @@ export function ProjectsSection() {
                         transition={{ duration: 0.3 }}
                         className="text-tech-accent"
                       >
-                        <ArrowUpRight size={18} />
+                        <ArrowUpRight size={16} className="sm:w-[18px] sm:h-[18px]" />
                       </motion.span>
                     </CardTitle>
-                    <CardDescription className="line-clamp-2 text-left">
+                    <CardDescription className="line-clamp-2 text-left text-xs sm:text-sm">
                       {project.description}
                     </CardDescription>
+                    {/* Analytics Badge - mobile only (below description) */}
+                    {badge.type && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`sm:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border w-fit mt-2 ${
+                          badge.type === 'popular'
+                            ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                            : badge.type === 'trending'
+                            ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                            : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                        }`}
+                      >
+                        {badge.type === 'popular' ? (
+                          <Eye size={10} />
+                        ) : (
+                          <TrendingUp size={10} />
+                        )}
+                        {badge.label}
+                      </motion.span>
+                    )}
                   </CardHeader>
 
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2 mt-2">
+                  <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
                       {project.technologies?.slice(0, 4).map((tech, i) => (
                         <motion.span
                           key={i}
@@ -275,14 +296,14 @@ export function ProjectsSection() {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="flex justify-between items-center">
-                    <div className="flex gap-2">
+                  <CardFooter className="flex justify-between items-center px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
+                    <div className="flex gap-1 sm:gap-2">
                       {project.github && (
                         <motion.a
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
+                          className="p-1.5 sm:p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
                           whileHover={{ scale: 1.1, rotate: 5 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
@@ -290,7 +311,7 @@ export function ProjectsSection() {
                             analytics.trackProjectLinkClick(project.id, project.title, 'github');
                           }}
                         >
-                          <Github size={18} />
+                          <Github size={16} className="sm:w-[18px] sm:h-[18px]" />
                           <span className="sr-only">GitHub</span>
                         </motion.a>
                       )}
@@ -300,7 +321,7 @@ export function ProjectsSection() {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
+                          className="p-1.5 sm:p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
                           whileHover={{ scale: 1.1, rotate: -5 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
@@ -308,7 +329,7 @@ export function ProjectsSection() {
                             analytics.trackProjectLinkClick(project.id, project.title, 'demo');
                           }}
                         >
-                          <Globe size={18} />
+                          <Globe size={16} className="sm:w-[18px] sm:h-[18px]" />
                           <span className="sr-only">Live Demo</span>
                         </motion.a>
                       )}
@@ -319,23 +340,23 @@ export function ProjectsSection() {
                             href={`https://wa.me/${project.whatsappLink.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
+                            className="p-1.5 sm:p-2 rounded-full hover:bg-tech-glass transition-all duration-300 hover:text-tech-accent"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => analytics.trackProjectLinkClick(project.id, project.title, 'whatsapp')}
                           >
-                            <MessageSquare size={18} />
+                            <MessageSquare size={16} className="sm:w-[18px] sm:h-[18px]" />
                             <span className="sr-only">WhatsApp</span>
                           </motion.a>
-                          <span className="text-xs text-muted-foreground ml-1">
+                          <span className="hidden sm:inline text-xs text-muted-foreground ml-1">
                             Message "join action-practice"
                           </span>
                         </div>
                       )}
                     </div>
-                    <span className="text-xs text-tech-accent font-medium flex items-center gap-1 group-hover:underline">
+                    <span className="text-[10px] sm:text-xs text-tech-accent font-medium flex items-center gap-1 group-hover:underline">
                       View Case Study
-                      <ArrowUpRight size={14} />
+                      <ArrowUpRight size={12} className="sm:w-3.5 sm:h-3.5" />
                     </span>
                   </CardFooter>
                 </Card>

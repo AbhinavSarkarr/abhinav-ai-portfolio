@@ -772,16 +772,21 @@
 @media (max-width: 640px) {
   /* Better touch targets */
   .tech-btn {
-    @apply min-h-[44px] px-5;
+    @apply min-h-[44px] px-5 text-sm;
   }
 
   .skill-badge {
-    @apply px-3 py-2 text-xs;
+    @apply px-3 py-1.5 text-xs;
   }
 
   /* Reduce padding on mobile */
   section {
     @apply py-12;
+  }
+
+  /* Container padding adjustment */
+  .container {
+    @apply px-4;
   }
 
   .glass-card {
@@ -800,7 +805,25 @@
 
   /* Smaller section headings */
   .section-heading {
+    @apply text-2xl mb-4;
+  }
+
+  .section-heading::after {
+    width: 40px;
+    bottom: -8px;
+  }
+
+  /* Tighter spacing for headings */
+  h1 {
+    @apply text-3xl leading-tight;
+  }
+
+  h2 {
     @apply text-2xl;
+  }
+
+  h3 {
+    @apply text-xl;
   }
 
   /* Better scrolling performance */
@@ -817,6 +840,65 @@
   /* Hide floating code snippets on mobile for performance */
   .floating-code {
     display: none;
+  }
+
+  /* Reduce blur effects for performance */
+  .blur-\[100px\],
+  .blur-\[120px\],
+  .blur-\[150px\],
+  .blur-\[180px\] {
+    filter: blur(60px);
+  }
+
+  /* Compact card spacing */
+  .space-y-8 {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(1.25rem * var(--tw-space-y-reverse));
+  }
+
+  /* Better text sizing for mobile */
+  .text-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .text-xl {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  /* Tighter gaps */
+  .gap-12 {
+    gap: 2rem;
+  }
+
+  .gap-8 {
+    gap: 1.5rem;
+  }
+
+  /* CTA button adjustments */
+  .gradient-cta {
+    @apply px-4 py-2.5 text-sm gap-2;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 380px) {
+  .container {
+    @apply px-3;
+  }
+
+  .glass-card {
+    @apply p-3;
+  }
+
+  h1 {
+    @apply text-2xl;
+  }
+
+  .section-heading {
+    @apply text-xl;
   }
 }
 

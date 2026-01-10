@@ -122,7 +122,7 @@ export function ContactSection() {
   ];
 
   return (
-    <section id="contact" className="relative py-24 overflow-hidden" ref={sectionRef}>
+    <section id="contact" className="relative py-8 sm:py-24 overflow-hidden" ref={sectionRef}>
       {/* Animated background */}
       <div className="absolute inset-0 z-0">
         <motion.div
@@ -159,35 +159,35 @@ export function ContactSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-3xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading block">
             Get In Touch
           </motion.h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12 max-w-6xl mx-auto">
           {/* Left Column - Contact Info */}
           <motion.div
             variants={fadeInLeft}
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
-            className="space-y-8"
+            className="space-y-4 sm:space-y-8"
           >
             {/* CTA Card */}
             <motion.div
-              className="relative p-8 rounded-3xl overflow-hidden"
+              className="relative p-4 sm:p-8 rounded-2xl sm:rounded-3xl overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               {/* Gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-tech-neon/20 via-tech-accent/10 to-tech-highlight/10 rounded-3xl" />
-              <div className="absolute inset-0 backdrop-blur-xl rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-tech-neon/20 via-tech-accent/10 to-tech-highlight/10 rounded-2xl sm:rounded-3xl" />
+              <div className="absolute inset-0 backdrop-blur-xl rounded-2xl sm:rounded-3xl" />
 
               {/* Animated border */}
               <motion.div
-                className="absolute inset-0 rounded-3xl"
+                className="absolute inset-0 rounded-2xl sm:rounded-3xl"
                 style={{
                   background: 'linear-gradient(90deg, transparent, rgba(0, 224, 255, 0.3), transparent)',
                   backgroundSize: '200% 100%',
@@ -204,24 +204,24 @@ export function ContactSection() {
 
               <div className="relative z-10">
                 <motion.div
-                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center mb-6"
+                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center mb-4 sm:mb-6"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                 >
-                  <MessageSquare className="w-8 h-8 text-white" />
+                  <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </motion.div>
 
-                <h3 className="text-2xl font-bold mb-3">Let's Talk AI</h3>
-                <p className="text-muted-foreground mb-6">
+                <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-3">Let's Talk AI</h3>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
                   Whether you're looking to implement machine learning solutions,
                   fine-tune LLMs, or build intelligent systems - I'm here to help
                   turn your ideas into reality.
                 </p>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                   {['LLM Fine-tuning', 'ML Systems', 'GenAI Apps', 'Data Pipelines'].map((tag, i) => (
                     <motion.span
                       key={tag}
-                      className="px-3 py-1 rounded-full text-xs bg-tech-glass border border-tech-accent/30 text-tech-accent"
+                      className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs bg-tech-glass border border-tech-accent/30 text-tech-accent"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={isInView ? { opacity: 1, scale: 1 } : {}}
                       transition={{ delay: 0.4 + i * 0.1 }}
@@ -235,7 +235,7 @@ export function ContactSection() {
 
             {/* Contact Links */}
             <motion.div
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
               variants={staggerContainer}
               initial="hidden"
               animate={isInView ? 'visible' : 'hidden'}
@@ -247,22 +247,22 @@ export function ContactSection() {
                   target={item.isExternal ? '_blank' : undefined}
                   rel={item.isExternal ? 'noopener noreferrer' : undefined}
                   variants={staggerItem}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-tech-glass/50 border border-white/5 group hover:border-tech-accent/30 transition-all duration-300"
+                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-tech-glass/50 border border-white/5 group hover:border-tech-accent/30 transition-all duration-300"
                   whileHover={{ x: 8, scale: 1.02 }}
                   onClick={() => analytics.trackSocialClick(item.label, item.href)}
                 >
                   <motion.div
-                    className={`p-3 rounded-xl bg-gradient-to-br ${item.color} group-hover:shadow-lg transition-shadow duration-300`}
+                    className={`p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br ${item.color} group-hover:shadow-lg transition-shadow duration-300`}
                     whileHover={{ rotate: 10 }}
                   >
-                    <item.icon className="w-5 h-5 text-white" />
+                    <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </motion.div>
-                  <div className="flex-1">
-                    <p className="font-medium text-sm text-muted-foreground">{item.label}</p>
-                    <p className="text-foreground group-hover:text-tech-accent transition-colors">{item.value}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-xs sm:text-sm text-muted-foreground">{item.label}</p>
+                    <p className="text-sm sm:text-base text-foreground group-hover:text-tech-accent transition-colors truncate">{item.value}</p>
                   </div>
                   <motion.div
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity"
                     animate={{ x: [0, 5, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   >
@@ -277,22 +277,22 @@ export function ContactSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 variants={staggerItem}
-                className="flex items-center gap-4 p-4 rounded-2xl bg-tech-glass/50 border border-white/5 group hover:border-tech-accent/30 transition-all duration-300"
+                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-tech-glass/50 border border-white/5 group hover:border-tech-accent/30 transition-all duration-300"
                 whileHover={{ x: 8, scale: 1.02 }}
                 onClick={() => analytics.trackSocialClick('Hugging Face', 'https://huggingface.co/abhinavsarkar')}
               >
                 <motion.div
-                  className="p-3 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 group-hover:shadow-lg transition-shadow duration-300"
+                  className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 group-hover:shadow-lg transition-shadow duration-300"
                   whileHover={{ rotate: 10 }}
                 >
-                  <span className="text-xl">🤗</span>
+                  <span className="text-base sm:text-xl">🤗</span>
                 </motion.div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-muted-foreground">Hugging Face</p>
-                  <p className="text-foreground group-hover:text-tech-accent transition-colors">abhinavsarkar</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-xs sm:text-sm text-muted-foreground">Hugging Face</p>
+                  <p className="text-sm sm:text-base text-foreground group-hover:text-tech-accent transition-colors">abhinavsarkar</p>
                 </div>
                 <motion.div
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity"
                   animate={{ x: [0, 5, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
@@ -303,7 +303,7 @@ export function ContactSection() {
 
             {/* Resume Card */}
             <motion.div
-              className="p-6 glass rounded-2xl relative overflow-hidden group cursor-pointer"
+              className="p-4 sm:p-6 glass rounded-xl sm:rounded-2xl relative overflow-hidden group cursor-pointer"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.8 }}
@@ -317,20 +317,20 @@ export function ContactSection() {
                 className="absolute inset-0 bg-gradient-to-r from-tech-neon/10 via-tech-accent/10 to-tech-highlight/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               />
               <div className="relative z-10 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-tech-glass border border-tech-accent/30">
-                    <span className="text-2xl">📄</span>
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-tech-glass border border-tech-accent/30">
+                    <span className="text-xl sm:text-2xl">📄</span>
                   </div>
                   <div>
-                    <p className="font-semibold">Download Resume</p>
-                    <p className="text-sm text-muted-foreground">View my full experience & qualifications</p>
+                    <p className="font-semibold text-sm sm:text-base">Download Resume</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">View my full experience & qualifications</p>
                   </div>
                 </div>
                 <motion.div
                   animate={{ x: [0, 5, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <ExternalLink className="w-5 h-5 text-tech-accent" />
+                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 text-tech-accent" />
                 </motion.div>
               </div>
             </motion.div>
@@ -343,7 +343,7 @@ export function ContactSection() {
             animate={isInView ? 'visible' : 'hidden'}
           >
             <motion.div
-              className="glass-card relative overflow-hidden rounded-3xl"
+              className="glass-card relative overflow-hidden rounded-2xl sm:rounded-3xl"
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.3 }}
             >
@@ -355,17 +355,17 @@ export function ContactSection() {
                 }}
               />
 
-              <div className="relative z-10 p-8">
-                <div className="flex items-center gap-3 mb-8">
+              <div className="relative z-10 p-4 sm:p-8">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-8">
                   <motion.div
-                    className="w-10 h-10 rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center"
                     whileHover={{ rotate: 10 }}
                   >
-                    <Send className="w-5 h-5 text-white" />
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </motion.div>
                   <div>
-                    <h3 className="text-xl font-bold">Send a Message</h3>
-                    <p className="text-sm text-muted-foreground">I'll get back to you within 24 hours</p>
+                    <h3 className="text-base sm:text-xl font-bold">Send a Message</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">I'll get back to you within 24 hours</p>
                   </div>
                 </div>
 
@@ -374,7 +374,7 @@ export function ContactSection() {
                   method="POST"
                   data-netlify="true"
                   onSubmit={handleSubmit}
-                  className="space-y-6"
+                  className="space-y-4 sm:space-y-6"
                 >
                   <input type="hidden" name="form-name" value="contact" />
                   <motion.div
@@ -391,7 +391,7 @@ export function ContactSection() {
                       id="name"
                       name="name"
                       placeholder="Your name"
-                      className="bg-tech-glass/50 border-white/10 focus:border-tech-accent h-12 rounded-xl transition-all duration-300 placeholder:text-muted-foreground/50"
+                      className="bg-tech-glass/50 border-white/10 focus:border-tech-accent h-10 sm:h-12 rounded-lg sm:rounded-xl transition-all duration-300 placeholder:text-muted-foreground/50 text-sm sm:text-base"
                       value={formData.name}
                       onChange={handleChange}
                       required
@@ -413,7 +413,7 @@ export function ContactSection() {
                       name="email"
                       type="email"
                       placeholder="your.email@example.com"
-                      className="bg-tech-glass/50 border-white/10 focus:border-tech-accent h-12 rounded-xl transition-all duration-300 placeholder:text-muted-foreground/50"
+                      className="bg-tech-glass/50 border-white/10 focus:border-tech-accent h-10 sm:h-12 rounded-lg sm:rounded-xl transition-all duration-300 placeholder:text-muted-foreground/50 text-sm sm:text-base"
                       value={formData.email}
                       onChange={handleChange}
                       required
@@ -434,7 +434,7 @@ export function ContactSection() {
                       id="message"
                       name="message"
                       placeholder="Tell me about your project or idea..."
-                      className="bg-tech-glass/50 border-white/10 focus:border-tech-accent min-h-[140px] rounded-xl transition-all duration-300 resize-none placeholder:text-muted-foreground/50"
+                      className="bg-tech-glass/50 border-white/10 focus:border-tech-accent min-h-[100px] sm:min-h-[140px] rounded-lg sm:rounded-xl transition-all duration-300 resize-none placeholder:text-muted-foreground/50 text-sm sm:text-base"
                       value={formData.message}
                       onChange={handleChange}
                       required
@@ -449,7 +449,7 @@ export function ContactSection() {
                     <motion.div whileHover={buttonHover} whileTap={buttonTap}>
                       <Button
                         type="submit"
-                        className="w-full tech-btn h-14 text-base font-semibold relative overflow-hidden group rounded-xl"
+                        className="w-full tech-btn h-11 sm:h-14 text-sm sm:text-base font-semibold relative overflow-hidden group rounded-lg sm:rounded-xl"
                         disabled={isSubmitting}
                       >
                         <span className="relative z-10 flex items-center justify-center gap-3">
@@ -481,17 +481,17 @@ export function ContactSection() {
 
                 {/* Trust indicators */}
                 <motion.div
-                  className="mt-8 pt-6 border-t border-white/5 flex items-center justify-center gap-6 text-xs text-muted-foreground"
+                  className="mt-4 sm:mt-8 pt-4 sm:pt-6 border-t border-white/5 flex items-center justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-muted-foreground"
                   initial={{ opacity: 0 }}
                   animate={isInView ? { opacity: 1 } : {}}
                   transition={{ delay: 0.9 }}
                 >
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  <span className="flex items-center gap-1 sm:gap-1.5">
+                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-green-500" />
                     Quick Response
                   </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  <span className="flex items-center gap-1 sm:gap-1.5">
+                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-500" />
                     Secure & Private
                   </span>
                 </motion.div>

@@ -78,7 +78,7 @@ export function DataPipelineSection() {
   });
 
   return (
-    <section id="data-pipeline" className="relative pt-24 pb-12 overflow-hidden" ref={sectionRef}>
+    <section id="data-pipeline" className="relative py-8 sm:py-24 overflow-hidden" ref={sectionRef}>
       {/* Animated background */}
       <div className="absolute inset-0 z-0">
         <motion.div
@@ -113,13 +113,13 @@ export function DataPipelineSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="max-w-4xl mx-auto text-center mb-6"
+          className="max-w-4xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading">
-            Built on Real Analytics
+            How This Portfolio Is Different
           </motion.h2>
 
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto text-center">
+          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center max-w-3xl mx-auto">
             This portfolio isn't just a static showcase. It's a living, data-driven system.
             Every interaction feeds into a complete analytics pipeline that dynamically optimizes
             content ordering, powers a recommendation engine, and provides real-time insights

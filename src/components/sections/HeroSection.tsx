@@ -112,9 +112,9 @@ export function HeroSection() {
       </div>
 
       <div className="container relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-center">
           <motion.div
-            className="lg:col-span-3 space-y-6"
+            className="lg:col-span-3 space-y-4 sm:space-y-6"
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
@@ -122,7 +122,7 @@ export function HeroSection() {
             {/* Status badge */}
             <motion.div variants={fadeInUp}>
               <motion.span
-                className="px-4 py-2 rounded-full text-sm font-medium bg-tech-glass/80 border border-tech-accent/30 inline-flex items-center gap-2 backdrop-blur-md"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-tech-glass/80 border border-tech-accent/30 inline-flex items-center gap-2 backdrop-blur-md"
                 whileHover={{ scale: 1.05, borderColor: 'rgba(0, 224, 255, 0.5)' }}
               >
                 <motion.span
@@ -148,17 +148,16 @@ export function HeroSection() {
 
             {/* Main heading */}
             <motion.div variants={fadeInUp}>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              <h1 className="text-[8.5vw] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight whitespace-nowrap">
                 <motion.span
-                  className="block"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6 }}
                 >
-                  Hi, I'm
+                  Hi, I'm{' '}
                 </motion.span>
                 <motion.span
-                  className="block bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent bg-[length:200%_auto]"
+                  className="bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent bg-[length:200%_auto] sm:block"
                   animate={{
                     backgroundPosition: ['0% center', '200% center'],
                   }}
@@ -176,10 +175,10 @@ export function HeroSection() {
             {/* Typewriter role */}
             <motion.div
               variants={fadeInUp}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2 sm:gap-3"
             >
-              <Terminal className="text-tech-accent w-5 h-5" />
-              <span className="text-xl md:text-2xl text-muted-foreground">
+              <Terminal className="text-tech-accent w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="text-base sm:text-xl md:text-2xl text-muted-foreground">
                 <TypeWriter
                   words={roles}
                   className="text-tech-accent font-semibold"
@@ -190,17 +189,17 @@ export function HeroSection() {
               </span>
             </motion.div>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Stack on mobile, row on larger screens */}
             <motion.div
-              className="flex flex-wrap gap-4 pt-4"
+              className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2 sm:pt-4"
               variants={fadeInUp}
             >
-              <motion.div whileHover={buttonHover} whileTap={buttonTap}>
+              <motion.div whileHover={buttonHover} whileTap={buttonTap} className="w-full sm:w-auto">
                 <Button
-                  className="tech-btn relative overflow-hidden group px-8 py-6 text-base"
+                  className="tech-btn relative overflow-hidden group w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-6 text-sm sm:text-base"
                   onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  <span className="relative z-10 flex items-center gap-2">
+                  <span className="relative z-10 flex items-center justify-center gap-2">
                     <Sparkles className="w-4 h-4" />
                     Let's Collaborate
                   </span>
@@ -209,46 +208,48 @@ export function HeroSection() {
                   />
                 </Button>
               </motion.div>
-              <motion.div whileHover={buttonHover} whileTap={buttonTap}>
-                <Button
-                  variant="outline"
-                  className="border-tech-accent/40 hover:border-tech-accent hover:bg-tech-glass/50 backdrop-blur-sm transition-all duration-300 px-8 py-6 text-base group"
-                  onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  <span className="flex items-center gap-2">
-                    About Me
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      →
-                    </motion.span>
-                  </span>
-                </Button>
-              </motion.div>
-              <motion.div whileHover={buttonHover} whileTap={buttonTap}>
-                <Button
-                  variant="outline"
-                  className="border-tech-accent/40 hover:border-tech-accent hover:bg-tech-glass/50 backdrop-blur-sm transition-all duration-300 px-8 py-6 text-base group"
-                  onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  <span className="flex items-center gap-2">
-                    View My Work
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      →
-                    </motion.span>
-                  </span>
-                </Button>
-              </motion.div>
+              <div className="flex gap-3 w-full sm:w-auto">
+                <motion.div whileHover={buttonHover} whileTap={buttonTap} className="flex-1 sm:flex-initial">
+                  <Button
+                    variant="outline"
+                    className="w-full border-tech-accent/40 hover:border-tech-accent hover:bg-tech-glass/50 backdrop-blur-sm transition-all duration-300 px-4 py-3 sm:px-8 sm:py-6 text-sm sm:text-base group"
+                    onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      About Me
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        →
+                      </motion.span>
+                    </span>
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={buttonHover} whileTap={buttonTap} className="flex-1 sm:flex-initial">
+                  <Button
+                    variant="outline"
+                    className="w-full border-tech-accent/40 hover:border-tech-accent hover:bg-tech-glass/50 backdrop-blur-sm transition-all duration-300 px-4 py-3 sm:px-8 sm:py-6 text-sm sm:text-base group"
+                    onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      My Work
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        →
+                      </motion.span>
+                    </span>
+                  </Button>
+                </motion.div>
+              </div>
             </motion.div>
 
             {/* Quick stats */}
             <motion.div
               variants={fadeInUp}
-              className="flex flex-wrap gap-8 pt-6 border-t border-white/10"
+              className="flex justify-center gap-8 sm:gap-10 pt-4 sm:pt-6 border-t border-white/10"
             >
               {[
                 { value: '2', label: 'YOE' },
@@ -262,8 +263,8 @@ export function HeroSection() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 + index * 0.1 }}
                 >
-                  <div className="text-2xl font-bold text-tech-accent">{stat.value}</div>
-                  <div className="text-xs text-muted-foreground">{stat.label}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-tech-accent">{stat.value}</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -271,16 +272,16 @@ export function HeroSection() {
 
           {/* Profile section */}
           <motion.div
-            className="lg:col-span-2 flex justify-center"
+            className="lg:col-span-2 flex justify-center order-first lg:order-last"
             initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
             animate={{ opacity: 1, scale: 1, rotateY: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="relative">
-              {/* Animated rings */}
+              {/* Animated rings - smaller on mobile */}
               <motion.div
-                className="absolute inset-0 w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80"
-                style={{ margin: '-20px' }}
+                className="absolute inset-0 w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80"
+                style={{ margin: '-16px' }}
               >
                 <motion.div
                   className="absolute inset-0 rounded-full border-2 border-tech-neon/30"
@@ -288,22 +289,22 @@ export function HeroSection() {
                   transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                 />
                 <motion.div
-                  className="absolute inset-2 rounded-full border border-dashed border-tech-accent/30"
+                  className="absolute inset-2 rounded-full border border-dashed border-tech-accent/30 hidden sm:block"
                   animate={{ rotate: -360 }}
                   transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
                 />
                 <motion.div
-                  className="absolute inset-4 rounded-full border border-tech-highlight/20"
+                  className="absolute inset-4 rounded-full border border-tech-highlight/20 hidden sm:block"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
                 />
               </motion.div>
 
-              {/* Floating tech icons - hidden on small mobile */}
+              {/* Floating tech icons - hidden on mobile */}
               {['🧠', '🤖', '📊', '⚡'].map((emoji, index) => (
                 <motion.div
                   key={index}
-                  className="absolute w-10 h-10 rounded-full bg-tech-glass/80 backdrop-blur-sm border border-tech-neon/30 items-center justify-center text-lg hidden sm:flex"
+                  className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-tech-glass/80 backdrop-blur-sm border border-tech-neon/30 items-center justify-center text-sm sm:text-lg hidden md:flex"
                   style={{
                     top: `${20 + Math.sin(index * Math.PI / 2) * 40}%`,
                     left: `${50 + Math.cos(index * Math.PI / 2) * 60}%`,
@@ -323,9 +324,9 @@ export function HeroSection() {
                 </motion.div>
               ))}
 
-              {/* Profile image */}
+              {/* Profile image - smaller on mobile */}
               <motion.div
-                className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full overflow-hidden"
+                className="relative w-36 h-36 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full overflow-hidden"
                 animate={{
                   y: [0, -8, 0],
                 }}
@@ -364,7 +365,7 @@ export function HeroSection() {
                 />
               </motion.div>
 
-              {/* Resume badge */}
+              {/* Resume badge - compact on mobile */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -373,39 +374,38 @@ export function HeroSection() {
                   scale: 1.1,
                   boxShadow: '0 10px 40px rgba(0, 224, 255, 0.3)',
                 }}
-                className="absolute -bottom-2 -right-2 glass px-5 py-3 rounded-2xl border border-tech-accent/40 shadow-lg cursor-pointer group"
+                className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 glass px-3 py-2 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl border border-tech-accent/40 shadow-lg cursor-pointer group"
                 onClick={() => window.open(hero.resumeLink, "_blank")}
               >
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-xl">📄</span>
+                <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                  <span className="text-base sm:text-xl">📄</span>
                   <span className="font-medium group-hover:text-tech-accent transition-colors">Resume</span>
-                  <ExternalLink size={14} className="text-muted-foreground group-hover:text-tech-accent transition-colors" />
+                  <ExternalLink size={12} className="text-muted-foreground group-hover:text-tech-accent transition-colors sm:w-[14px] sm:h-[14px]" />
                 </div>
               </motion.div>
-
-                          </div>
+            </div>
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
+        {/* Scroll indicator - hidden on small mobile */}
         <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2"
+          className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex-col items-center gap-2 hidden sm:flex"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5 }}
         >
-          <span className="text-sm text-muted-foreground">Scroll to explore</span>
+          <span className="text-xs sm:text-sm text-muted-foreground">Scroll to explore</span>
           <motion.div
-            className="w-6 h-10 rounded-full border-2 border-tech-accent/50 flex justify-center pt-2"
+            className="w-5 h-8 sm:w-6 sm:h-10 rounded-full border-2 border-tech-accent/50 flex justify-center pt-1.5 sm:pt-2"
             animate={{
               borderColor: ['rgba(0, 224, 255, 0.3)', 'rgba(0, 224, 255, 0.6)', 'rgba(0, 224, 255, 0.3)'],
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
             <motion.div
-              className="w-1.5 h-1.5 rounded-full bg-tech-accent"
+              className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-tech-accent"
               animate={{
-                y: [0, 16, 0],
+                y: [0, 12, 0],
                 opacity: [1, 0.3, 1],
               }}
               transition={{

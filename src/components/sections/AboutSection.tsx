@@ -23,7 +23,7 @@ export function AboutSection() {
   });
 
   return (
-    <section id="about" className="relative py-24" ref={sectionRef}>
+    <section id="about" className="relative py-8 sm:py-24" ref={sectionRef}>
       {/* Animated background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div
@@ -58,25 +58,26 @@ export function AboutSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-3xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading">
             About Me
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
+          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
             Passionate AI-ML Engineer with expertise in building innovative solutions using cutting-edge technologies.
           </motion.p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12 items-center">
           <motion.div
             variants={fadeInLeft}
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
-            className="space-y-6"
+            className="space-y-3 sm:space-y-6"
           >
+            {/* Name - hidden on mobile since it's in hero */}
             <motion.h3
-              className="text-3xl font-bold"
+              className="hidden sm:block text-3xl font-bold"
               initial={{ opacity: 0, x: -20 }}
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -84,7 +85,7 @@ export function AboutSection() {
               {hero.name}
             </motion.h3>
             <motion.p
-              className="text-muted-foreground leading-relaxed"
+              className="text-sm sm:text-base text-muted-foreground leading-relaxed text-center sm:text-left"
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -92,8 +93,41 @@ export function AboutSection() {
               {hero.description}
             </motion.p>
 
+            {/* Mobile: Compact inline contact info */}
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4"
+              className="flex flex-wrap justify-center gap-2 pt-2 sm:hidden"
+              variants={staggerContainer}
+              initial="hidden"
+              animate={isInView ? 'visible' : 'hidden'}
+            >
+              <motion.a
+                href="mailto:abhinavsarkar53@gmail.com"
+                variants={staggerItem}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tech-glass/50 border border-tech-accent/20 text-xs hover:border-tech-accent/50 transition-colors"
+              >
+                <Mail size={12} className="text-tech-accent" />
+                <span className="text-muted-foreground">Email</span>
+              </motion.a>
+              <motion.a
+                href="tel:+919812047920"
+                variants={staggerItem}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tech-glass/50 border border-tech-accent/20 text-xs hover:border-tech-accent/50 transition-colors"
+              >
+                <Phone size={12} className="text-tech-accent" />
+                <span className="text-muted-foreground">Call</span>
+              </motion.a>
+              <motion.span
+                variants={staggerItem}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tech-glass/50 border border-tech-accent/20 text-xs"
+              >
+                <MapPin size={12} className="text-tech-accent" />
+                <span className="text-muted-foreground">Gurugram</span>
+              </motion.span>
+            </motion.div>
+
+            {/* Desktop: Card-based contact info */}
+            <motion.div
+              className="hidden sm:grid grid-cols-2 gap-4 pt-4"
               variants={staggerContainer}
               initial="hidden"
               animate={isInView ? 'visible' : 'hidden'}
@@ -145,7 +179,7 @@ export function AboutSection() {
               <motion.div
                 variants={staggerItem}
                 whileHover={{ scale: 1.02, y: -2 }}
-                className="glass-card group cursor-pointer sm:col-span-2"
+                className="glass-card group cursor-pointer col-span-2"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <motion.div
@@ -167,10 +201,23 @@ export function AboutSection() {
             variants={fadeInRight}
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
-            className="space-y-8"
+            className="space-y-3 sm:space-y-8"
           >
+            {/* Mobile: Simple highlight badges */}
+            <div className="sm:hidden flex flex-wrap justify-center gap-3 pt-2">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-tech-glass/30 border border-white/10">
+                <GraduationCap size={14} className="text-tech-accent" />
+                <span className="text-xs text-muted-foreground">B.Tech AI & ML</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-tech-glass/30 border border-white/10">
+                <Award size={14} className="text-tech-accent" />
+                <span className="text-xs text-muted-foreground">{certifications.length}+ Certifications</span>
+              </div>
+            </div>
+
+            {/* Desktop: Full cards with timeline */}
             <motion.div
-              className="glass-card overflow-hidden"
+              className="hidden sm:block glass-card overflow-hidden"
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.3 }}
             >
@@ -197,7 +244,7 @@ export function AboutSection() {
             </motion.div>
 
             <motion.div
-              className="glass-card overflow-hidden"
+              className="hidden sm:block glass-card overflow-hidden"
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.3 }}
             >
@@ -218,7 +265,7 @@ export function AboutSection() {
                 initial="hidden"
                 animate={isInView ? 'visible' : 'hidden'}
               >
-                {certifications.slice(0, 3).map((cert, index) => (
+                {certifications.slice(0, 3).map((cert) => (
                   <motion.li
                     key={cert.id}
                     variants={staggerItem}

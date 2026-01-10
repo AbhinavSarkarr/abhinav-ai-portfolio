@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { portfolioData } from '@/data/portfolioData';
-import { trackSkillClick, trackCTAClick } from '@/hooks/useAnalytics';
+import { trackSkillClick } from '@/hooks/useAnalytics';
 import {
   useAnalyticsRankings,
   sortSkillsByRanking,
@@ -13,9 +13,6 @@ import {
   staggerItem,
   sectionHeading,
   sectionSubheading,
-  scaleIn,
-  buttonHover,
-  buttonTap,
 } from '@/lib/animations';
 
 export function SkillsSection() {
@@ -62,7 +59,7 @@ export function SkillsSection() {
   };
 
   return (
-    <section id="skills" className="relative py-24" ref={sectionRef}>
+    <section id="skills" className="relative py-8 sm:py-24" ref={sectionRef}>
       {/* Animated background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div
@@ -97,18 +94,18 @@ export function SkillsSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-3xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading">
             Technical Skills
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
+          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
             My technical toolkit for building AI and ML solutions
           </motion.p>
         </motion.div>
 
         {sortedSkills && sortedSkills.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
             {sortedSkills.map((category, index) => (
               <motion.div
                 key={category.id}
@@ -131,12 +128,12 @@ export function SkillsSection() {
 
                 <div className="relative z-10">
                   <motion.h3
-                    className="text-xl font-bold mb-4 flex items-center gap-2"
+                    className="text-sm sm:text-xl font-bold mb-2 sm:mb-4 flex items-center gap-1.5 sm:gap-2"
                     whileHover={{ x: 5 }}
                     transition={{ duration: 0.2 }}
                   >
                     <motion.span
-                      className="w-2 h-2 rounded-full bg-tech-accent"
+                      className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-tech-accent"
                       animate={{
                         scale: [1, 1.3, 1],
                       }}
@@ -151,7 +148,7 @@ export function SkillsSection() {
                   </motion.h3>
 
                   <motion.div
-                    className="grid grid-cols-1 gap-2"
+                    className="grid grid-cols-1 gap-1.5 sm:gap-2"
                     variants={staggerContainer}
                     initial="hidden"
                     animate={isInView ? 'visible' : 'hidden'}
@@ -164,14 +161,14 @@ export function SkillsSection() {
                         <motion.div
                           key={idx}
                           variants={skillItemVariants}
-                          className={`flex items-center gap-2 group/skill cursor-pointer ${
+                          className={`flex items-center gap-1.5 sm:gap-2 group/skill cursor-pointer ${
                             highDemand ? 'relative' : ''
                           }`}
                           whileHover={{ x: 8, transition: { duration: 0.2 } }}
                           onClick={() => trackSkillClick(skill, category.name)}
                         >
                           <motion.div
-                            className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+                            className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full transition-colors duration-300 flex-shrink-0 ${
                               highDemand
                                 ? 'bg-green-400 group-hover/skill:bg-green-300'
                                 : 'bg-tech-accent/60 group-hover/skill:bg-tech-accent'
@@ -196,7 +193,7 @@ export function SkillsSection() {
                             }
                           />
                           <span
-                            className={`text-sm transition-colors duration-300 ${
+                            className={`text-xs sm:text-sm transition-colors duration-300 ${
                               highDemand
                                 ? 'text-green-400 font-medium group-hover/skill:text-green-300'
                                 : 'group-hover/skill:text-tech-accent'
@@ -204,19 +201,19 @@ export function SkillsSection() {
                           >
                             {skill}
                           </span>
-                          {/* Different badges based on demand tier */}
+                          {/* Different badges based on demand tier - hidden on mobile */}
                           {demandTier === 'high_demand' && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                            <span className="hidden sm:inline text-[10px] px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
                               Hot
                             </span>
                           )}
                           {demandTier === 'moderate_demand' && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
+                            <span className="hidden sm:inline text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
                               Trending
                             </span>
                           )}
                           {demandTier === 'emerging' && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                            <span className="hidden sm:inline text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
                               Rising
                             </span>
                           )}
@@ -234,59 +231,6 @@ export function SkillsSection() {
           </div>
         )}
 
-        <motion.div
-          variants={scaleIn}
-          initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
-          className="mt-16 p-8 glass rounded-2xl max-w-3xl mx-auto text-center relative overflow-hidden"
-        >
-          {/* Animated border glow */}
-          <motion.div
-            className="absolute inset-0 rounded-2xl"
-            style={{
-              background: 'linear-gradient(90deg, transparent, rgba(123, 66, 246, 0.3), transparent)',
-              backgroundSize: '200% 100%',
-            }}
-            animate={{
-              backgroundPosition: ['200% 0', '-200% 0'],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-          />
-
-          <div className="relative z-10">
-            <motion.h3
-              className="text-2xl font-bold mb-3"
-              initial={{ opacity: 0, y: 10 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              <span className="bg-gradient-tech bg-clip-text text-transparent">
-                Looking to collaborate?
-              </span>
-            </motion.h3>
-            <motion.p
-              className="text-muted-foreground mb-6"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              I'm always interested in challenging AI projects and opportunities to expand my skills.
-            </motion.p>
-            <motion.a
-              href="#contact"
-              className="tech-btn inline-block"
-              whileHover={buttonHover}
-              whileTap={buttonTap}
-              onClick={() => trackCTAClick('Get in touch', 'Skills Section')}
-            >
-              Get in touch
-            </motion.a>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

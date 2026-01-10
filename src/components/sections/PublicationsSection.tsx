@@ -33,7 +33,7 @@ export function PublicationsSection() {
   };
 
   return (
-    <section id="publications" className="relative py-24" ref={sectionRef}>
+    <section id="publications" className="relative py-8 sm:py-24" ref={sectionRef}>
       {/* Animated background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div
@@ -68,12 +68,12 @@ export function PublicationsSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-3xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading">
             Publications
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
+          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
             Research papers and academic contributions
           </motion.p>
         </motion.div>
@@ -91,7 +91,7 @@ export function PublicationsSection() {
                 y: -5,
                 transition: { duration: 0.3 },
               }}
-              className="glass-card relative overflow-hidden mb-6 group"
+              className="glass-card relative overflow-hidden mb-4 sm:mb-6 group"
             >
               {/* Animated left border */}
               <motion.div
@@ -108,9 +108,9 @@ export function PublicationsSection() {
                 initial={false}
               />
 
-              <div className="flex items-start gap-4 relative z-10">
+              <div className="flex items-start gap-3 sm:gap-4 relative z-10">
                 <motion.div
-                  className="p-3 rounded-full bg-tech-glass mt-1"
+                  className="p-2 sm:p-3 rounded-full bg-tech-glass mt-1 flex-shrink-0"
                   whileHover={{ scale: 1.1, rotate: 10 }}
                   animate={{
                     y: [0, -3, 0],
@@ -123,28 +123,28 @@ export function PublicationsSection() {
                     },
                   }}
                 >
-                  <BookOpen className="text-tech-accent" size={24} />
+                  <BookOpen className="text-tech-accent w-5 h-5 sm:w-6 sm:h-6" />
                 </motion.div>
 
-                <div className="flex-1">
-                  <div className="flex flex-wrap justify-between gap-4 mb-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap justify-between gap-2 sm:gap-4 mb-2">
                     <motion.h3
-                      className="text-xl font-bold group-hover:text-tech-accent transition-colors duration-300"
+                      className="text-base sm:text-xl font-bold group-hover:text-tech-accent transition-colors duration-300"
                       whileHover={{ x: 3 }}
                     >
                       {pub.title}
                     </motion.h3>
                     <motion.div
-                      className="flex items-center gap-1 text-sm text-muted-foreground px-3 py-1 rounded-full bg-tech-glass/50"
+                      className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-tech-glass/50"
                       whileHover={{ scale: 1.05 }}
                     >
-                      <Clock size={14} />
+                      <Clock size={12} className="sm:w-3.5 sm:h-3.5" />
                       <span>{pub.date}</span>
                     </motion.div>
                   </div>
 
-                  <p className="text-sm text-tech-accent mb-2">{pub.publisher}</p>
-                  <p className="text-muted-foreground mb-4 group-hover:text-foreground/80 transition-colors duration-300 text-left">
+                  <p className="text-xs sm:text-sm text-tech-accent mb-1.5 sm:mb-2">{pub.publisher}</p>
+                  <p className="text-xs sm:text-base text-muted-foreground mb-3 sm:mb-4 group-hover:text-foreground/80 transition-colors duration-300 text-left">
                     {pub.description || "A detailed publication in the field of AI and machine learning."}
                   </p>
 
@@ -153,7 +153,7 @@ export function PublicationsSection() {
                       href={pub.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-tech-accent hover:text-tech-neon transition-colors duration-300"
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-tech-accent hover:text-tech-neon transition-colors duration-300"
                       whileHover={{ x: 5 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => trackPublicationClick(pub.title)}
@@ -163,7 +163,7 @@ export function PublicationsSection() {
                         animate={{ x: [0, 3, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                       >
-                        <ExternalLink size={14} />
+                        <ExternalLink size={12} className="sm:w-3.5 sm:h-3.5" />
                       </motion.span>
                     </motion.a>
                   )}
