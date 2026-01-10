@@ -2,6 +2,33 @@
   command = "npm run build"
   publish = "dist"
 
+# Subdomain: analytics.abhinavbuilds.in serves the dashboard
+[[redirects]]
+  from = "https://analytics.abhinavbuilds.in/*"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://analytics.abhinavbuilds.in"
+  to = "/index.html"
+  status = 200
+  force = true
+
+# Block /dashboard on main domain (redirect to subdomain)
+[[redirects]]
+  from = "https://abhinavbuilds.in/dashboard"
+  to = "https://analytics.abhinavbuilds.in"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.abhinavbuilds.in/dashboard"
+  to = "https://analytics.abhinavbuilds.in"
+  status = 301
+  force = true
+
+# Main site SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"

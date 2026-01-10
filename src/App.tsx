@@ -12,6 +12,9 @@ import { RecommenderProvider } from "@/context/RecommenderContext";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
 import { ProjectRecommendation } from "@/components/ProjectRecommendation";
 
+// Check if we're on the analytics subdomain
+const isAnalyticsSubdomain = window.location.hostname.startsWith('analytics.');
+
 const App = () => (
   <TooltipProvider>
     <Toaster />
@@ -19,14 +22,23 @@ const App = () => (
     <BrowserRouter>
       <AnalyticsProvider>
         <RecommenderProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/project/:id" element={<ProjectDetail />} />
-            <Route path="/client/:experienceId/:clientId" element={<ClientDetail />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <ProjectRecommendation />
+          {isAnalyticsSubdomain ? (
+            // Analytics subdomain: only show dashboard
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="*" element={<Dashboard />} />
+            </Routes>
+          ) : (
+            // Main domain: full portfolio
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/project/:id" element={<ProjectDetail />} />
+              <Route path="/client/:experienceId/:clientId" element={<ClientDetail />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          )}
+          {!isAnalyticsSubdomain && <ProjectRecommendation />}
         </RecommenderProvider>
       </AnalyticsProvider>
     </BrowserRouter>
