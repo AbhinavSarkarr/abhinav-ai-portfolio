@@ -204,9 +204,20 @@ export function SkillsSection() {
                           >
                             {skill}
                           </span>
+                          {/* Different badges based on demand tier */}
                           {demandTier === 'high_demand' && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                              Hot
+                            </span>
+                          )}
+                          {demandTier === 'moderate_demand' && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
-                              trending
+                              Trending
+                            </span>
+                          )}
+                          {demandTier === 'emerging' && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                              Rising
                             </span>
                           )}
                         </motion.div>
