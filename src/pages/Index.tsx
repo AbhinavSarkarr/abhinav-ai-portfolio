@@ -2,6 +2,7 @@
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { DataPipelineSection } from "@/components/sections/DataPipelineSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
@@ -40,6 +41,9 @@ const Index = () => {
           </TrackedSection>
           <TrackedSection sectionId="about" sectionName="About">
             <AboutSection />
+          </TrackedSection>
+          <TrackedSection sectionId="data-pipeline" sectionName="Data Pipeline">
+            <DataPipelineSection />
           </TrackedSection>
           <TrackedSection sectionId="experience" sectionName="Experience">
             <ExperienceSection />

@@ -58,15 +58,14 @@ export function Footer() {
           </div>
         </motion.div>
         
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           viewport={{ once: true }}
-          className="flex flex-col sm:flex-row justify-between items-center pt-8 border-t border-white/10 text-sm text-muted-foreground"
+          className="flex justify-center items-center pt-8 border-t border-white/10 text-sm text-muted-foreground"
         >
           <p>&copy; {new Date().getFullYear()} Abhinav Sarkar. All rights reserved.</p>
-          <p className="mt-2 sm:mt-0">Built with ❤️ and modern tech</p>
         </motion.div>
       </div>
     </footer>

@@ -10,16 +10,16 @@ interface Section {
 }
 
 export function useSmartScroll() {
-  const isScrolling = useRef(false);
-  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
-  const lastSnapTime = useRef(0);
+  const isLocked = useRef(false);
+  const lockTimeout = useRef<NodeJS.Timeout | null>(null);
   const sections = useRef<Section[]>([]);
-  const pendingSnap = useRef(false);
+  const currentSectionIndex = useRef(0);
 
   // Touch tracking
   const touchStartY = useRef(0);
-  const touchStartTime = useRef(0);
-  const isTouching = useRef(false);
+
+  const NAVBAR_HEIGHT = 80;
+  const LOCK_DURATION = 1500; // 1.5 seconds lock after each snap
 
   const updateSections = useCallback(() => {
     const sectionElements = document.querySelectorAll('section[id]');
@@ -34,211 +34,192 @@ export function useSmartScroll() {
         top: rect.top + scrollTop,
         bottom: rect.bottom + scrollTop,
         height: rect.height,
-        fitsInViewport: rect.height <= viewportHeight * 0.95, // Section must fit with 5% margin
+        fitsInViewport: rect.height <= viewportHeight - NAVBAR_HEIGHT,
       };
     });
   }, []);
 
-  const getCurrentSection = useCallback((): { section: Section | null; index: number } => {
+  const getCurrentSectionIndex = useCallback((): number => {
     const scrollTop = window.scrollY;
     const viewportHeight = window.innerHeight;
-    const viewportCenter = scrollTop + viewportHeight / 2;
 
     for (let i = 0; i < sections.current.length; i++) {
       const section = sections.current[i];
-      if (viewportCenter >= section.top && viewportCenter < section.bottom) {
-        return { section, index: i };
+      const sectionStart = section.top - NAVBAR_HEIGHT;
+      const sectionEnd = section.bottom;
+
+      // Check if we're within this section
+      if (scrollTop >= sectionStart - 50 && scrollTop < sectionEnd - viewportHeight + 50) {
+        return i;
       }
     }
-    return { section: null, index: -1 };
+
+    // Fallback: find by viewport center
+    const viewportCenter = scrollTop + viewportHeight / 2;
+    for (let i = 0; i < sections.current.length; i++) {
+      if (viewportCenter >= sections.current[i].top && viewportCenter < sections.current[i].bottom) {
+        return i;
+      }
+    }
+
+    return 0;
   }, []);
 
-  const isSectionFullyVisible = useCallback((section: Section): boolean => {
-    const scrollTop = window.scrollY;
-    const viewportHeight = window.innerHeight;
-    const viewportTop = scrollTop;
-    const viewportBottom = scrollTop + viewportHeight;
+  const scrollToSectionStart = useCallback((index: number) => {
+    if (index < 0 || index >= sections.current.length) return;
+    if (isLocked.current) return;
 
-    // Check if entire section is visible within viewport
-    return section.top >= viewportTop - 20 && section.bottom <= viewportBottom + 20;
-  }, []);
+    const section = sections.current[index];
 
-  const isAtSectionEnd = useCallback((section: Section): boolean => {
-    const scrollTop = window.scrollY;
-    const viewportHeight = window.innerHeight;
-    const viewportBottom = scrollTop + viewportHeight;
+    // Lock immediately
+    isLocked.current = true;
+    currentSectionIndex.current = index;
 
-    // Only return true when the ENTIRE section bottom is visible (with small buffer)
-    // This ensures user can see ALL content before snapping
-    return viewportBottom >= section.bottom - 20;
-  }, []);
-
-  const isAtSectionStart = useCallback((section: Section): boolean => {
-    const scrollTop = window.scrollY;
-    const navbarHeight = 80;
-
-    // Check if we're at the very top of the section
-    return scrollTop <= section.top - navbarHeight + 20;
-  }, []);
-
-  const scrollToSection = useCallback((section: Section) => {
-    // Prevent multiple snaps
-    if (pendingSnap.current || isScrolling.current) return;
-
-    const now = Date.now();
-    // Minimum 1 second between snaps to prevent multiple jumps
-    if (now - lastSnapTime.current < 1000) return;
-
-    pendingSnap.current = true;
-    isScrolling.current = true;
-    lastSnapTime.current = now;
-
-    const navbarHeight = 80;
-    const targetScroll = section.top - navbarHeight;
+    // Scroll to the START of the section (accounting for navbar)
+    const targetScroll = section.top - NAVBAR_HEIGHT;
 
     window.scrollTo({
       top: Math.max(0, targetScroll),
       behavior: 'smooth',
     });
 
-    if (scrollTimeout.current) {
-      clearTimeout(scrollTimeout.current);
+    // Clear existing timeout
+    if (lockTimeout.current) {
+      clearTimeout(lockTimeout.current);
     }
 
-    // Reset flags after animation completes
-    scrollTimeout.current = setTimeout(() => {
-      isScrolling.current = false;
-      pendingSnap.current = false;
-    }, 1000);
+    // Release lock after duration
+    lockTimeout.current = setTimeout(() => {
+      isLocked.current = false;
+    }, LOCK_DURATION);
   }, []);
 
-  const handleScrollDirection = useCallback((direction: 'up' | 'down') => {
-    // Don't process if already scrolling or snap is pending
-    if (isScrolling.current || pendingSnap.current) return false;
-
-    // Check minimum time between snaps
-    const now = Date.now();
-    if (now - lastSnapTime.current < 1000) return false;
-
-    updateSections();
-    const { section: currentSection, index: currentIndex } = getCurrentSection();
-
-    if (!currentSection || currentIndex === -1) return false;
-
-    const scrollingDown = direction === 'down';
-    const scrollingUp = direction === 'up';
-
-    // Case 1: Section fits entirely in viewport - snap scroll
-    if (currentSection.fitsInViewport && isSectionFullyVisible(currentSection)) {
-      if (scrollingDown && currentIndex < sections.current.length - 1) {
-        scrollToSection(sections.current[currentIndex + 1]);
-        return true;
-      } else if (scrollingUp && currentIndex > 0) {
-        scrollToSection(sections.current[currentIndex - 1]);
-        return true;
-      }
-    }
-
-    // Case 2: Section doesn't fit - only snap at actual boundaries
-    if (!currentSection.fitsInViewport) {
-      if (scrollingDown && isAtSectionEnd(currentSection)) {
-        if (currentIndex < sections.current.length - 1) {
-          scrollToSection(sections.current[currentIndex + 1]);
-          return true;
-        }
-      } else if (scrollingUp && isAtSectionStart(currentSection)) {
-        if (currentIndex > 0) {
-          scrollToSection(sections.current[currentIndex - 1]);
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }, [updateSections, getCurrentSection, isSectionFullyVisible, isAtSectionEnd, isAtSectionStart, scrollToSection]);
-
-  // Desktop wheel handler
   const handleWheel = useCallback((e: WheelEvent) => {
-    // Don't interfere if currently animating
-    if (isScrolling.current || pendingSnap.current) {
+    // Block ALL wheel events while locked
+    if (isLocked.current) {
       e.preventDefault();
       return;
     }
 
-    // Only trigger on significant scroll (not tiny trackpad movements)
-    if (Math.abs(e.deltaY) < 30) return;
-
-    const direction = e.deltaY > 0 ? 'down' : 'up';
-    const didSnap = handleScrollDirection(direction);
-
-    if (didSnap) {
-      e.preventDefault();
+    // Ignore tiny scroll movements
+    if (Math.abs(e.deltaY) < 10) {
+      return;
     }
-  }, [handleScrollDirection]);
 
-  // Mobile touch handlers
+    updateSections();
+
+    const currentIndex = getCurrentSectionIndex();
+    const currentSection = sections.current[currentIndex];
+
+    if (!currentSection) return;
+
+    const scrollTop = window.scrollY;
+    const viewportHeight = window.innerHeight;
+    const viewportBottom = scrollTop + viewportHeight;
+    const sectionStart = currentSection.top - NAVBAR_HEIGHT;
+
+    const scrollingDown = e.deltaY > 0;
+    const scrollingUp = e.deltaY < 0;
+
+    // For sections that FIT in viewport - always snap
+    if (currentSection.fitsInViewport) {
+      e.preventDefault();
+
+      if (scrollingDown && currentIndex < sections.current.length - 1) {
+        scrollToSectionStart(currentIndex + 1);
+      } else if (scrollingUp && currentIndex > 0) {
+        scrollToSectionStart(currentIndex - 1);
+      }
+      return;
+    }
+
+    // For LARGE sections - only snap at boundaries
+    const atSectionTop = scrollTop <= sectionStart + 20;
+    const atSectionBottom = viewportBottom >= currentSection.bottom - 20;
+
+    if (scrollingUp && atSectionTop) {
+      e.preventDefault();
+      if (currentIndex > 0) {
+        scrollToSectionStart(currentIndex - 1);
+      }
+      return;
+    }
+
+    if (scrollingDown && atSectionBottom) {
+      e.preventDefault();
+      if (currentIndex < sections.current.length - 1) {
+        scrollToSectionStart(currentIndex + 1);
+      }
+      return;
+    }
+
+    // Allow normal scrolling within large sections
+  }, [updateSections, getCurrentSectionIndex, scrollToSectionStart]);
+
+  // Touch handlers for mobile
   const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (e.touches.length !== 1) return;
-
-    touchStartY.current = e.touches[0].clientY;
-    touchStartTime.current = Date.now();
-    isTouching.current = true;
+    if (e.touches.length === 1) {
+      touchStartY.current = e.touches[0].clientY;
+    }
   }, []);
 
   const handleTouchEnd = useCallback((e: TouchEvent) => {
-    if (!isTouching.current) return;
-    isTouching.current = false;
-
-    // Don't process if already scrolling
-    if (isScrolling.current || pendingSnap.current) return;
+    if (isLocked.current) return;
 
     const touchEndY = e.changedTouches[0]?.clientY ?? touchStartY.current;
-    const touchEndTime = Date.now();
-
     const deltaY = touchStartY.current - touchEndY;
-    const deltaTime = touchEndTime - touchStartTime.current;
 
-    // Calculate velocity
-    const velocity = Math.abs(deltaY) / deltaTime;
+    // Need significant swipe distance
+    if (Math.abs(deltaY) < 50) return;
 
-    // Only trigger on deliberate swipes - higher threshold
-    // Must be fast (velocity > 0.8) AND significant distance (> 100px)
-    const isDeliberateSwipe = velocity > 0.8 && Math.abs(deltaY) > 100;
+    updateSections();
 
-    if (!isDeliberateSwipe) return;
+    const currentIndex = getCurrentSectionIndex();
+    const currentSection = sections.current[currentIndex];
 
-    const direction = deltaY > 0 ? 'down' : 'up';
+    if (!currentSection) return;
 
-    // Delay to let momentum scroll settle
-    setTimeout(() => {
-      handleScrollDirection(direction);
-    }, 100);
-  }, [handleScrollDirection]);
+    const scrollTop = window.scrollY;
+    const viewportHeight = window.innerHeight;
+    const viewportBottom = scrollTop + viewportHeight;
+    const sectionStart = currentSection.top - NAVBAR_HEIGHT;
+
+    const scrollingDown = deltaY > 0;
+    const scrollingUp = deltaY < 0;
+
+    if (currentSection.fitsInViewport) {
+      if (scrollingDown && currentIndex < sections.current.length - 1) {
+        scrollToSectionStart(currentIndex + 1);
+      } else if (scrollingUp && currentIndex > 0) {
+        scrollToSectionStart(currentIndex - 1);
+      }
+      return;
+    }
+
+    const atSectionTop = scrollTop <= sectionStart + 30;
+    const atSectionBottom = viewportBottom >= currentSection.bottom - 30;
+
+    if (scrollingUp && atSectionTop && currentIndex > 0) {
+      scrollToSectionStart(currentIndex - 1);
+    } else if (scrollingDown && atSectionBottom && currentIndex < sections.current.length - 1) {
+      scrollToSectionStart(currentIndex + 1);
+    }
+  }, [updateSections, getCurrentSectionIndex, scrollToSectionStart]);
 
   useEffect(() => {
     updateSections();
 
-    const handleResize = () => {
-      updateSections();
-    };
-
-    // Desktop: wheel events
     window.addEventListener('wheel', handleWheel, { passive: false });
-
-    // Mobile: touch events
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', updateSections);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('resize', handleResize);
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current);
-      }
+      window.removeEventListener('resize', updateSections);
+      if (lockTimeout.current) clearTimeout(lockTimeout.current);
     };
   }, [handleWheel, handleTouchStart, handleTouchEnd, updateSections]);
 

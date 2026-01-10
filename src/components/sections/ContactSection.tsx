@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Github, Linkedin, Mail, Send, ExternalLink, MessageSquare, ArrowRight, Sparkles } from 'lucide-react';
+import { Github, Linkedin, Mail, Send, ExternalLink, MessageSquare, ArrowRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -164,28 +164,6 @@ export function ContactSection() {
           <motion.h2 variants={sectionHeading} className="section-heading block">
             Get In Touch
           </motion.h2>
-
-          <div className="mt-8 flex justify-center">
-            <motion.div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-tech-glass border border-tech-accent/30"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <motion.span
-                animate={{ rotate: [0, 15, -15, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <Sparkles className="text-tech-accent" size={18} />
-              </motion.span>
-              <span className="text-sm font-medium">Let's build something amazing</span>
-            </motion.div>
-          </div>
-
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 max-w-2xl mx-auto text-center">
-            Have a project in mind or want to discuss AI opportunities?
-            I'm always excited to explore new challenges and collaborations.
-          </motion.p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
