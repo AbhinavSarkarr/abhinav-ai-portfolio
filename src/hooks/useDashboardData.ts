@@ -244,6 +244,184 @@ const SAMPLE_DATA: DashboardData = {
 // Dashboard data Gist - updated daily by GitHub Actions
 const DASHBOARD_GIST_URL = 'https://gist.githubusercontent.com/AbhinavSarkarr/dedbbf6ebcb32542e7b724b86f2b214f/raw/dashboard-analytics.json';
 
+// ==================== DATA NORMALIZATION ====================
+// BigQuery returns numbers as strings, so we need to convert them
+
+function toNumber(val: unknown, defaultVal = 0): number {
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') {
+    const parsed = parseFloat(val);
+    return isNaN(parsed) ? defaultVal : parsed;
+  }
+  return defaultVal;
+}
+
+function normalizeData(raw: Record<string, unknown>): DashboardData {
+  const data = raw as Record<string, unknown>;
+
+  // Normalize overview
+  const overview = (data.overview || {}) as Record<string, unknown>;
+  const normalizedOverview: OverviewMetrics = {
+    total_visitors_7d: toNumber(overview.total_visitors_7d),
+    total_sessions_7d: toNumber(overview.total_sessions_7d),
+    engagement_rate: toNumber(overview.engagement_rate),
+    bounce_rate: toNumber(overview.bounce_rate),
+    total_conversions: toNumber(overview.total_conversions),
+    resume_downloads: toNumber(overview.resume_downloads),
+    avg_session_duration_sec: toNumber(overview.avg_session_duration_sec),
+  };
+
+  // Normalize dailyMetrics
+  const dailyMetrics = (data.dailyMetrics || []) as Record<string, unknown>[];
+  const normalizedDailyMetrics: DailyMetric[] = dailyMetrics.map(d => ({
+    date: String(d.date || ''),
+    visitors: toNumber(d.visitors),
+    sessions: toNumber(d.sessions),
+    engagement_rate: toNumber(d.engagement_rate),
+    bounce_rate: toNumber(d.bounce_rate),
+    avg_session_duration_sec: toNumber(d.avg_session_duration_sec),
+    desktop: toNumber(d.desktop),
+    mobile: toNumber(d.mobile),
+    tablet: toNumber(d.tablet),
+  }));
+
+  // Normalize trafficSources
+  const trafficSources = (data.trafficSources || []) as Record<string, unknown>[];
+  const normalizedTrafficSources: TrafficSource[] = trafficSources.map(d => ({
+    source: String(d.source || 'direct'),
+    medium: String(d.medium || 'none'),
+    sessions: toNumber(d.sessions),
+    engagement_rate: toNumber(d.engagement_rate),
+  }));
+
+  // Normalize topCountries
+  const topCountries = (data.topCountries || []) as Record<string, unknown>[];
+  const normalizedTopCountries: CountryData[] = topCountries
+    .filter(d => d.country && String(d.country).trim() !== '')
+    .map(d => ({
+      country: String(d.country),
+      visitors: toNumber(d.visitors),
+    }));
+
+  // Normalize visitorSegments
+  const segments = (data.visitorSegments || {}) as Record<string, unknown>;
+  const normalizedVisitorSegments: VisitorSegments = {
+    converters: toNumber(segments.converters),
+    high_intent: toNumber(segments.high_intent),
+    engaged_explorers: toNumber(segments.engaged_explorers),
+    returning_visitors: toNumber(segments.returning_visitors),
+    casual_browsers: toNumber(segments.casual_browsers),
+  };
+
+  // Normalize conversionFunnel
+  const funnel = (data.conversionFunnel || {}) as Record<string, unknown>;
+  const normalizedConversionFunnel: ConversionFunnel = {
+    cta_views: toNumber(funnel.cta_views),
+    cta_clicks: toNumber(funnel.cta_clicks),
+    form_starts: toNumber(funnel.form_starts),
+    form_submissions: toNumber(funnel.form_submissions),
+    resume_downloads: toNumber(funnel.resume_downloads),
+    social_clicks: toNumber(funnel.social_clicks),
+  };
+
+  // Normalize recommendations
+  const recs = (data.recommendations || {}) as Record<string, unknown>;
+  const normalizedRecommendations: RecommendationData = {
+    system_health: (recs.system_health as RecommendationData['system_health']) || 'needs_improvement',
+    overall_ctr: toNumber(recs.overall_ctr),
+    position_1_ctr: toNumber(recs.position_1_ctr),
+    position_2_ctr: toNumber(recs.position_2_ctr),
+    position_3_ctr: toNumber(recs.position_3_ctr),
+    user_conversion_rate: toNumber(recs.user_conversion_rate),
+    total_impressions: toNumber(recs.total_impressions),
+    total_clicks: toNumber(recs.total_clicks),
+  };
+
+  // Normalize domains
+  const domains = (data.domains || []) as Record<string, unknown>[];
+  const normalizedDomains: DomainRanking[] = domains.map(d => ({
+    domain: String(d.domain || 'Unknown'),
+    interest_rank: toNumber(d.interest_rank, 999),
+    total_interest_score: toNumber(d.total_interest_score),
+    demand_tier: (d.demand_tier as DomainRanking['demand_tier']) || 'niche_interest',
+    portfolio_recommendation: String(d.portfolio_recommendation || 'maintain'),
+  }));
+
+  // Normalize experiences
+  const experiences = (data.experiences || []) as Record<string, unknown>[];
+  const normalizedExperiences: ExperienceRanking[] = experiences.map(d => ({
+    role_title: String(d.role_title || 'Unknown'),
+    company_name: String(d.company_name || 'Unknown'),
+    interest_rank: toNumber(d.interest_rank, 999),
+    interest_score: toNumber(d.interest_score),
+  }));
+
+  // Normalize skills
+  const skills = (data.skills || []) as Record<string, unknown>[];
+  const normalizedSkills: SkillRanking[] = skills.map(d => ({
+    skill_name: String(d.skill_name || 'Unknown'),
+    skill_category: String(d.skill_category || 'Other'),
+    clicks: toNumber(d.clicks),
+    demand_rank: toNumber(d.demand_rank, 999),
+    demand_tier: (d.demand_tier as SkillRanking['demand_tier']) || 'niche',
+    learning_priority: String(d.learning_priority || 'maintain_expertise'),
+  }));
+
+  // Normalize projects
+  const projects = (data.projects || []) as Record<string, unknown>[];
+  const normalizedProjects: ProjectRanking[] = projects.map(d => ({
+    project_id: String(d.project_id || 'unknown'),
+    project_title: String(d.project_title || 'Unknown Project'),
+    overall_rank: toNumber(d.overall_rank, 999),
+    total_views: toNumber(d.total_views),
+    total_clicks: toNumber(d.total_clicks),
+    engagement_score: toNumber(d.engagement_score),
+    recommended_position: String(d.recommended_position || 'primary'),
+  }));
+
+  // Normalize sections
+  const sections = (data.sections || []) as Record<string, unknown>[];
+  const normalizedSections: SectionRanking[] = sections.map(d => ({
+    section_id: String(d.section_id || 'unknown'),
+    health_score: toNumber(d.health_score, 50),
+    engagement_rank: toNumber(d.engagement_rank, 999),
+    health_tier: (d.health_tier as SectionRanking['health_tier']) || 'needs_attention',
+    optimization_hint: String(d.optimization_hint || 'review_content'),
+    total_views: toNumber(d.total_views),
+    avg_engagement_rate: toNumber(d.avg_engagement_rate),
+    avg_exit_rate: toNumber(d.avg_exit_rate),
+  }));
+
+  // Normalize clients
+  const clients = (data.clients || []) as Record<string, unknown>[];
+  const normalizedClients: ClientRanking[] = clients.map(d => ({
+    client_id: String(d.client_id || 'unknown'),
+    client_name: String(d.client_name || 'Unknown Client'),
+    experience_id: String(d.experience_id || 'exp1'),
+    domain: String(d.domain || 'Other'),
+    engagement_rank: toNumber(d.engagement_rank, 999),
+    total_views: toNumber(d.total_views),
+    total_clicks: toNumber(d.total_clicks),
+  }));
+
+  return {
+    overview: normalizedOverview,
+    dailyMetrics: normalizedDailyMetrics,
+    trafficSources: normalizedTrafficSources,
+    topCountries: normalizedTopCountries,
+    visitorSegments: normalizedVisitorSegments,
+    conversionFunnel: normalizedConversionFunnel,
+    recommendations: normalizedRecommendations,
+    domains: normalizedDomains,
+    experiences: normalizedExperiences,
+    skills: normalizedSkills,
+    projects: normalizedProjects,
+    sections: normalizedSections,
+    clients: normalizedClients,
+    updated_at: String(data.updated_at || new Date().toISOString()),
+  };
+}
+
 // Module-level cache
 let cachedData: DashboardData | null = null;
 let fetchPromise: Promise<DashboardData> | null = null;
@@ -267,9 +445,11 @@ async function fetchDashboardData(): Promise<DashboardData> {
       if (!response.ok) throw new Error('Failed to fetch');
       return response.json();
     })
-    .then(data => {
-      cachedData = data;
-      return data;
+    .then(rawData => {
+      // Normalize data to ensure correct types (BigQuery returns strings)
+      const normalized = normalizeData(rawData);
+      cachedData = normalized;
+      return normalized;
     })
     .catch(() => {
       // Fallback to sample data on error
