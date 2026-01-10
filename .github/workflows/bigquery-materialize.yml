@@ -379,50 +379,83 @@ jobs:
             exit 0
           fi
 
-          # Ensure all files have valid JSON
+          # Ensure all files have valid JSON arrays
           for f in /tmp/daily-metrics.json /tmp/traffic-sources.json /tmp/top-countries.json \
-                   /tmp/visitor-segments.json /tmp/conversion-funnel.json /tmp/domain-rankings.json \
-                   /tmp/experience-rankings.json /tmp/recommendations.json /tmp/section-rankings-full.json; do
+                   /tmp/domain-rankings.json /tmp/experience-rankings.json \
+                   /tmp/section-rankings-full.json /tmp/skill-rankings.json \
+                   /tmp/project-rankings.json /tmp/client-rankings.json; do
             if ! jq empty "$f" 2>/dev/null; then
               echo '[]' > "$f"
             fi
           done
 
-          # Calculate overview metrics
-          OVERVIEW=$(bq query --use_legacy_sql=false --format=json --location=US '
+          # Ensure object files have valid JSON objects
+          for f in /tmp/visitor-segments.json /tmp/conversion-funnel.json /tmp/recommendations.json; do
+            if ! jq empty "$f" 2>/dev/null; then
+              echo '[{}]' > "$f"
+            fi
+          done
+
+          # Calculate overview metrics with proper error handling
+          OVERVIEW_RAW=$(bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
-              SUM(unique_visitors) as total_visitors_7d,
-              SUM(total_sessions) as total_sessions_7d,
-              ROUND(AVG(engagement_rate), 1) as engagement_rate,
-              ROUND(AVG(bounce_rate), 1) as bounce_rate,
-              ROUND(AVG(avg_session_duration_sec), 0) as avg_session_duration_sec
+              COALESCE(SUM(unique_visitors), 0) as total_visitors_7d,
+              COALESCE(SUM(total_sessions), 0) as total_sessions_7d,
+              ROUND(COALESCE(AVG(engagement_rate), 0), 1) as engagement_rate,
+              ROUND(COALESCE(AVG(bounce_rate), 0), 1) as bounce_rate,
+              ROUND(COALESCE(AVG(avg_session_duration_sec), 0), 0) as avg_session_duration_sec
             FROM `portfolio-483605.analytics_processed.v_daily_metrics`
             WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
-          ' 2>/dev/null | jq '.[0] // {}')
+          ' 2>/dev/null || echo '[]')
 
-          CONVERSIONS=$(bq query --use_legacy_sql=false --format=json --location=US '
+          if echo "$OVERVIEW_RAW" | jq empty 2>/dev/null; then
+            OVERVIEW=$(echo "$OVERVIEW_RAW" | jq '.[0] // {"total_visitors_7d":0,"total_sessions_7d":0,"engagement_rate":0,"bounce_rate":0,"avg_session_duration_sec":0}')
+          else
+            OVERVIEW='{"total_visitors_7d":0,"total_sessions_7d":0,"engagement_rate":0,"bounce_rate":0,"avg_session_duration_sec":0}'
+          fi
+
+          CONVERSIONS_RAW=$(bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
-              SUM(contact_form_submissions) as total_conversions,
-              SUM(resume_downloads) as resume_downloads
+              COALESCE(SUM(contact_form_submissions), 0) as total_conversions,
+              COALESCE(SUM(resume_downloads), 0) as resume_downloads
             FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
             WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
-          ' 2>/dev/null | jq '.[0] // {}')
+          ' 2>/dev/null || echo '[]')
 
-          # Combine into dashboard JSON
+          if echo "$CONVERSIONS_RAW" | jq empty 2>/dev/null; then
+            CONVERSIONS=$(echo "$CONVERSIONS_RAW" | jq '.[0] // {"total_conversions":0,"resume_downloads":0}')
+          else
+            CONVERSIONS='{"total_conversions":0,"resume_downloads":0}'
+          fi
+
+          # Safely merge overview and conversions
+          COMBINED_OVERVIEW=$(echo "$OVERVIEW" "$CONVERSIONS" | jq -s '.[0] * .[1]')
+
+          # Helper function to safely get first element or empty object
+          get_first_or_empty() {
+            local file=$1
+            if [ -f "$file" ]; then
+              jq '.[0] // {}' "$file" 2>/dev/null || echo '{}'
+            else
+              echo '{}'
+            fi
+          }
+
+          # Combine into dashboard JSON with safe defaults
           jq -n \
-            --argjson overview "$(echo $OVERVIEW | jq '. + '"$CONVERSIONS"'')" \
-            --argjson dailyMetrics "$(cat /tmp/daily-metrics.json)" \
-            --argjson trafficSources "$(cat /tmp/traffic-sources.json)" \
-            --argjson topCountries "$(cat /tmp/top-countries.json)" \
-            --argjson visitorSegments "$(cat /tmp/visitor-segments.json | jq '.[0] // {}')" \
-            --argjson conversionFunnel "$(cat /tmp/conversion-funnel.json | jq '.[0] // {}')" \
-            --argjson recommendations "$(cat /tmp/recommendations.json | jq '.[0] // {}')" \
-            --argjson domains "$(cat /tmp/domain-rankings.json)" \
-            --argjson experiences "$(cat /tmp/experience-rankings.json)" \
-            --argjson skills "$(cat /tmp/skill-rankings.json)" \
-            --argjson projects "$(cat /tmp/project-rankings.json)" \
-            --argjson sections "$(cat /tmp/section-rankings-full.json)" \
-            --argjson clients "$(cat /tmp/client-rankings.json)" \
+            --argjson overview "$COMBINED_OVERVIEW" \
+            --argjson dailyMetrics "$(cat /tmp/daily-metrics.json 2>/dev/null || echo '[]')" \
+            --argjson trafficSources "$(cat /tmp/traffic-sources.json 2>/dev/null || echo '[]')" \
+            --argjson topCountries "$(cat /tmp/top-countries.json 2>/dev/null || echo '[]')" \
+            --argjson visitorSegments "$(jq '.[0] // {}' /tmp/visitor-segments.json 2>/dev/null || echo '{}')" \
+            --argjson conversionFunnel "$(jq '.[0] // {}' /tmp/conversion-funnel.json 2>/dev/null || echo '{}')" \
+            --argjson recommendations "$(jq '.[0] // {}' /tmp/recommendations.json 2>/dev/null || echo '{}')" \
+            --argjson domains "$(cat /tmp/domain-rankings.json 2>/dev/null || echo '[]')" \
+            --argjson experiences "$(cat /tmp/experience-rankings.json 2>/dev/null || echo '[]')" \
+            --argjson skills "$(cat /tmp/skill-rankings.json 2>/dev/null || echo '[]')" \
+            --argjson projects "$(cat /tmp/project-rankings.json 2>/dev/null || echo '[]')" \
+            --argjson sections "$(cat /tmp/section-rankings-full.json 2>/dev/null || echo '[]')" \
+            --argjson clients "$(cat /tmp/client-rankings.json 2>/dev/null || echo '[]')" \
             --arg updated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             '{
               overview: $overview,
