@@ -34,6 +34,7 @@ import {
   AlertCircle,
   BarChart3,
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Dashboard() {
   const { data, isLoading, isUsingMockData } = useDashboardData();
@@ -317,6 +318,9 @@ export default function Dashboard() {
           }}
         />
       </div>
+
+      {/* Theme Toggle */}
+      <ThemeToggle />
     </div>
   );
 }
