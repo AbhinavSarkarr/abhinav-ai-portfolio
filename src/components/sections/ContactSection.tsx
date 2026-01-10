@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from '@/components/ui/use-toast';
 import { useAnalyticsContext } from '@/context/AnalyticsContext';
+import { portfolioData } from '@/data/portfolioData';
 import {
   staggerContainer,
   staggerItem,
@@ -331,7 +332,7 @@ export function ContactSection() {
               whileHover={{ scale: 1.02 }}
               onClick={() => {
                 analytics.trackResumeDownload();
-                window.open("https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view", "_blank");
+                window.open(portfolioData.hero.resumeLink, "_blank");
               }}
             >
               <motion.div

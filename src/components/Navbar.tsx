@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Menu, X } from 'lucide-react';
+import { portfolioData } from '@/data/portfolioData';
 
 const navLinks = [
   { name: "Home", href: "#home" },
@@ -109,7 +110,7 @@ export function Navbar() {
             </motion.a>
           ))}
           <motion.a
-            href="https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
+            href={portfolioData.hero.resumeLink}
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, y: -20 }}
@@ -200,7 +201,7 @@ export function Navbar() {
                 </motion.a>
               ))}
               <motion.a
-                href="https://drive.google.com/file/d/1kvz-xyhbenuvSjtZr98EC8WMhYjv4pIc/view"
+                href={portfolioData.hero.resumeLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 variants={{
