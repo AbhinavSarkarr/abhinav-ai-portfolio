@@ -119,7 +119,7 @@ export function ProjectsSection() {
           <motion.h2 variants={sectionHeading} className="section-heading">
             Projects
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6">
+          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
             Exploring the intersection of AI, language models, and practical applications
           </motion.p>
         </motion.div>

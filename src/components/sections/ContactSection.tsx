@@ -154,7 +154,7 @@ export function ContactSection() {
             </motion.div>
           </div>
 
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 max-w-2xl mx-auto">
+          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 max-w-2xl mx-auto text-center">
             Have a project in mind or want to discuss AI opportunities?
             I'm always excited to explore new challenges and collaborations.
           </motion.p>

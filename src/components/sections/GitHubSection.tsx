@@ -42,7 +42,7 @@ export function GitHubSection() {
           <motion.h2 variants={sectionHeading} className="section-heading">
             GitHub Activity
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6">
+          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
             My open source contributions and coding activity
           </motion.p>
         </motion.div>

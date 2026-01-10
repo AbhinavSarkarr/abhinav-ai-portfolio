@@ -111,7 +111,7 @@ export function CurrentlyWorkingSection() {
             </motion.div>
           </div>
 
-          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6">
+          <motion.p variants={sectionSubheading} className="text-lg text-muted-foreground mt-6 text-center">
             What I'm exploring and building right now
           </motion.p>
         </motion.div>
