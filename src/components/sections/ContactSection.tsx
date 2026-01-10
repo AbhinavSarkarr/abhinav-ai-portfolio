@@ -44,7 +44,7 @@ export function ContactSection() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -55,15 +55,36 @@ export function ContactSection() {
       hasMessage: !!formData.message.trim(),
     });
 
-    setTimeout(() => {
-      toast({
-        title: "Message sent successfully",
-        description: "Thanks for reaching out! I'll get back to you soon.",
+    try {
+      // Submit to Netlify Forms
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          'form-name': 'contact',
+          ...formData,
+        }).toString(),
       });
-      setFormData({ name: '', email: '', message: '' });
-      setHasStartedForm(false);
+
+      if (response.ok) {
+        toast({
+          title: "Message sent successfully",
+          description: "Thanks for reaching out! I'll get back to you soon.",
+        });
+        setFormData({ name: '', email: '', message: '' });
+        setHasStartedForm(false);
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to send message",
+        description: "Please try again or email me directly.",
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   const contactItems = [
@@ -363,7 +384,14 @@ export function ContactSection() {
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form
+                  name="contact"
+                  method="POST"
+                  data-netlify="true"
+                  onSubmit={handleSubmit}
+                  className="space-y-6"
+                >
+                  <input type="hidden" name="form-name" value="contact" />
                   <motion.div
                     className="space-y-2"
                     initial={{ opacity: 0, y: 10 }}
