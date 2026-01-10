@@ -116,16 +116,16 @@ jobs:
             ORDER BY overall_rank
           ' > /tmp/project-rankings.json 2>/dev/null || echo '[]' > /tmp/project-rankings.json
 
-          # Sections
+          # Sections (use actual column names from deployed view)
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(section_id, "unknown") as section_id,
               ROUND(COALESCE(health_score, 50), 1) as health_score,
               COALESCE(engagement_rank, 999) as engagement_rank,
               COALESCE(health_tier, "needs_attention") as health_tier,
-              COALESCE(optimization_hint, "add_more_content") as optimization_hint,
+              COALESCE(dropoff_indicator, "moderate_dropoff") as optimization_hint,
               COALESCE(total_views, 0) as total_views,
-              ROUND(COALESCE(avg_engagement_rate, 0), 1) as avg_engagement_rate,
+              ROUND(COALESCE(engagement_rate, 0), 1) as avg_engagement_rate,
               ROUND(COALESCE(avg_exit_rate, 0), 1) as avg_exit_rate
             FROM `portfolio-483605.analytics_materialized.section_rankings`
             ORDER BY engagement_rank
@@ -157,30 +157,34 @@ jobs:
             ORDER BY interest_rank
           ' > /tmp/domain-rankings.json 2>/dev/null || echo '[]' > /tmp/domain-rankings.json
 
-          # Experiences
+          # Experiences (use actual column names from deployed view)
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
-              COALESCE(experience_title, "Unknown Role") as role_title,
-              COALESCE(company, "Unknown Company") as company_name,
-              COALESCE(interest_rank, 999) as interest_rank,
+              COALESCE(experience_id, "unknown") as role_title,
+              COALESCE(experience_id, "unknown") as company_name,
+              COALESCE(experience_rank, 999) as interest_rank,
               COALESCE(total_interactions, 0) as interest_score
             FROM `portfolio-483605.analytics_materialized.experience_rankings`
-            ORDER BY interest_rank
+            ORDER BY experience_rank
             LIMIT 10
           ' > /tmp/experience-rankings.json 2>/dev/null || echo '[]' > /tmp/experience-rankings.json
 
-          # Recommendations
+          # Recommendations (use actual column names from deployed view)
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
-              COALESCE(system_health, "good") as system_health,
-              ROUND(COALESCE(overall_ctr, 0), 1) as overall_ctr,
-              ROUND(COALESCE(position_1_ctr, 0), 1) as position_1_ctr,
-              ROUND(COALESCE(position_2_ctr, 0), 1) as position_2_ctr,
-              ROUND(COALESCE(position_3_ctr, 0), 1) as position_3_ctr,
-              ROUND(COALESCE(user_conversion_rate, 0), 1) as user_conversion_rate,
-              COALESCE(total_impressions, 0) as total_impressions,
-              COALESCE(total_clicks, 0) as total_clicks
+              CASE WHEN COALESCE(click_through_rate, 0) >= 5 THEN "good"
+                   WHEN COALESCE(click_through_rate, 0) >= 2 THEN "needs_improvement"
+                   ELSE "underperforming" END as system_health,
+              ROUND(COALESCE(click_through_rate, 0), 1) as overall_ctr,
+              0 as position_1_ctr,
+              0 as position_2_ctr,
+              0 as position_3_ctr,
+              0 as user_conversion_rate,
+              COALESCE(times_shown, 0) as total_impressions,
+              COALESCE(times_clicked, 0) as total_clicks
             FROM `portfolio-483605.analytics_materialized.recommendation_performance`
+            WHERE metric_type = "recommendations"
+            LIMIT 1
           ' > /tmp/recommendations.json 2>/dev/null || echo '[{}]' > /tmp/recommendations.json
 
           echo "Rankings data exported"
