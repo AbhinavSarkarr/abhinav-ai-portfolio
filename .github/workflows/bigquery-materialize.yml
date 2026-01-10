@@ -125,7 +125,7 @@ jobs:
               COALESCE(health_tier, "needs_attention") as health_tier,
               COALESCE(dropoff_indicator, "moderate_dropoff") as optimization_hint,
               COALESCE(total_views, 0) as total_views,
-              ROUND(COALESCE(engagement_rate, 0), 1) as avg_engagement_rate,
+              ROUND(COALESCE(health_score, 0) / 3, 1) as avg_engagement_rate,
               ROUND(COALESCE(avg_exit_rate, 0), 1) as avg_exit_rate
             FROM `portfolio-483605.analytics_materialized.section_rankings`
             ORDER BY engagement_rank
