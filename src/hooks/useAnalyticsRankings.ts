@@ -147,11 +147,12 @@ export function useAnalyticsRankings(): AnalyticsRankingsData {
           }
 
           // Process client rankings
+          // Store by client_name (exact) for lookup since GA4 tracks names not IDs
           if (data.clients && Array.isArray(data.clients)) {
             const clientsMap = new Map<string, ClientRanking>();
             data.clients.forEach((client) => {
-              if (client.client_id) {
-                clientsMap.set(client.client_id, client);
+              if (client.client_name) {
+                clientsMap.set(client.client_name, client);
               }
             });
             setClientRankings(clientsMap);
@@ -272,18 +273,19 @@ export function getProjectStats(
 // ==================== CLIENT HELPERS ====================
 
 // For sorting clients within an experience
-export function sortClientsByEngagement<T extends { id: string }>(
+export function sortClientsByEngagement<T extends { id: string; name: string }>(
   clients: T[],
   clientRankings: Map<string, ClientRanking>
 ): T[] {
   if (clientRankings.size === 0) return clients;
 
   return [...clients].sort((a, b) => {
-    const rankA = clientRankings.get(a.id);
-    const rankB = clientRankings.get(b.id);
+    // Look up by name since GA4 tracks names not IDs
+    const rankA = clientRankings.get(a.name);
+    const rankB = clientRankings.get(b.name);
 
     if (rankA && rankB) {
-      return rankA.engagement_rank - rankB.engagement_rank;
+      return Number(rankA.engagement_rank) - Number(rankB.engagement_rank);
     }
     if (rankA) return -1;
     if (rankB) return 1;
@@ -291,22 +293,25 @@ export function sortClientsByEngagement<T extends { id: string }>(
   });
 }
 
-// Get client badge based on engagement
+// Get client badge based on engagement (pass client.name, not client.id)
 export function getClientBadge(
-  clientId: string,
+  clientName: string,
   rankings: Map<string, ClientRanking>
 ): { label: string; type: 'popular' | 'trending' | null } {
-  const ranking = rankings.get(clientId);
+  const ranking = rankings.get(clientName);
 
   if (!ranking) return { label: '', type: null };
 
+  const rank = Number(ranking.engagement_rank);
+  const views = Number(ranking.total_views);
+
   // Top ranked client in their experience
-  if (ranking.engagement_rank === 1) {
+  if (rank === 1) {
     return { label: 'Most Viewed', type: 'popular' };
   }
 
   // Top 3 within experience
-  if (ranking.engagement_rank <= 3 && ranking.total_views > 0) {
+  if (rank <= 3 && views > 0) {
     return { label: 'Popular', type: 'trending' };
   }
 

@@ -226,7 +226,7 @@ export function ExperienceSection() {
                   {exp.clients && exp.clients.length > 0 ? (
                     <div className="grid gap-3">
                       {exp.clients.map((client, idx) => {
-                        const badge = getClientBadge(client.id, clientRankings);
+                        const badge = getClientBadge(client.name, clientRankings);
 
                         return (
                         <motion.div
