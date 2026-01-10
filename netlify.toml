@@ -2,33 +2,15 @@
   command = "npm run build"
   publish = "dist"
 
-# Subdomain: analytics.abhinavbuilds.in serves the dashboard
+# Redirect /dashboard on main domain to analytics subdomain
 [[redirects]]
-  from = "https://analytics.abhinavbuilds.in/*"
-  to = "/index.html"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://analytics.abhinavbuilds.in"
-  to = "/index.html"
-  status = 200
-  force = true
-
-# Block /dashboard on main domain (redirect to subdomain)
-[[redirects]]
-  from = "https://abhinavbuilds.in/dashboard"
+  from = "/dashboard"
   to = "https://analytics.abhinavbuilds.in"
   status = 301
   force = true
 
-[[redirects]]
-  from = "https://www.abhinavbuilds.in/dashboard"
-  to = "https://analytics.abhinavbuilds.in"
-  status = 301
-  force = true
-
-# Main site SPA fallback
+# SPA fallback - serves index.html for all routes (works for both domains)
+# React app detects subdomain and shows appropriate content
 [[redirects]]
   from = "/*"
   to = "/index.html"
