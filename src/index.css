@@ -83,23 +83,21 @@
     background-attachment: fixed;
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
-    text-align: justify;
   }
 
-  /* Justify text for paragraphs and content */
-  p, .text-justify {
+  /* Only justify long-form content where it makes sense */
+  .prose p,
+  article p,
+  .long-description,
+  .text-justify {
     text-align: justify;
-    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
   }
 
-  /* Keep headings and specific elements left-aligned */
-  h1, h2, h3, h4, h5, h6,
-  .text-left,
-  .text-center,
-  nav, footer,
-  button, a.tech-btn,
-  .skill-badge {
-    text-align: inherit;
+  /* Balance headings for better text distribution */
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
   }
 
   .dark body,
