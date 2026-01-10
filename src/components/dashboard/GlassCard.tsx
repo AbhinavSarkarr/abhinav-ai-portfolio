@@ -42,15 +42,15 @@ export function GlassCard({
         />
       )}
 
-      <div className={`relative z-10 ${noPadding ? '' : 'p-6'}`}>
+      <div className={`relative z-10 ${noPadding ? '' : 'p-4 sm:p-6'}`}>
         {/* Header */}
         {(title || subtitle) && (
-          <div className={noPadding ? 'px-6 pt-6' : 'mb-4'}>
+          <div className={noPadding ? 'px-4 sm:px-6 pt-4 sm:pt-6' : 'mb-3 sm:mb-4'}>
             {title && (
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
             )}
             {subtitle && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">{subtitle}</p>
             )}
           </div>
         )}

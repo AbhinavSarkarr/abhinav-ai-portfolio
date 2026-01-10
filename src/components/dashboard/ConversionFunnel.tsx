@@ -54,7 +54,7 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
   return (
     <div className="space-y-6">
       {/* Funnel Visualization */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {funnelSteps.map((step, index) => {
           const width = maxValue > 0 ? (step.value / maxValue) * 100 : 0;
           const nextStep = funnelSteps[index + 1];
@@ -70,31 +70,32 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
                 transition={{ delay: index * 0.1 }}
               >
                 {/* Bar */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${step.color}20` }}
                   >
-                    <step.icon size={18} style={{ color: step.color }} />
+                    <step.icon size={14} className="sm:hidden" style={{ color: step.color }} />
+                    <step.icon size={18} className="hidden sm:block" style={{ color: step.color }} />
                   </div>
 
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-black dark:text-white">{step.label}</span>
-                      <span className="text-sm font-bold text-black dark:text-white">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-0.5 sm:mb-1">
+                      <span className="text-xs sm:text-sm font-medium text-black dark:text-white truncate">{step.label}</span>
+                      <span className="text-xs sm:text-sm font-bold text-black dark:text-white ml-2 flex-shrink-0">
                         {formatNumber(step.value)}
                       </span>
                     </div>
-                    <div className="h-8 bg-white/10 rounded-lg overflow-hidden">
+                    <div className="h-6 sm:h-8 bg-white/10 rounded-md sm:rounded-lg overflow-hidden">
                       <motion.div
-                        className="h-full rounded-lg flex items-center justify-end pr-3"
+                        className="h-full rounded-md sm:rounded-lg flex items-center justify-end pr-2 sm:pr-3"
                         style={{ backgroundColor: step.color }}
                         initial={{ width: 0 }}
                         animate={{ width: `${width}%` }}
                         transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
                       >
-                        {width > 20 && (
-                          <span className="text-xs font-medium text-black dark:text-white">
+                        {width > 25 && (
+                          <span className="text-[10px] sm:text-xs font-medium text-black dark:text-white">
                             {width.toFixed(0)}%
                           </span>
                         )}
@@ -105,8 +106,9 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
 
                 {/* Drop-off indicator */}
                 {dropOffRate && parseFloat(dropOffRate) > 0 && (
-                  <div className="ml-14 mt-1 flex items-center gap-2 text-xs text-red-400">
-                    <ChevronRight size={12} className="rotate-90" />
+                  <div className="ml-10 sm:ml-14 mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-red-400">
+                    <ChevronRight size={10} className="rotate-90 sm:hidden" />
+                    <ChevronRight size={12} className="rotate-90 hidden sm:block" />
                     <span>-{dropOff} ({dropOffRate}% drop-off)</span>
                   </div>
                 )}
@@ -117,44 +119,46 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
       </div>
 
       {/* Conversion Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="p-3 rounded-xl bg-white/5 text-center">
-          <p className="text-xs text-muted-foreground mb-1">CTA Click Rate</p>
-          <p className="text-lg font-bold text-tech-neon">{ctaClickRate.toFixed(1)}%</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">CTA Click Rate</p>
+          <p className="text-sm sm:text-lg font-bold text-tech-neon">{ctaClickRate.toFixed(1)}%</p>
         </div>
-        <div className="p-3 rounded-xl bg-white/5 text-center">
-          <p className="text-xs text-muted-foreground mb-1">Form Start Rate</p>
-          <p className="text-lg font-bold text-tech-accent">{formStartRate.toFixed(1)}%</p>
+        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Start Rate</p>
+          <p className="text-sm sm:text-lg font-bold text-tech-accent">{formStartRate.toFixed(1)}%</p>
         </div>
-        <div className="p-3 rounded-xl bg-white/5 text-center">
-          <p className="text-xs text-muted-foreground mb-1">Form Completion</p>
-          <p className="text-lg font-bold text-tech-highlight">{formCompletionRate.toFixed(1)}%</p>
+        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Completion</p>
+          <p className="text-sm sm:text-lg font-bold text-tech-highlight">{formCompletionRate.toFixed(1)}%</p>
         </div>
-        <div className="p-3 rounded-xl bg-white/5 text-center">
-          <p className="text-xs text-muted-foreground mb-1">Overall Conversion</p>
-          <p className="text-lg font-bold text-green-400">{overallConversionRate.toFixed(2)}%</p>
+        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">Overall Conversion</p>
+          <p className="text-sm sm:text-lg font-bold text-green-400">{overallConversionRate.toFixed(2)}%</p>
         </div>
       </div>
 
       {/* Other Conversions */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-xl bg-white/5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-            <Download size={20} className="text-green-400" />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-white/5 flex items-center gap-2 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+            <Download size={16} className="text-green-400 sm:hidden" />
+            <Download size={20} className="text-green-400 hidden sm:block" />
           </div>
-          <div>
-            <p className="text-2xl font-bold text-black dark:text-white">{data.resume_downloads}</p>
-            <p className="text-sm text-muted-foreground">Resume Downloads</p>
+          <div className="min-w-0">
+            <p className="text-lg sm:text-2xl font-bold text-black dark:text-white">{data.resume_downloads}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">Resume Downloads</p>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white/5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-            <Share2 size={20} className="text-blue-400" />
+        <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-white/5 flex items-center gap-2 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+            <Share2 size={16} className="text-blue-400 sm:hidden" />
+            <Share2 size={20} className="text-blue-400 hidden sm:block" />
           </div>
-          <div>
-            <p className="text-2xl font-bold text-black dark:text-white">{data.social_clicks}</p>
-            <p className="text-sm text-muted-foreground">Social Clicks</p>
+          <div className="min-w-0">
+            <p className="text-lg sm:text-2xl font-bold text-black dark:text-white">{data.social_clicks}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">Social Clicks</p>
           </div>
         </div>
       </div>

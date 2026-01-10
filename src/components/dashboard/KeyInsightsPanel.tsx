@@ -167,24 +167,24 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
   };
 
   return (
-    <div className="rounded-2xl bg-white/70 dark:bg-tech-glass backdrop-blur-xl border border-black/5 dark:border-white/10 p-5">
+    <div className="rounded-2xl bg-white/70 dark:bg-tech-glass backdrop-blur-xl border border-black/5 dark:border-white/10 p-4 sm:p-5">
       {/* Summary Row */}
-      <div className="flex items-center gap-6 pb-4 border-b border-gray-200 dark:border-white/10">
+      <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-6 pb-4 border-b border-gray-200 dark:border-white/10">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">{groupedInsights.success.length} Wins</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.success.length} Wins</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-amber-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">{groupedInsights.warning.length} Warnings</span>
+          <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
+          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.warning.length} Warnings</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-tech-neon" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">{groupedInsights.opportunity.length} Opportunities</span>
+          <span className="w-2 h-2 rounded-full bg-tech-neon flex-shrink-0" />
+          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.opportunity.length} Opportunities</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-tech-accent" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">{groupedInsights.info.length} Insights</span>
+          <span className="w-2 h-2 rounded-full bg-tech-accent flex-shrink-0" />
+          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.info.length} Insights</span>
         </div>
       </div>
 
@@ -196,27 +196,27 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
           return (
             <div
               key={insight.id}
-              className="py-3 flex items-center gap-4 group hover:bg-gray-50 dark:hover:bg-white/5 -mx-3 px-3 rounded-lg transition-colors"
+              className="py-3 flex items-start sm:items-center gap-3 sm:gap-4 group hover:bg-gray-50 dark:hover:bg-white/5 -mx-2 sm:-mx-3 px-2 sm:px-3 rounded-lg transition-colors"
             >
               {/* Status Dot */}
-              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${config.dotColor}`} />
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 sm:mt-0 ${config.dotColor}`} />
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-900 dark:text-white text-sm">{insight.title}</span>
+                <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                  <span className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm">{insight.title}</span>
                   {insight.metric && (
                     <span className={`text-xs font-semibold ${config.textColor}`}>
                       {insight.metric}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{insight.description}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 sm:truncate">{insight.description}</p>
               </div>
 
               {/* Action */}
               {insight.action && (
-                <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="hidden sm:flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
                   <span>{insight.action}</span>
                   <ChevronRight size={12} />
                 </div>

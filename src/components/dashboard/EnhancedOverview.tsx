@@ -176,7 +176,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
           return (
             <motion.div
               key={metric.label}
-              className="relative overflow-hidden rounded-2xl bg-white/70 dark:bg-tech-glass backdrop-blur-xl border border-black/5 dark:border-white/10 p-5 group hover:border-tech-accent/30 dark:hover:border-tech-accent/40 transition-all"
+              className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-white/70 dark:bg-tech-glass backdrop-blur-xl border border-black/5 dark:border-white/10 p-3 sm:p-5 group hover:border-tech-accent/30 dark:hover:border-tech-accent/40 transition-all"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -206,21 +206,23 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
               )}
 
               <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${metric.gradient} flex items-center justify-center shadow-lg`}>
-                    <Icon size={18} className="text-white" />
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br ${metric.gradient} flex items-center justify-center shadow-lg`}>
+                    <Icon size={14} className="text-white sm:hidden" />
+                    <Icon size={18} className="text-white hidden sm:block" />
                   </div>
                   {metric.trend && TrendIcon && (
-                    <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full font-semibold ${getTrendStyles(metric.trend.direction)}`}>
-                      <TrendIcon size={12} />
-                      {metric.trend.value.toFixed(1)}%
+                    <div className={`flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-semibold ${getTrendStyles(metric.trend.direction)}`}>
+                      <TrendIcon size={10} className="sm:hidden" />
+                      <TrendIcon size={12} className="hidden sm:block" />
+                      <span className="hidden xs:inline">{metric.trend.value.toFixed(1)}%</span>
                     </div>
                   )}
                 </div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{metric.value}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{metric.label}</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{metric.value}</p>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium leading-tight">{metric.label}</p>
                 {metric.subtitle && (
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 mt-0.5 sm:mt-1 hidden xs:block">
                     {metric.subtitle}
                   </p>
                 )}
@@ -239,7 +241,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
       </div>
 
       {/* Secondary Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {metrics.slice(4).map((metric, index) => {
           const Icon = metric.icon;
           const TrendIcon = metric.trend ? getTrendIcon(metric.trend.direction) : null;
@@ -247,30 +249,32 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
           return (
             <motion.div
               key={metric.label}
-              className="relative overflow-hidden rounded-xl bg-white/70 dark:bg-tech-glass backdrop-blur-xl border border-black/5 dark:border-white/10 p-4 group hover:border-tech-accent/30 dark:hover:border-tech-accent/40 transition-all"
+              className="relative overflow-hidden rounded-lg sm:rounded-xl bg-white/70 dark:bg-tech-glass backdrop-blur-xl border border-black/5 dark:border-white/10 p-3 sm:p-4 group hover:border-tech-accent/30 dark:hover:border-tech-accent/40 transition-all"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: (index + 4) * 0.1 }}
               whileHover={{ y: -2 }}
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${metric.gradient} flex items-center justify-center shadow-lg`}>
-                  <Icon size={18} className="text-white" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br ${metric.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                  <Icon size={14} className="text-white sm:hidden" />
+                  <Icon size={18} className="text-white hidden sm:block" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-xl font-bold text-gray-900 dark:text-white">{metric.value}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{metric.value}</p>
                     {metric.trend && TrendIcon && (
-                      <div className={`p-1 rounded ${getTrendStyles(metric.trend.direction)}`}>
-                        <TrendIcon size={12} />
+                      <div className={`p-0.5 sm:p-1 rounded ${getTrendStyles(metric.trend.direction)}`}>
+                        <TrendIcon size={10} className="sm:hidden" />
+                        <TrendIcon size={12} className="hidden sm:block" />
                       </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{metric.label}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium truncate">{metric.label}</p>
                 </div>
               </div>
               {metric.subtitle && (
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 mt-1.5 sm:mt-2 truncate">
                   {metric.subtitle}
                 </p>
               )}
@@ -280,39 +284,42 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
       </div>
 
       {/* Quick Stats Bar */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-tech-neon/10 via-tech-accent/10 to-tech-highlight/10 dark:from-tech-neon/5 dark:via-tech-accent/5 dark:to-tech-highlight/5 border border-tech-accent/20 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-6 flex-wrap">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-tech-neon/10 via-tech-accent/10 to-tech-highlight/10 dark:from-tech-neon/5 dark:via-tech-accent/5 dark:to-tech-highlight/5 border border-tech-accent/20 p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:flex sm:items-center sm:gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center shadow-md">
-                <Eye size={14} className="text-white" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center shadow-md flex-shrink-0">
+                <Eye size={12} className="text-white sm:hidden" />
+                <Eye size={14} className="text-white hidden sm:block" />
               </div>
-              <span className="text-sm text-gray-600 dark:text-gray-400">Page Views:</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Page Views:</span>
+              <span className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">
                 {data.sections.reduce((sum, s) => sum + s.total_views, 0)}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
-                <MousePointerClick size={14} className="text-white" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md flex-shrink-0">
+                <MousePointerClick size={12} className="text-white sm:hidden" />
+                <MousePointerClick size={14} className="text-white hidden sm:block" />
               </div>
-              <span className="text-sm text-gray-600 dark:text-gray-400">Total Clicks:</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Total Clicks:</span>
+              <span className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">
                 {data.projects.reduce((sum, p) => sum + p.total_clicks, 0) +
                  data.skills.reduce((sum, s) => sum + s.clicks, 0)}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-md">
-                <Target size={14} className="text-white" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-md flex-shrink-0">
+                <Target size={12} className="text-white sm:hidden" />
+                <Target size={14} className="text-white hidden sm:block" />
               </div>
-              <span className="text-sm text-gray-600 dark:text-gray-400">Form Submissions:</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Submissions:</span>
+              <span className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">
                 {data.conversionFunnel.form_submissions}
               </span>
             </div>
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 font-medium px-3 py-1 rounded-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10">
+          <div className="text-xs text-gray-500 dark:text-gray-400 font-medium px-3 py-1 rounded-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 self-start sm:self-auto">
             Last 7 days
           </div>
         </div>

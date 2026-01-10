@@ -121,23 +121,24 @@ export default function Dashboard() {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="container py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center shadow-lg shadow-tech-neon/20">
-              <BarChart3 size={20} className="text-white" />
+        <div className="container py-3 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center shadow-lg shadow-tech-neon/20 flex-shrink-0">
+              <BarChart3 size={16} className="text-white sm:hidden" />
+              <BarChart3 size={20} className="text-white hidden sm:block" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent">
+            <h1 className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent">
               Portfolio Analytics
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {isUsingMockData && (
-              <span className="text-xs px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium border border-amber-500/20">
-                Sample Data
+              <span className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium border border-amber-500/20">
+                Sample
               </span>
             )}
-            <div className="text-xs text-muted-foreground hidden sm:block px-3 py-1.5 rounded-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10">
+            <div className="text-[10px] sm:text-xs text-muted-foreground hidden md:block px-3 py-1.5 rounded-full bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10">
               Updated: {format(new Date(data.updated_at), 'MMM d, yyyy HH:mm')}
             </div>
           </div>
@@ -145,7 +146,7 @@ export default function Dashboard() {
       </motion.header>
 
       {/* Main Content */}
-      <main className="pt-24 relative z-10">
+      <main className="pt-16 sm:pt-20 md:pt-24 relative z-10">
         {/* Key Insights Section */}
         <DashboardSection
           id="insights"
