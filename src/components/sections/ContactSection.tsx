@@ -57,13 +57,17 @@ export function ContactSection() {
 
     try {
       // Submit to Netlify Forms
+      const formBody = new URLSearchParams({
+        'form-name': 'contact',
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      }).toString();
+
       const response = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          'form-name': 'contact',
-          ...formData,
-        }).toString(),
+        body: formBody,
       });
 
       if (response.ok) {
@@ -74,9 +78,11 @@ export function ContactSection() {
         setFormData({ name: '', email: '', message: '' });
         setHasStartedForm(false);
       } else {
+        console.error('Form submission failed:', response.status, response.statusText);
         throw new Error('Form submission failed');
       }
     } catch (error) {
+      console.error('Form error:', error);
       toast({
         title: "Failed to send message",
         description: "Please try again or email me directly.",
