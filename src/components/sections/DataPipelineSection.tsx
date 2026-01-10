@@ -256,7 +256,7 @@ export function DataPipelineSection() {
                 >
                   {/* Vertical Connector */}
                   {index < pipelineSteps.length - 1 && (
-                    <div className="absolute left-6 top-full w-0.5 h-4 bg-gradient-to-b from-tech-accent/50 to-transparent" />
+                    <div className="absolute left-10 sm:left-12 top-full w-0.5 h-4 bg-gradient-to-b from-tech-accent/50 to-transparent" />
                   )}
 
                   <motion.div
@@ -276,7 +276,7 @@ export function DataPipelineSection() {
                           {step.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-muted-foreground text-center">
+                      <p className="text-xs text-muted-foreground">
                         {step.description}
                       </p>
                     </div>
