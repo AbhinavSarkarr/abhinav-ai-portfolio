@@ -66,17 +66,24 @@ export function Navbar() {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      // Offset for fixed navbar height
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({
-        top: elementPosition - offset,
-        behavior: 'smooth'
-      });
-    }
+
+    // Close mobile menu first
     setMobileMenuOpen(false);
+
+    // Small delay to let menu close, then scroll
+    setTimeout(() => {
+      const element = document.getElementById(href.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Adjust for navbar offset after scroll
+        setTimeout(() => {
+          window.scrollBy({ top: -80, behavior: 'smooth' });
+        }, 100);
+      } else {
+        // Fallback: use native hash navigation
+        window.location.hash = href;
+      }
+    }, 200);
   };
 
   return (
@@ -204,23 +211,25 @@ export function Navbar() {
               }}
             >
               {navLinks.map((link) => (
-                <motion.a
+                <motion.div
                   key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`p-3 rounded-xl transition-all duration-300 ${
-                    activeSection === link.href.substring(1)
-                      ? 'bg-tech-accent/10 text-tech-accent border border-tech-accent/20'
-                      : isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100'
-                  }`}
                   variants={{
                     visible: { opacity: 1, x: 0, scale: 1 },
                     hidden: { opacity: 0, x: -20, scale: 0.95 }
                   }}
-                  whileTap={{ scale: 0.98 }}
                 >
-                  {link.name}
-                </motion.a>
+                  <a
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className={`block p-3 rounded-xl transition-all duration-300 cursor-pointer touch-manipulation ${
+                      activeSection === link.href.substring(1)
+                        ? 'bg-tech-accent/10 text-tech-accent border border-tech-accent/20'
+                        : isDark ? 'hover:bg-white/5 active:bg-white/10' : 'hover:bg-gray-100 active:bg-gray-200'
+                    }`}
+                  >
+                    {link.name}
+                  </a>
+                </motion.div>
               ))}
               <motion.a
                 href={portfolioData.hero.resumeLink}
