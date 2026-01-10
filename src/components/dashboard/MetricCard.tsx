@@ -15,7 +15,7 @@ type MetricCardProps = {
 };
 
 const colorClasses = {
-  default: 'text-white',
+  default: 'text-black dark:text-white',
   success: 'text-green-400',
   warning: 'text-amber-400',
   danger: 'text-red-400',

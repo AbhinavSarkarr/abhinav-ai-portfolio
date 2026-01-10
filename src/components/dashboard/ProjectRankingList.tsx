@@ -71,7 +71,7 @@ export function ProjectRankingList({ data }: ProjectRankingListProps) {
                   )}
                 </div>
 
-                <h4 className="font-semibold text-white mb-3 line-clamp-2">
+                <h4 className="font-semibold text-black dark:text-white mb-3 line-clamp-2">
                   {project.project_title}
                 </h4>
 
@@ -79,21 +79,21 @@ export function ProjectRankingList({ data }: ProjectRankingListProps) {
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-center p-2 rounded-lg bg-white/5">
                     <Eye size={14} className="mx-auto text-tech-neon mb-1" />
-                    <span className="block text-sm font-semibold text-white">
+                    <span className="block text-sm font-semibold text-black dark:text-white">
                       {formatNumber(project.total_views)}
                     </span>
                     <span className="text-[10px] text-muted-foreground">Views</span>
                   </div>
                   <div className="text-center p-2 rounded-lg bg-white/5">
                     <MousePointerClick size={14} className="mx-auto text-tech-accent mb-1" />
-                    <span className="block text-sm font-semibold text-white">
+                    <span className="block text-sm font-semibold text-black dark:text-white">
                       {formatNumber(project.total_clicks)}
                     </span>
                     <span className="text-[10px] text-muted-foreground">Clicks</span>
                   </div>
                   <div className="text-center p-2 rounded-lg bg-white/5">
                     <TrendingUp size={14} className="mx-auto text-green-400 mb-1" />
-                    <span className="block text-sm font-semibold text-white">
+                    <span className="block text-sm font-semibold text-black dark:text-white">
                       {ctr}%
                     </span>
                     <span className="text-[10px] text-muted-foreground">CTR</span>
@@ -104,7 +104,7 @@ export function ProjectRankingList({ data }: ProjectRankingListProps) {
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-muted-foreground">Engagement Score</span>
-                    <span className="text-white font-medium">
+                    <span className="text-black dark:text-white font-medium">
                       {project.engagement_score.toFixed(1)}
                     </span>
                   </div>
@@ -131,7 +131,7 @@ export function ProjectRankingList({ data }: ProjectRankingListProps) {
         <div className="flex items-start gap-3">
           <Star size={18} className="text-tech-neon mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-white">Recommended Order</p>
+            <p className="text-sm font-medium text-black dark:text-white">Recommended Order</p>
             <p className="text-xs text-muted-foreground mt-1">
               Based on visitor engagement, consider ordering your projects as shown above.
               {sortedProjects[0] && (

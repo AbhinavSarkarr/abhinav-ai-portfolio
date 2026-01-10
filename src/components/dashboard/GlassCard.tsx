@@ -20,18 +20,24 @@ export function GlassCard({
 }: GlassCardProps) {
   return (
     <motion.div
-      className={`glass border border-white/10 rounded-2xl overflow-hidden ${
-        hover ? 'group' : ''
-      } ${className}`}
-      whileHover={hover ? { y: -4, transition: { duration: 0.2 } } : undefined}
+      className={`
+        relative overflow-hidden rounded-2xl
+        bg-white/70 dark:bg-tech-glass
+        backdrop-blur-xl
+        border border-black/5 dark:border-white/10
+        shadow-lg shadow-black/5 dark:shadow-none
+        transition-all duration-300
+        ${hover ? 'group hover:border-tech-accent/30 dark:hover:border-tech-accent/40' : ''}
+        ${className}
+      `}
+      whileHover={hover ? { y: -4, transition: { duration: 0.3 } } : undefined}
     >
-      {/* Hover glow effect */}
+      {/* Hover Glow Effect - Dark Mode Only */}
       {hover && (
-        <motion.div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0 hidden dark:block"
           style={{
-            background:
-              'radial-gradient(400px circle at 50% 50%, rgba(123, 66, 246, 0.08), transparent 60%)',
+            background: 'radial-gradient(600px circle at 50% 50%, rgba(0, 224, 255, 0.08), transparent 60%)',
           }}
         />
       )}
@@ -41,10 +47,10 @@ export function GlassCard({
         {(title || subtitle) && (
           <div className={noPadding ? 'px-6 pt-6' : 'mb-4'}>
             {title && (
-              <h3 className="text-lg font-semibold text-white">{title}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
             )}
             {subtitle && (
-              <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
             )}
           </div>
         )}
@@ -67,17 +73,17 @@ export function StatusBadge({ status, label, size = 'md' }: StatusBadgeProps) {
   const getStatusStyles = () => {
     switch (status) {
       case 'excellent':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
+        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30';
       case 'good':
-        return 'bg-tech-neon/20 text-tech-neon border-tech-neon/30';
+        return 'bg-blue-100 text-blue-700 dark:bg-tech-neon/20 dark:text-tech-neon border-blue-200 dark:border-tech-neon/30';
       case 'needs_attention':
       case 'needs_improvement':
-        return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 border-amber-200 dark:border-amber-500/30';
       case 'critical':
       case 'underperforming':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
+        return 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border-red-200 dark:border-red-500/30';
       default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-400 border-gray-200 dark:border-gray-500/30';
     }
   };
 
@@ -99,23 +105,30 @@ export function StatusBadge({ status, label, size = 'md' }: StatusBadgeProps) {
     }
   };
 
+  const getDotColor = () => {
+    switch (status) {
+      case 'excellent':
+        return 'bg-emerald-500';
+      case 'good':
+        return 'bg-tech-neon';
+      case 'needs_attention':
+      case 'needs_improvement':
+        return 'bg-amber-500';
+      case 'critical':
+      case 'underperforming':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   const sizeClasses = size === 'sm' ? 'text-xs px-2 py-0.5' : 'text-sm px-3 py-1';
 
   return (
     <span
       className={`inline-flex items-center gap-1.5 ${sizeClasses} rounded-full font-medium border ${getStatusStyles()}`}
     >
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${
-          status === 'excellent'
-            ? 'bg-green-400'
-            : status === 'good'
-            ? 'bg-tech-neon'
-            : status === 'needs_attention' || status === 'needs_improvement'
-            ? 'bg-amber-400'
-            : 'bg-red-400'
-        }`}
-      />
+      <span className={`w-1.5 h-1.5 rounded-full ${getDotColor()}`} />
       {getStatusLabel()}
     </span>
   );
@@ -146,10 +159,10 @@ export function ProgressRing({
 
   const getColor = () => {
     if (color) return color;
-    if (percentage >= 0.8) return '#10B981'; // green
-    if (percentage >= 0.6) return '#7B42F6'; // purple
-    if (percentage >= 0.4) return '#F59E0B'; // amber
-    return '#EF4444'; // red
+    if (percentage >= 0.8) return '#10B981';
+    if (percentage >= 0.6) return '#7B42F6';
+    if (percentage >= 0.4) return '#F59E0B';
+    return '#EF4444';
   };
 
   return (
@@ -161,7 +174,7 @@ export function ProgressRing({
           cy={size / 2}
           r={radius}
           fill="transparent"
-          stroke="rgba(255, 255, 255, 0.1)"
+          className="stroke-gray-200 dark:stroke-white/10"
           strokeWidth={strokeWidth}
         />
         {/* Progress circle */}
@@ -182,9 +195,9 @@ export function ProgressRing({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold text-white">{Math.round(value)}</span>
+        <span className="text-lg font-bold text-gray-900 dark:text-white">{Math.round(value)}</span>
         {label && (
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+          <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             {label}
           </span>
         )}

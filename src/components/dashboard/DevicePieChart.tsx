@@ -119,7 +119,7 @@ export function DevicePieChart({ data, height = 250 }: DevicePieChartProps) {
               />
               {Icon && <Icon size={14} className="text-muted-foreground" />}
               <span className="text-sm text-muted-foreground">{item.name}</span>
-              <span className="text-sm font-medium text-white">{item.value}</span>
+              <span className="text-sm font-medium text-black dark:text-white">{item.value}</span>
             </div>
           );
         })}

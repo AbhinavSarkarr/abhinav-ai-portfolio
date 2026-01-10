@@ -113,7 +113,7 @@ export function SourceBarChart({ data, height = 250 }: SourceBarChartProps) {
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-white font-medium">{source.sessions}</span>
+                <span className="text-black dark:text-white font-medium">{source.sessions}</span>
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full ${
                     source.engagement_rate >= 50

@@ -80,8 +80,8 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
 
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-white">{step.label}</span>
-                      <span className="text-sm font-bold text-white">
+                      <span className="text-sm font-medium text-black dark:text-white">{step.label}</span>
+                      <span className="text-sm font-bold text-black dark:text-white">
                         {formatNumber(step.value)}
                       </span>
                     </div>
@@ -94,7 +94,7 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
                         transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
                       >
                         {width > 20 && (
-                          <span className="text-xs font-medium text-white">
+                          <span className="text-xs font-medium text-black dark:text-white">
                             {width.toFixed(0)}%
                           </span>
                         )}
@@ -143,7 +143,7 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
             <Download size={20} className="text-green-400" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-white">{data.resume_downloads}</p>
+            <p className="text-2xl font-bold text-black dark:text-white">{data.resume_downloads}</p>
             <p className="text-sm text-muted-foreground">Resume Downloads</p>
           </div>
         </div>
@@ -153,7 +153,7 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
             <Share2 size={20} className="text-blue-400" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-white">{data.social_clicks}</p>
+            <p className="text-2xl font-bold text-black dark:text-white">{data.social_clicks}</p>
             <p className="text-sm text-muted-foreground">Social Clicks</p>
           </div>
         </div>

@@ -53,7 +53,7 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
           <ProgressRing value={avgHealth} size={70} label="avg" />
           <div>
             <p className="text-sm text-muted-foreground">Overall Health</p>
-            <p className="text-lg font-semibold text-white">
+            <p className="text-lg font-semibold text-black dark:text-white">
               {avgHealth >= 70 ? 'Good' : avgHealth >= 50 ? 'Fair' : 'Needs Work'}
             </p>
           </div>
@@ -61,7 +61,7 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
 
         <div className="p-4 rounded-xl bg-white/5">
           <p className="text-sm text-muted-foreground mb-1">Sections Tracked</p>
-          <p className="text-2xl font-bold text-white">{data.length}</p>
+          <p className="text-2xl font-bold text-black dark:text-white">{data.length}</p>
         </div>
 
         <div className="p-4 rounded-xl bg-white/5">
@@ -95,7 +95,7 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
                     <Icon size={18} style={{ color: healthColor }} />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white capitalize">
+                    <h4 className="font-semibold text-black dark:text-white capitalize">
                       {section.section_id}
                     </h4>
                     <StatusBadge status={section.health_tier} size="sm" />
@@ -107,7 +107,7 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-2 mb-4">
                 <div className="text-center p-2 rounded-lg bg-white/5">
-                  <span className="block text-sm font-semibold text-white">
+                  <span className="block text-sm font-semibold text-black dark:text-white">
                     {section.total_views}
                   </span>
                   <span className="text-[10px] text-muted-foreground">Views</span>
@@ -159,7 +159,7 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
           <div className="flex items-start gap-3">
             <AlertTriangle size={18} className="text-amber-400 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-white">Priority Actions</p>
+              <p className="text-sm font-medium text-black dark:text-white">Priority Actions</p>
               <ul className="mt-2 space-y-1">
                 {criticalSections.map((section) => {
                   const hint = OPTIMIZATION_HINTS[section.optimization_hint];

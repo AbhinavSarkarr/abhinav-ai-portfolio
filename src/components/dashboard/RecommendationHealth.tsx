@@ -84,7 +84,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
             <Target size={16} className="text-tech-accent" />
             <p className="text-sm text-muted-foreground">Overall CTR</p>
           </div>
-          <p className="text-3xl font-bold text-white">{data.overall_ctr.toFixed(1)}%</p>
+          <p className="text-3xl font-bold text-black dark:text-white">{data.overall_ctr.toFixed(1)}%</p>
           <p className="text-xs text-muted-foreground mt-1">
             {data.total_clicks} clicks / {data.total_impressions} impressions
           </p>
@@ -101,7 +101,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
             <Users size={16} className="text-tech-highlight" />
             <p className="text-sm text-muted-foreground">User Conversion</p>
           </div>
-          <p className="text-3xl font-bold text-white">{data.user_conversion_rate.toFixed(1)}%</p>
+          <p className="text-3xl font-bold text-black dark:text-white">{data.user_conversion_rate.toFixed(1)}%</p>
           <p className="text-xs text-muted-foreground mt-1">
             % of users who click recommendations
           </p>
@@ -119,7 +119,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
             <p className="text-sm text-muted-foreground">Total Engagement</p>
           </div>
           <div className="flex items-baseline gap-2">
-            <p className="text-3xl font-bold text-white">{formatNumber(data.total_clicks)}</p>
+            <p className="text-3xl font-bold text-black dark:text-white">{formatNumber(data.total_clicks)}</p>
             <p className="text-sm text-muted-foreground">clicks</p>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -132,7 +132,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar Chart */}
         <div className="p-4 rounded-xl bg-white/5">
-          <h4 className="text-sm font-medium text-white mb-4 flex items-center gap-2">
+          <h4 className="text-sm font-medium text-black dark:text-white mb-4 flex items-center gap-2">
             <MousePointerClick size={16} className="text-tech-accent" />
             Position Performance
           </h4>
@@ -172,7 +172,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
 
         {/* Position Cards */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-white mb-2">Position Analysis</h4>
+          <h4 className="text-sm font-medium text-black dark:text-white mb-2">Position Analysis</h4>
           {positionData.map((pos, index) => {
             const isTopPerformer = pos.ctr === Math.max(...positionData.map((p) => p.ctr));
             return (
@@ -195,14 +195,14 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">{pos.position}</p>
+                    <p className="text-sm font-medium text-black dark:text-white">{pos.position}</p>
                     {isTopPerformer && (
                       <span className="text-[10px] text-green-400">Best performer</span>
                     )}
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold text-white">{pos.ctr.toFixed(1)}%</p>
+                  <p className="text-xl font-bold text-black dark:text-white">{pos.ctr.toFixed(1)}%</p>
                   <p className="text-xs text-muted-foreground">CTR</p>
                 </div>
               </motion.div>

@@ -34,7 +34,7 @@ export function ClientRankingList({ clients, domains }: ClientRankingListProps) 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Client Rankings */}
       <div>
-        <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h4 className="text-lg font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
           <Building2 size={18} className="text-tech-accent" />
           Client Work Rankings
         </h4>
@@ -54,7 +54,7 @@ export function ClientRankingList({ clients, domains }: ClientRankingListProps) 
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-black dark:text-white font-bold text-sm"
                       style={{
                         backgroundColor: chartColorPalette[index % chartColorPalette.length],
                       }}
@@ -62,7 +62,7 @@ export function ClientRankingList({ clients, domains }: ClientRankingListProps) 
                       #{client.engagement_rank}
                     </div>
                     <div>
-                      <h5 className="font-medium text-white">{client.client_name}</h5>
+                      <h5 className="font-medium text-black dark:text-white">{client.client_name}</h5>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <DomainIcon size={10} />
                         {client.domain}
@@ -74,18 +74,18 @@ export function ClientRankingList({ clients, domains }: ClientRankingListProps) 
                 <div className="flex items-center gap-4 mt-3">
                   <div className="flex items-center gap-1.5">
                     <Eye size={12} className="text-tech-neon" />
-                    <span className="text-sm text-white">{formatNumber(client.total_views)}</span>
+                    <span className="text-sm text-black dark:text-white">{formatNumber(client.total_views)}</span>
                     <span className="text-xs text-muted-foreground">views</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <MousePointerClick size={12} className="text-tech-accent" />
-                    <span className="text-sm text-white">{formatNumber(client.total_clicks)}</span>
+                    <span className="text-sm text-black dark:text-white">{formatNumber(client.total_clicks)}</span>
                     <span className="text-xs text-muted-foreground">clicks</span>
                   </div>
                   {client.total_views > 0 && (
                     <div className="flex items-center gap-1.5">
                       <TrendingUp size={12} className="text-green-400" />
-                      <span className="text-sm text-white">
+                      <span className="text-sm text-black dark:text-white">
                         {((client.total_clicks / client.total_views) * 100).toFixed(1)}%
                       </span>
                       <span className="text-xs text-muted-foreground">CTR</span>
@@ -100,7 +100,7 @@ export function ClientRankingList({ clients, domains }: ClientRankingListProps) 
 
       {/* Domain Interest */}
       <div>
-        <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h4 className="text-lg font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
           <Heart size={18} className="text-tech-highlight" />
           Industry Interest
         </h4>
@@ -133,7 +133,7 @@ export function ClientRankingList({ clients, domains }: ClientRankingListProps) 
                       />
                     </div>
                     <div>
-                      <h5 className="font-medium text-white">{domain.domain}</h5>
+                      <h5 className="font-medium text-black dark:text-white">{domain.domain}</h5>
                       <span className="text-xs text-muted-foreground">
                         Rank #{domain.interest_rank}
                       </span>
@@ -157,7 +157,7 @@ export function ClientRankingList({ clients, domains }: ClientRankingListProps) 
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-muted-foreground">Interest Score</span>
-                    <span className="text-white">{domain.total_interest_score}</span>
+                    <span className="text-black dark:text-white">{domain.total_interest_score}</span>
                   </div>
                   <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                     <motion.div

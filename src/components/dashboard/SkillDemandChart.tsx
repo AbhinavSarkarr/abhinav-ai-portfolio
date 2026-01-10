@@ -120,7 +120,7 @@ export function SkillDemandChart({ data, height = 350 }: SkillDemandChartProps) 
               transition={{ delay: index * 0.03 }}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-white truncate">
+                <span className="text-sm font-medium text-black dark:text-white truncate">
                   {skill.skill_name}
                 </span>
                 <span className="text-xs text-muted-foreground">#{skill.demand_rank}</span>
@@ -159,7 +159,7 @@ export function SkillDemandChart({ data, height = 350 }: SkillDemandChartProps) 
             >
               <div className="flex items-center gap-2 mb-3">
                 <config.icon size={16} style={{ color: config.color }} />
-                <span className="text-sm font-medium text-white">{config.label}</span>
+                <span className="text-sm font-medium text-black dark:text-white">{config.label}</span>
                 <span className="text-xs text-muted-foreground">({skills.length})</span>
               </div>
               <div className="flex flex-wrap gap-1.5">

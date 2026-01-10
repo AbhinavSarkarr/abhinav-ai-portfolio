@@ -149,10 +149,10 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white">
+                  <span className="text-sm font-medium text-black dark:text-white">
                     {segment.label}
                   </span>
-                  <span className="text-sm font-bold text-white">
+                  <span className="text-sm font-bold text-black dark:text-white">
                     {segment.value}
                   </span>
                 </div>

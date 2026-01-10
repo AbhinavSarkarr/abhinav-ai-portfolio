@@ -104,7 +104,7 @@ export function CountryBarChart({ data, height = 250 }: CountryBarChartProps) {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-white font-medium">{country.visitors}</span>
+              <span className="text-black dark:text-white font-medium">{country.visitors}</span>
               <span className="text-xs text-muted-foreground">
                 ({country.percentage}%)
               </span>
