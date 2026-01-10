@@ -250,7 +250,7 @@ jobs:
             FROM `portfolio-483605.analytics_processed.v_visitor_insights`
           ' > /tmp/visitor-segments.json 2>/dev/null || echo '[{}]' > /tmp/visitor-segments.json
 
-          # Conversion funnel
+          # Conversion funnel (event_date is STRING in YYYYMMDD format)
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(SUM(total_cta_views), 0) as cta_views,
@@ -260,8 +260,8 @@ jobs:
               COALESCE(SUM(resume_downloads), 0) as resume_downloads,
               COALESCE(SUM(social_clicks), 0) as social_clicks
             FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
-            WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
-              AND event_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+            WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY))
+              AND event_date <= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
           ' > /tmp/conversion-funnel.json 2>/dev/null || echo '[{}]' > /tmp/conversion-funnel.json
 
           echo "Dashboard metrics exported"
@@ -332,8 +332,8 @@ jobs:
               COALESCE(SUM(contact_form_submissions), 0) as total_conversions,
               COALESCE(SUM(resume_downloads), 0) as resume_downloads
             FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
-            WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
-              AND event_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+            WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY))
+              AND event_date <= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
           ' 2>/dev/null | jq '.[0] // {}' || echo '{}')
 
           COMBINED_OVERVIEW=$(echo "$OVERVIEW" "$CONVERSIONS" | jq -s '.[0] * .[1]')
