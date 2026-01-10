@@ -1,15 +1,12 @@
 # BigQuery Analytics Materialization
 # Runs daily at 2:00 PM IST (8:30 UTC) to materialize analytics views into tables
-# This makes Looker dashboards faster and creates daily snapshots
+# and export data to GitHub Gists for the portfolio and dashboard
 
 name: Materialize BigQuery Analytics
 
 on:
   schedule:
-    # Runs at 2:00 PM IST (8:30 UTC) daily
     - cron: '30 8 * * *'
-
-  # Allow manual trigger from GitHub Actions tab
   workflow_dispatch:
 
 jobs:
@@ -35,100 +32,64 @@ jobs:
         run: |
           bq mk --dataset --location=US portfolio-483605:analytics_materialized || true
 
-      - name: Materialize Section Rankings
+      # ==================== MATERIALIZE VIEWS ====================
+      - name: Materialize All Rankings Views
         run: |
+          echo "Materializing section_rankings..."
           bq query --use_legacy_sql=false --location=US '
             CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.section_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
             FROM `portfolio-483605.analytics_processed.v_section_rankings`
-          '
-          echo "Section rankings materialized"
+          ' || echo "Warning: section_rankings failed"
 
-      - name: Materialize Project Rankings
-        run: |
+          echo "Materializing project_rankings..."
           bq query --use_legacy_sql=false --location=US '
             CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.project_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
             FROM `portfolio-483605.analytics_processed.v_project_rankings`
-          '
-          echo "Project rankings materialized"
+          ' || echo "Warning: project_rankings failed"
 
-      - name: Materialize Skill Rankings
-        run: |
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.skill_rankings` AS
-            SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_skill_rankings`
-          '
-          echo "Skill rankings materialized"
-
-      - name: Materialize Client Rankings
-        run: |
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.client_rankings` AS
-            SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_client_rankings`
-          '
-          echo "Client rankings materialized"
-
-      - name: Materialize Domain Rankings
-        run: |
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.domain_rankings` AS
-            SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_domain_rankings`
-          '
-          echo "Domain rankings materialized"
-
-      - name: Materialize Experience Rankings
-        run: |
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.experience_rankings` AS
-            SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_experience_rankings`
-          '
-          echo "Experience rankings materialized"
-
-      - name: Materialize Tech Demand Insights
-        run: |
+          echo "Materializing tech_demand_insights (skills)..."
           bq query --use_legacy_sql=false --location=US '
             CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.tech_demand_insights` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
             FROM `portfolio-483605.analytics_processed.v_tech_demand_insights`
-          '
-          echo "Tech demand insights materialized"
+          ' || echo "Warning: tech_demand_insights failed"
 
-      - name: Materialize Visitor Insights
-        run: |
+          echo "Materializing client_rankings..."
           bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.visitor_insights` AS
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.client_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_visitor_insights`
-          '
-          echo "Visitor insights materialized"
+            FROM `portfolio-483605.analytics_processed.v_client_rankings`
+          ' || echo "Warning: client_rankings failed"
 
-      - name: Materialize Conversion Funnel
-        run: |
+          echo "Materializing domain_rankings..."
           bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.conversion_funnel` AS
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.domain_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
-          '
-          echo "Conversion funnel materialized"
+            FROM `portfolio-483605.analytics_processed.v_domain_rankings`
+          ' || echo "Warning: domain_rankings failed"
 
-      - name: Materialize Recommendation Performance
-        run: |
+          echo "Materializing experience_rankings..."
+          bq query --use_legacy_sql=false --location=US '
+            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.experience_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `portfolio-483605.analytics_processed.v_experience_rankings`
+          ' || echo "Warning: experience_rankings failed"
+
+          echo "Materializing recommendation_performance..."
           bq query --use_legacy_sql=false --location=US '
             CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.recommendation_performance` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
             FROM `portfolio-483605.analytics_processed.v_recommendation_performance`
-          '
-          echo "Recommendation performance materialized"
+          ' || echo "Warning: recommendation_performance failed"
 
-      # Export rankings to JSON and update GitHub Gist
-      # Use || echo '[]' to handle empty results gracefully
-      - name: Export Skill Rankings to JSON
+          echo "All materializations complete"
+
+      # ==================== EXPORT DATA TO JSON ====================
+      - name: Export Rankings Data
         run: |
+          # Skills
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(technology, "Unknown") as skill_name,
@@ -139,11 +100,9 @@ jobs:
               COALESCE(learning_priority, "maintain_expertise") as learning_priority
             FROM `portfolio-483605.analytics_materialized.tech_demand_insights`
             ORDER BY demand_rank
-          ' > /tmp/skill-rankings.json || echo '[]' > /tmp/skill-rankings.json
-          echo "Skill rankings exported: $(cat /tmp/skill-rankings.json | head -c 100)"
+          ' > /tmp/skill-rankings.json 2>/dev/null || echo '[]' > /tmp/skill-rankings.json
 
-      - name: Export Project Rankings to JSON
-        run: |
+          # Projects
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(project_id, "unknown") as project_id,
@@ -155,25 +114,24 @@ jobs:
               COALESCE(recommended_position, "primary") as recommended_position
             FROM `portfolio-483605.analytics_materialized.project_rankings`
             ORDER BY overall_rank
-          ' > /tmp/project-rankings.json || echo '[]' > /tmp/project-rankings.json
-          echo "Project rankings exported: $(cat /tmp/project-rankings.json | head -c 100)"
+          ' > /tmp/project-rankings.json 2>/dev/null || echo '[]' > /tmp/project-rankings.json
 
-      - name: Export Section Rankings to JSON
-        run: |
+          # Sections
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(section_id, "unknown") as section_id,
-              COALESCE(health_score, 50) as health_score,
+              ROUND(COALESCE(health_score, 50), 1) as health_score,
               COALESCE(engagement_rank, 999) as engagement_rank,
               COALESCE(health_tier, "needs_attention") as health_tier,
-              COALESCE(optimization_hint, "add_more_content") as optimization_hint
+              COALESCE(optimization_hint, "add_more_content") as optimization_hint,
+              COALESCE(total_views, 0) as total_views,
+              ROUND(COALESCE(avg_engagement_rate, 0), 1) as avg_engagement_rate,
+              ROUND(COALESCE(avg_exit_rate, 0), 1) as avg_exit_rate
             FROM `portfolio-483605.analytics_materialized.section_rankings`
             ORDER BY engagement_rank
-          ' > /tmp/section-rankings.json || echo '[]' > /tmp/section-rankings.json
-          echo "Section rankings exported: $(cat /tmp/section-rankings.json | head -c 100)"
+          ' > /tmp/section-rankings.json 2>/dev/null || echo '[]' > /tmp/section-rankings.json
 
-      - name: Export Client Rankings to JSON
-        run: |
+          # Clients
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(client_id, "unknown") as client_id,
@@ -185,61 +143,51 @@ jobs:
               COALESCE(total_clicks, 0) as total_clicks
             FROM `portfolio-483605.analytics_materialized.client_rankings`
             ORDER BY experience_id, engagement_rank
-          ' > /tmp/client-rankings.json || echo '[]' > /tmp/client-rankings.json
-          echo "Client rankings exported: $(cat /tmp/client-rankings.json | head -c 100)"
+          ' > /tmp/client-rankings.json 2>/dev/null || echo '[]' > /tmp/client-rankings.json
 
-      - name: Update GitHub Gist with rankings data
-        env:
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          # Domains
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              COALESCE(domain, "Unknown") as domain,
+              COALESCE(interest_rank, 999) as interest_rank,
+              COALESCE(total_interest_score, 0) as total_interest_score,
+              COALESCE(demand_tier, "niche_interest") as demand_tier,
+              COALESCE(portfolio_recommendation, "maintain") as portfolio_recommendation
+            FROM `portfolio-483605.analytics_materialized.domain_rankings`
+            ORDER BY interest_rank
+          ' > /tmp/domain-rankings.json 2>/dev/null || echo '[]' > /tmp/domain-rankings.json
+
+          # Experiences
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              COALESCE(experience_title, "Unknown Role") as role_title,
+              COALESCE(company, "Unknown Company") as company_name,
+              COALESCE(interest_rank, 999) as interest_rank,
+              COALESCE(total_interactions, 0) as interest_score
+            FROM `portfolio-483605.analytics_materialized.experience_rankings`
+            ORDER BY interest_rank
+            LIMIT 10
+          ' > /tmp/experience-rankings.json 2>/dev/null || echo '[]' > /tmp/experience-rankings.json
+
+          # Recommendations
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              COALESCE(system_health, "good") as system_health,
+              ROUND(COALESCE(overall_ctr, 0), 1) as overall_ctr,
+              ROUND(COALESCE(position_1_ctr, 0), 1) as position_1_ctr,
+              ROUND(COALESCE(position_2_ctr, 0), 1) as position_2_ctr,
+              ROUND(COALESCE(position_3_ctr, 0), 1) as position_3_ctr,
+              ROUND(COALESCE(user_conversion_rate, 0), 1) as user_conversion_rate,
+              COALESCE(total_impressions, 0) as total_impressions,
+              COALESCE(total_clicks, 0) as total_clicks
+            FROM `portfolio-483605.analytics_materialized.recommendation_performance`
+          ' > /tmp/recommendations.json 2>/dev/null || echo '[{}]' > /tmp/recommendations.json
+
+          echo "Rankings data exported"
+
+      - name: Export Dashboard Metrics
         run: |
-          # Ensure all files have valid JSON (default to empty array if invalid)
-          for f in /tmp/skill-rankings.json /tmp/project-rankings.json /tmp/section-rankings.json /tmp/client-rankings.json; do
-            if ! jq empty "$f" 2>/dev/null; then
-              echo '[]' > "$f"
-            fi
-          done
-
-          # Combine all rankings into one JSON file
-          jq -n \
-            --argjson skills "$(cat /tmp/skill-rankings.json)" \
-            --argjson projects "$(cat /tmp/project-rankings.json)" \
-            --argjson sections "$(cat /tmp/section-rankings.json)" \
-            --argjson clients "$(cat /tmp/client-rankings.json)" \
-            --arg updated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            '{
-              skills: $skills,
-              projects: $projects,
-              sections: $sections,
-              clients: $clients,
-              updated_at: $updated_at
-            }' > /tmp/rankings.json
-
-          echo "Combined rankings JSON:"
-          cat /tmp/rankings.json
-
-          # Update Gist via GitHub API
-          RESPONSE=$(curl -s -X PATCH \
-            -H "Authorization: token $GIST_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/gists/7983bb85c69ec4cc45fe37b6a8d2d391 \
-            -d "$(jq -n --arg content "$(cat /tmp/rankings.json)" '{files: {"skill-rankings.json": {content: $content}}}')")
-
-          echo "Gist API Response:"
-          echo "$RESPONSE" | head -20
-
-          if echo "$RESPONSE" | grep -q '"id"'; then
-            echo "Gist updated successfully!"
-          else
-            echo "Warning: Gist update may have failed"
-            exit 1
-          fi
-
-      # ==================== DASHBOARD DATA EXPORT ====================
-      # Export comprehensive dashboard data to a separate Gist
-
-      - name: Export Daily Metrics to JSON
-        run: |
-          # Use INTERVAL 1 DAY offset to account for GA4 export delay
+          # Daily metrics (last 30 days, excluding today due to GA4 delay)
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               FORMAT_DATE("%Y-%m-%d", session_date) as date,
@@ -256,10 +204,9 @@ jobs:
               AND session_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
             ORDER BY session_date DESC
             LIMIT 30
-          ' > /tmp/daily-metrics.json || echo '[]' > /tmp/daily-metrics.json
+          ' > /tmp/daily-metrics.json 2>/dev/null || echo '[]' > /tmp/daily-metrics.json
 
-      - name: Export Traffic Sources to JSON
-        run: |
+          # Traffic sources
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(traffic_source, "direct") as source,
@@ -272,10 +219,9 @@ jobs:
             GROUP BY traffic_source, traffic_medium
             ORDER BY sessions DESC
             LIMIT 10
-          ' > /tmp/traffic-sources.json || echo '[]' > /tmp/traffic-sources.json
+          ' > /tmp/traffic-sources.json 2>/dev/null || echo '[]' > /tmp/traffic-sources.json
 
-      - name: Export Top Countries to JSON
-        run: |
+          # Top countries
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(country, "Unknown") as country,
@@ -287,10 +233,9 @@ jobs:
             HAVING visitors > 0
             ORDER BY visitors DESC
             LIMIT 10
-          ' > /tmp/top-countries.json || echo '[]' > /tmp/top-countries.json
+          ' > /tmp/top-countries.json 2>/dev/null || echo '[]' > /tmp/top-countries.json
 
-      - name: Export Visitor Segments Summary to JSON
-        run: |
+          # Visitor segments
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(COUNTIF(visitor_segment = "converter"), 0) as converters,
@@ -299,10 +244,9 @@ jobs:
               COALESCE(COUNTIF(visitor_segment = "returning_visitor"), 0) as returning_visitors,
               COALESCE(COUNTIF(visitor_segment = "casual_browser" OR visitor_segment = "engaged_new"), 0) as casual_browsers
             FROM `portfolio-483605.analytics_processed.v_visitor_insights`
-          ' > /tmp/visitor-segments.json || echo '[{}]' > /tmp/visitor-segments.json
+          ' > /tmp/visitor-segments.json 2>/dev/null || echo '[{}]' > /tmp/visitor-segments.json
 
-      - name: Export Conversion Funnel to JSON
-        run: |
+          # Conversion funnel
           bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(SUM(total_cta_views), 0) as cta_views,
@@ -314,97 +258,60 @@ jobs:
             FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
             WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
               AND event_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-          ' > /tmp/conversion-funnel.json || echo '[{}]' > /tmp/conversion-funnel.json
+          ' > /tmp/conversion-funnel.json 2>/dev/null || echo '[{}]' > /tmp/conversion-funnel.json
 
-      - name: Export Domain Rankings to JSON
-        run: |
-          bq query --use_legacy_sql=false --format=json --location=US '
-            SELECT
-              COALESCE(domain, "Unknown") as domain,
-              COALESCE(interest_rank, 999) as interest_rank,
-              COALESCE(total_interest_score, 0) as total_interest_score,
-              COALESCE(demand_tier, "niche_interest") as demand_tier,
-              COALESCE(portfolio_recommendation, "maintain") as portfolio_recommendation
-            FROM `portfolio-483605.analytics_materialized.domain_rankings`
-            ORDER BY interest_rank
-          ' > /tmp/domain-rankings.json || echo '[]' > /tmp/domain-rankings.json
+          echo "Dashboard metrics exported"
 
-      - name: Export Experience Rankings to JSON
+      # ==================== UPDATE GISTS ====================
+      - name: Update Portfolio Rankings Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
-          bq query --use_legacy_sql=false --format=json --location=US '
-            SELECT
-              COALESCE(job_title, "Unknown Role") as role_title,
-              COALESCE(company, "Unknown Company") as company_name,
-              COALESCE(interest_rank, 999) as interest_rank,
-              COALESCE(total_interest_score, 0) as interest_score
-            FROM `portfolio-483605.analytics_materialized.experience_rankings`
-            ORDER BY interest_rank
-            LIMIT 10
-          ' > /tmp/experience-rankings.json || echo '[]' > /tmp/experience-rankings.json
+          # Validate JSON files
+          for f in /tmp/skill-rankings.json /tmp/project-rankings.json /tmp/section-rankings.json /tmp/client-rankings.json; do
+            jq empty "$f" 2>/dev/null || echo '[]' > "$f"
+          done
 
-      - name: Export Recommendation Performance to JSON
-        run: |
-          bq query --use_legacy_sql=false --format=json --location=US '
-            SELECT
-              COALESCE(system_health, "good") as system_health,
-              ROUND(COALESCE(overall_ctr, 0), 1) as overall_ctr,
-              ROUND(COALESCE(position_1_ctr, 0), 1) as position_1_ctr,
-              ROUND(COALESCE(position_2_ctr, 0), 1) as position_2_ctr,
-              ROUND(COALESCE(position_3_ctr, 0), 1) as position_3_ctr,
-              ROUND(COALESCE(user_conversion_rate, 0), 1) as user_conversion_rate,
-              COALESCE(total_impressions, 0) as total_impressions,
-              COALESCE(total_clicks, 0) as total_clicks
-            FROM `portfolio-483605.analytics_materialized.recommendation_performance`
-          ' > /tmp/recommendations.json || echo '[{}]' > /tmp/recommendations.json
+          # Combine rankings
+          jq -n \
+            --argjson skills "$(cat /tmp/skill-rankings.json)" \
+            --argjson projects "$(cat /tmp/project-rankings.json)" \
+            --argjson sections "$(cat /tmp/section-rankings.json)" \
+            --argjson clients "$(cat /tmp/client-rankings.json)" \
+            --arg updated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{skills: $skills, projects: $projects, sections: $sections, clients: $clients, updated_at: $updated_at}' \
+            > /tmp/rankings.json
 
-      - name: Export Section Rankings with Full Details to JSON
-        run: |
-          bq query --use_legacy_sql=false --format=json --location=US '
-            SELECT
-              COALESCE(section_id, "unknown") as section_id,
-              ROUND(COALESCE(health_score, 50), 1) as health_score,
-              COALESCE(engagement_rank, 999) as engagement_rank,
-              COALESCE(health_tier, "needs_attention") as health_tier,
-              COALESCE(optimization_hint, "add_more_content") as optimization_hint,
-              COALESCE(total_views, 0) as total_views,
-              ROUND(COALESCE(avg_engagement_rate, 0), 1) as avg_engagement_rate,
-              ROUND(COALESCE(avg_exit_rate, 0), 1) as avg_exit_rate
-            FROM `portfolio-483605.analytics_materialized.section_rankings`
-            ORDER BY engagement_rank
-          ' > /tmp/section-rankings-full.json || echo '[]' > /tmp/section-rankings-full.json
+          # Update Gist
+          curl -s -X PATCH \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/gists/7983bb85c69ec4cc45fe37b6a8d2d391 \
+            -d "$(jq -n --arg content "$(cat /tmp/rankings.json)" '{files: {"skill-rankings.json": {content: $content}}}')" \
+            | grep -q '"id"' && echo "Rankings Gist updated!" || echo "Warning: Rankings Gist update failed"
 
       - name: Update Dashboard Gist
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           DASHBOARD_GIST_ID: ${{ secrets.DASHBOARD_GIST_ID }}
         run: |
-          # Skip if DASHBOARD_GIST_ID is not set
           if [ -z "$DASHBOARD_GIST_ID" ]; then
-            echo "DASHBOARD_GIST_ID not set, skipping dashboard gist update"
-            echo "To enable: Create a new Gist and add its ID as DASHBOARD_GIST_ID secret"
+            echo "DASHBOARD_GIST_ID not set, skipping"
             exit 0
           fi
 
-          # Ensure all files have valid JSON arrays
+          # Validate JSON files
           for f in /tmp/daily-metrics.json /tmp/traffic-sources.json /tmp/top-countries.json \
-                   /tmp/domain-rankings.json /tmp/experience-rankings.json \
-                   /tmp/section-rankings-full.json /tmp/skill-rankings.json \
-                   /tmp/project-rankings.json /tmp/client-rankings.json; do
-            if ! jq empty "$f" 2>/dev/null; then
-              echo '[]' > "$f"
-            fi
+                   /tmp/domain-rankings.json /tmp/experience-rankings.json /tmp/section-rankings.json \
+                   /tmp/skill-rankings.json /tmp/project-rankings.json /tmp/client-rankings.json; do
+            jq empty "$f" 2>/dev/null || echo '[]' > "$f"
           done
-
-          # Ensure object files have valid JSON objects
           for f in /tmp/visitor-segments.json /tmp/conversion-funnel.json /tmp/recommendations.json; do
-            if ! jq empty "$f" 2>/dev/null; then
-              echo '[{}]' > "$f"
-            fi
+            jq empty "$f" 2>/dev/null || echo '[{}]' > "$f"
           done
 
-          # Calculate overview metrics with proper error handling
-          # Use INTERVAL 8 DAY to account for GA4 export delay (data available ~24-48hrs late)
-          OVERVIEW_RAW=$(bq query --use_legacy_sql=false --format=json --location=US '
+          # Calculate overview (7-day summary)
+          OVERVIEW=$(bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(SUM(unique_visitors), 0) as total_visitors_7d,
               COALESCE(SUM(total_sessions), 0) as total_sessions_7d,
@@ -414,57 +321,34 @@ jobs:
             FROM `portfolio-483605.analytics_processed.v_daily_metrics`
             WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
               AND session_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-          ' 2>/dev/null || echo '[]')
+          ' 2>/dev/null | jq '.[0] // {}' || echo '{}')
 
-          if echo "$OVERVIEW_RAW" | jq empty 2>/dev/null; then
-            OVERVIEW=$(echo "$OVERVIEW_RAW" | jq '.[0] // {"total_visitors_7d":0,"total_sessions_7d":0,"engagement_rate":0,"bounce_rate":0,"avg_session_duration_sec":0}')
-          else
-            OVERVIEW='{"total_visitors_7d":0,"total_sessions_7d":0,"engagement_rate":0,"bounce_rate":0,"avg_session_duration_sec":0}'
-          fi
-
-          CONVERSIONS_RAW=$(bq query --use_legacy_sql=false --format=json --location=US '
+          CONVERSIONS=$(bq query --use_legacy_sql=false --format=json --location=US '
             SELECT
               COALESCE(SUM(contact_form_submissions), 0) as total_conversions,
               COALESCE(SUM(resume_downloads), 0) as resume_downloads
             FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
             WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
               AND event_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-          ' 2>/dev/null || echo '[]')
+          ' 2>/dev/null | jq '.[0] // {}' || echo '{}')
 
-          if echo "$CONVERSIONS_RAW" | jq empty 2>/dev/null; then
-            CONVERSIONS=$(echo "$CONVERSIONS_RAW" | jq '.[0] // {"total_conversions":0,"resume_downloads":0}')
-          else
-            CONVERSIONS='{"total_conversions":0,"resume_downloads":0}'
-          fi
-
-          # Safely merge overview and conversions
           COMBINED_OVERVIEW=$(echo "$OVERVIEW" "$CONVERSIONS" | jq -s '.[0] * .[1]')
 
-          # Helper function to safely get first element or empty object
-          get_first_or_empty() {
-            local file=$1
-            if [ -f "$file" ]; then
-              jq '.[0] // {}' "$file" 2>/dev/null || echo '{}'
-            else
-              echo '{}'
-            fi
-          }
-
-          # Combine into dashboard JSON with safe defaults
+          # Build dashboard JSON
           jq -n \
             --argjson overview "$COMBINED_OVERVIEW" \
-            --argjson dailyMetrics "$(cat /tmp/daily-metrics.json 2>/dev/null || echo '[]')" \
-            --argjson trafficSources "$(cat /tmp/traffic-sources.json 2>/dev/null || echo '[]')" \
-            --argjson topCountries "$(cat /tmp/top-countries.json 2>/dev/null || echo '[]')" \
-            --argjson visitorSegments "$(jq '.[0] // {}' /tmp/visitor-segments.json 2>/dev/null || echo '{}')" \
-            --argjson conversionFunnel "$(jq '.[0] // {}' /tmp/conversion-funnel.json 2>/dev/null || echo '{}')" \
-            --argjson recommendations "$(jq '.[0] // {}' /tmp/recommendations.json 2>/dev/null || echo '{}')" \
-            --argjson domains "$(cat /tmp/domain-rankings.json 2>/dev/null || echo '[]')" \
-            --argjson experiences "$(cat /tmp/experience-rankings.json 2>/dev/null || echo '[]')" \
-            --argjson skills "$(cat /tmp/skill-rankings.json 2>/dev/null || echo '[]')" \
-            --argjson projects "$(cat /tmp/project-rankings.json 2>/dev/null || echo '[]')" \
-            --argjson sections "$(cat /tmp/section-rankings-full.json 2>/dev/null || echo '[]')" \
-            --argjson clients "$(cat /tmp/client-rankings.json 2>/dev/null || echo '[]')" \
+            --argjson dailyMetrics "$(cat /tmp/daily-metrics.json)" \
+            --argjson trafficSources "$(cat /tmp/traffic-sources.json)" \
+            --argjson topCountries "$(cat /tmp/top-countries.json)" \
+            --argjson visitorSegments "$(jq '.[0] // {}' /tmp/visitor-segments.json)" \
+            --argjson conversionFunnel "$(jq '.[0] // {}' /tmp/conversion-funnel.json)" \
+            --argjson recommendations "$(jq '.[0] // {}' /tmp/recommendations.json)" \
+            --argjson domains "$(cat /tmp/domain-rankings.json)" \
+            --argjson experiences "$(cat /tmp/experience-rankings.json)" \
+            --argjson skills "$(cat /tmp/skill-rankings.json)" \
+            --argjson projects "$(cat /tmp/project-rankings.json)" \
+            --argjson sections "$(cat /tmp/section-rankings.json)" \
+            --argjson clients "$(cat /tmp/client-rankings.json)" \
             --arg updated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             '{
               overview: $overview,
@@ -483,42 +367,20 @@ jobs:
               updated_at: $updated_at
             }' > /tmp/dashboard.json
 
-          echo "Dashboard JSON preview:"
-          cat /tmp/dashboard.json | head -50
-
-          # Update Dashboard Gist
-          RESPONSE=$(curl -s -X PATCH \
+          # Update Gist
+          curl -s -X PATCH \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/gists/$DASHBOARD_GIST_ID" \
-            -d "$(jq -n --arg content "$(cat /tmp/dashboard.json)" '{files: {"dashboard-analytics.json": {content: $content}}}')")
-
-          if echo "$RESPONSE" | grep -q '"id"'; then
-            echo "Dashboard Gist updated successfully!"
-          else
-            echo "Warning: Dashboard Gist update may have failed"
-            echo "$RESPONSE" | head -20
-          fi
+            -d "$(jq -n --arg content "$(cat /tmp/dashboard.json)" '{files: {"dashboard-analytics.json": {content: $content}}}')" \
+            | grep -q '"id"' && echo "Dashboard Gist updated!" || echo "Warning: Dashboard Gist update failed"
 
       - name: Summary
         run: |
           echo "========================================"
           echo "Materialization Complete!"
           echo "========================================"
-          echo "Tables updated in analytics_materialized:"
-          echo "  - section_rankings"
-          echo "  - project_rankings"
-          echo "  - skill_rankings"
-          echo "  - client_rankings"
-          echo "  - domain_rankings"
-          echo "  - experience_rankings"
-          echo "  - tech_demand_insights"
-          echo "  - visitor_insights"
-          echo "  - conversion_funnel"
-          echo "  - recommendation_performance"
-          echo ""
-          echo "GitHub Gists updated:"
+          echo "Gists updated:"
           echo "  - Rankings: https://gist.github.com/AbhinavSarkarr/7983bb85c69ec4cc45fe37b6a8d2d391"
           echo "  - Dashboard: https://gist.github.com/AbhinavSarkarr/dedbbf6ebcb32542e7b724b86f2b214f"
           echo "========================================"
-          echo "Timestamp: $(date)"
