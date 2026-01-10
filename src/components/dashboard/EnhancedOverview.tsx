@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   AreaChart,
   Area,
@@ -19,6 +19,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Minus,
+  Info,
 } from 'lucide-react';
 
 type EnhancedOverviewProps = {
@@ -37,7 +38,54 @@ type MetricConfig = {
     direction: 'up' | 'down' | 'neutral';
   };
   subtitle?: string;
+  tooltip: string;
 };
+
+// Custom Tooltip Component matching portfolio's glassmorphism style
+function MetricTooltip({
+  content,
+  children,
+  side = 'top'
+}: {
+  content: string;
+  children: React.ReactNode;
+  side?: 'top' | 'bottom';
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      {children}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: side === 'top' ? 10 : -10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: side === 'top' ? 10 : -10, scale: 0.9 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className={`absolute z-50 ${side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'} left-1/2 -translate-x-1/2 w-max max-w-[250px]`}
+          >
+            <div className="relative px-3 py-2 rounded-lg bg-gray-900 dark:bg-gray-900 border border-tech-accent/30 shadow-lg">
+              <p className="text-[11px] text-gray-200 leading-relaxed">{content}</p>
+              {/* Arrow */}
+              <div
+                className={`absolute left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-gray-900 border-tech-accent/30 ${
+                  side === 'top'
+                    ? 'top-full -mt-1 border-b border-r'
+                    : 'bottom-full -mb-1 border-t border-l'
+                }`}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export function EnhancedOverview({ data }: EnhancedOverviewProps) {
   const metrics = useMemo((): MetricConfig[] => {
@@ -67,6 +115,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
         sparklineData: dailyData.map(d => d.visitors),
         trend: calcTrend('visitors'),
         subtitle: `${(data.overview.total_visitors_7d / 7).toFixed(1)}/day avg`,
+        tooltip: 'Unique visitors to your portfolio in the last 7 days. Each person is counted once regardless of how many times they visit.',
       },
       {
         label: 'Total Sessions',
@@ -77,6 +126,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
         sparklineData: dailyData.map(d => d.sessions),
         trend: calcTrend('sessions'),
         subtitle: `${(data.overview.total_sessions_7d / data.overview.total_visitors_7d).toFixed(1)} sessions/visitor`,
+        tooltip: 'Total number of browsing sessions. A single visitor can have multiple sessions if they return later or after inactivity.',
       },
       {
         label: 'Engagement Rate',
@@ -87,6 +137,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
         sparklineData: dailyData.map(d => d.engagement_rate),
         trend: calcTrend('engagement_rate'),
         subtitle: data.overview.engagement_rate > 50 ? 'Above average' : 'Room to improve',
+        tooltip: 'Percentage of visitors who actively interact with your portfolio through clicks, scrolls, or spending meaningful time on the page.',
       },
       {
         label: 'Bounce Rate',
@@ -101,6 +152,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
                      calcTrend('bounce_rate').direction === 'down' ? 'up' as const : 'neutral' as const,
         },
         subtitle: data.overview.bounce_rate < 20 ? 'Excellent retention' : 'Monitor closely',
+        tooltip: 'Percentage of visitors who leave after viewing only one page without any interaction. Lower is better - it means visitors are exploring your content.',
       },
       {
         label: 'Conversions',
@@ -109,6 +161,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
         gradient: 'from-emerald-500 to-teal-500',
         color: '#10B981',
         subtitle: `${((data.overview.total_conversions / data.overview.total_visitors_7d) * 100).toFixed(1)}% conversion rate`,
+        tooltip: 'Total goal completions including contact form submissions, resume downloads, and CTA button clicks - key actions that show visitor interest.',
       },
       {
         label: 'Resume Downloads',
@@ -117,6 +170,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
         gradient: 'from-tech-neon to-tech-accent',
         color: '#7B42F6',
         subtitle: `${((data.overview.resume_downloads / data.overview.total_visitors_7d) * 100).toFixed(1)}% of visitors`,
+        tooltip: 'Number of times visitors downloaded your resume. A strong indicator of professional interest from recruiters or potential collaborators.',
       },
       {
         label: 'Avg Session Duration',
@@ -127,6 +181,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
         sparklineData: dailyData.map(d => d.avg_session_duration_sec),
         trend: calcTrend('avg_session_duration_sec'),
         subtitle: data.overview.avg_session_duration_sec > 90 ? 'Good engagement' : 'Increase content depth',
+        tooltip: 'Average time visitors spend on your portfolio per session. Longer durations suggest engaging content that holds visitor attention.',
       },
       {
         label: 'CTA Click Rate',
@@ -139,6 +194,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
         gradient: 'from-pink-500 to-rose-500',
         color: '#EC4899',
         subtitle: `${data.conversionFunnel.cta_clicks}/${data.conversionFunnel.cta_views} clicks`,
+        tooltip: 'Percentage of visitors who click on Call-to-Action buttons (like "Let\'s Collaborate"). Shows how compelling your CTAs are.',
       },
     ];
   }, [data]);
@@ -226,6 +282,12 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
                     {metric.subtitle}
                   </p>
                 )}
+                {/* Info Icon Tooltip */}
+                <MetricTooltip content={metric.tooltip} side="top">
+                  <button className="mt-2 p-1 rounded-full bg-white/50 dark:bg-white/5 hover:bg-tech-accent/20 border border-gray-200/50 dark:border-white/10 hover:border-tech-accent/40 transition-all group/info">
+                    <Info size={12} className="text-gray-400 dark:text-gray-500 group-hover/info:text-tech-accent transition-colors" />
+                  </button>
+                </MetricTooltip>
               </div>
 
               {/* Hover Glow */}
@@ -272,6 +334,12 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium truncate">{metric.label}</p>
                 </div>
+                {/* Info Icon Tooltip */}
+                <MetricTooltip content={metric.tooltip} side="top">
+                  <button className="p-1 rounded-full bg-white/50 dark:bg-white/5 hover:bg-tech-accent/20 border border-gray-200/50 dark:border-white/10 hover:border-tech-accent/40 transition-all group/info flex-shrink-0">
+                    <Info size={10} className="text-gray-400 dark:text-gray-500 group-hover/info:text-tech-accent transition-colors" />
+                  </button>
+                </MetricTooltip>
               </div>
               {metric.subtitle && (
                 <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 mt-1.5 sm:mt-2 truncate">

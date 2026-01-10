@@ -27,7 +27,9 @@ import {
   RefreshCw,
   AlertCircle,
   BarChart3,
+  ArrowLeft,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
 
@@ -116,20 +118,41 @@ export default function Dashboard() {
 
       {/* Fixed Header */}
       <motion.header
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/80 border-b border-white/10 dark:border-white/5"
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/80 border-b border-black/5 dark:border-white/5 shadow-lg shadow-black/5 dark:shadow-none"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <div className="container py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center shadow-lg shadow-tech-neon/20 flex-shrink-0">
-              <BarChart3 size={16} className="text-white sm:hidden" />
-              <BarChart3 size={20} className="text-white hidden sm:block" />
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Back to Portfolio */}
+            <Link to="/">
+              <motion.div
+                whileHover={{ scale: 1.05, x: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-xs sm:text-sm text-muted-foreground hover:text-tech-accent hover:bg-tech-accent/10 border border-transparent hover:border-tech-accent/20"
+                >
+                  <ArrowLeft size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden xs:inline">Portfolio</span>
+                </Button>
+              </motion.div>
+            </Link>
+
+            <div className="h-6 w-px bg-black/10 dark:bg-white/10 hidden sm:block" />
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center shadow-lg shadow-tech-neon/20 flex-shrink-0">
+                <BarChart3 size={16} className="text-white sm:hidden" />
+                <BarChart3 size={20} className="text-white hidden sm:block" />
+              </div>
+              <h1 className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent">
+                Portfolio Analytics
+              </h1>
             </div>
-            <h1 className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent">
-              Portfolio Analytics
-            </h1>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -147,30 +170,27 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="pt-16 sm:pt-20 md:pt-24 relative z-10">
-        {/* Key Insights Section */}
-        <DashboardSection
-          id="insights"
-          title="Key Insights"
-          subtitle="Auto-generated insights based on your analytics data"
-        >
-          <KeyInsightsPanel data={data} />
-        </DashboardSection>
-
         {/* Enhanced Overview Section */}
         <DashboardSection
           id="overview"
           title="Overview"
-          subtitle="Key metrics from the last 7 days with trend analysis"
-        >
+                  >
           <EnhancedOverview data={data} />
+        </DashboardSection>
+
+        {/* Key Insights Section */}
+        <DashboardSection
+          id="insights"
+          title="Key Insights"
+                  >
+          <KeyInsightsPanel data={data} />
         </DashboardSection>
 
         {/* Traffic & Visitors Section */}
         <DashboardSection
           id="traffic"
           title="Traffic & Visitors"
-          subtitle="Comprehensive traffic analysis and visitor behavior"
-        >
+                  >
           <GlassCard title="Traffic Trend" subtitle="Daily visitors and sessions over time" className="mb-6">
             <div className="mt-4">
               <TrafficTrendChart data={data.dailyMetrics} height={300} />
@@ -222,8 +242,7 @@ export default function Dashboard() {
         <DashboardSection
           id="projects"
           title="Project Performance"
-          subtitle="Data-driven project analysis with engagement metrics"
-        >
+                  >
           <ProjectScatterPlot data={data.projects} height={350} />
         </DashboardSection>
 
@@ -231,8 +250,7 @@ export default function Dashboard() {
         <DashboardSection
           id="skills"
           title="Skills & Tech Demand"
-          subtitle="Comprehensive skills analysis by category and demand tier"
-        >
+                  >
           <GlassCard title="Skills Overview" subtitle="Demand ranking and click distribution" className="mb-6">
             <div className="mt-4">
               <SkillDemandChart data={data.skills} height={320} />
@@ -250,8 +268,7 @@ export default function Dashboard() {
         <DashboardSection
           id="sections"
           title="Section Performance"
-          subtitle="Health scores, engagement metrics, and optimization insights"
-        >
+                  >
           <SectionRadarChart data={data.sections} height={350} />
         </DashboardSection>
 
@@ -259,8 +276,7 @@ export default function Dashboard() {
         <DashboardSection
           id="interest"
           title="Industry & Experience Interest"
-          subtitle="What domains and experiences attract the most attention"
-        >
+                  >
           <div className="space-y-6">
             <GlassCard title="Domain Interest Analysis" subtitle="Industry interest scores and recommendations">
               <div className="mt-4">
@@ -282,8 +298,7 @@ export default function Dashboard() {
         <DashboardSection
           id="conversions"
           title="Conversion Funnel"
-          subtitle="Track visitor journey from awareness to action"
-        >
+                  >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <GlassCard title="Conversion Journey" subtitle="Step-by-step funnel analysis">
               <div className="mt-4">
@@ -300,20 +315,33 @@ export default function Dashboard() {
         </DashboardSection>
 
         {/* Footer */}
-        <footer className="py-12 border-t border-white/10 dark:border-white/5 mt-8">
+        <footer className="py-12 border-t border-black/5 dark:border-white/5 mt-8">
           <div className="container text-center">
-            <p className="text-muted-foreground text-sm font-medium">
-              Portfolio Analytics Dashboard
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Data refreshed daily at 2:00 PM IST
-            </p>
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 mt-4 text-sm font-medium text-tech-accent hover:text-tech-neon transition-colors"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
             >
-              Back to Portfolio
-            </Link>
+              <p className="text-gray-700 dark:text-gray-300 text-sm font-medium">
+                Portfolio Analytics Dashboard
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                Data refreshed daily at 2:00 PM IST
+              </p>
+              <Link to="/">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-block mt-6"
+                >
+                  <Button className="tech-btn gap-2">
+                    <ArrowLeft size={16} />
+                    Back to Portfolio
+                  </Button>
+                </motion.div>
+              </Link>
+            </motion.div>
           </div>
         </footer>
       </main>

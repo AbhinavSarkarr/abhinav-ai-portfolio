@@ -1,6 +1,22 @@
 import { useMemo } from 'react';
 import { DashboardData } from '@/hooks/useDashboardData';
-import { ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  Lightbulb,
+  Target,
+  Users,
+  MousePointerClick,
+  FileDown,
+  Zap,
+  BarChart3,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Info
+} from 'lucide-react';
 
 type KeyInsightsPanelProps = {
   data: DashboardData;
@@ -12,7 +28,8 @@ type Insight = {
   title: string;
   description: string;
   metric?: string;
-  action?: string;
+  impact?: string;
+  icon: React.ReactNode;
 };
 
 export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
@@ -25,8 +42,10 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
         id: 'high-traffic',
         type: 'success',
         title: 'Strong Traffic',
-        description: `Averaging ${avgDailyVisitors.toFixed(1)} visitors/day`,
-        metric: `${data.overview.total_visitors_7d} total`,
+        description: `${avgDailyVisitors.toFixed(1)} visitors/day average`,
+        metric: `${data.overview.total_visitors_7d}`,
+        impact: 'total visitors',
+        icon: <Users size={16} />,
       });
     }
 
@@ -35,17 +54,20 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
         id: 'high-engagement',
         type: 'success',
         title: 'Excellent Engagement',
-        description: 'Over half of visitors engage with content',
+        description: 'Over half of visitors engage',
         metric: `${data.overview.engagement_rate.toFixed(1)}%`,
+        impact: 'engagement rate',
+        icon: <MousePointerClick size={16} />,
       });
     } else if (data.overview.engagement_rate < 30) {
       generatedInsights.push({
         id: 'low-engagement',
         type: 'warning',
         title: 'Low Engagement',
-        description: 'Consider adding more interactive elements',
+        description: 'Add more interactive elements',
         metric: `${data.overview.engagement_rate.toFixed(1)}%`,
-        action: 'Add CTAs',
+        impact: 'engagement rate',
+        icon: <TrendingDown size={16} />,
       });
     }
 
@@ -54,9 +76,10 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
         id: 'high-bounce',
         type: 'warning',
         title: 'High Bounce Rate',
-        description: 'Many visitors leave after one page',
+        description: 'Visitors leaving after one page',
         metric: `${data.overview.bounce_rate.toFixed(1)}%`,
-        action: 'Improve content',
+        impact: 'bounce rate',
+        icon: <AlertTriangle size={16} />,
       });
     }
 
@@ -68,8 +91,10 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
         id: 'top-source',
         type: 'info',
         title: `Top Source: ${topSource.source === 'direct' ? 'Direct' : topSource.source}`,
-        description: `${sourceShare.toFixed(0)}% of all sessions`,
-        metric: `${topSource.sessions} sessions`,
+        description: `${sourceShare.toFixed(0)}% of all traffic`,
+        metric: `${topSource.sessions}`,
+        impact: 'sessions',
+        icon: <BarChart3 size={16} />,
       });
     }
 
@@ -78,9 +103,11 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
       generatedInsights.push({
         id: 'top-project',
         type: 'success',
-        title: `Top Project`,
+        title: 'Top Project',
         description: topProject.project_title,
-        metric: `${topProject.total_clicks} clicks`,
+        metric: `${topProject.total_clicks}`,
+        impact: 'clicks',
+        icon: <Target size={16} />,
       });
     }
 
@@ -89,9 +116,9 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
       generatedInsights.push({
         id: 'hot-skills',
         type: 'opportunity',
-        title: `${hotSkills.length} High-Demand Skills`,
+        title: `${hotSkills.length} Hot Skills`,
         description: hotSkills.slice(0, 3).map(s => s.skill_name).join(', '),
-        action: 'Feature prominently',
+        icon: <Zap size={16} />,
       });
     }
 
@@ -100,23 +127,9 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
       generatedInsights.push({
         id: 'section-health',
         type: 'warning',
-        title: `${criticalSections.length} Section(s) Need Work`,
+        title: `${criticalSections.length} Sections Need Work`,
         description: criticalSections.map(s => s.section_id).join(', '),
-        action: 'Optimize',
-      });
-    }
-
-    const ctaClickRate = data.conversionFunnel.cta_views > 0
-      ? (data.conversionFunnel.cta_clicks / data.conversionFunnel.cta_views) * 100
-      : 0;
-    if (ctaClickRate < 10 && data.conversionFunnel.cta_views > 0) {
-      generatedInsights.push({
-        id: 'weak-cta',
-        type: 'opportunity',
-        title: 'CTA Optimization',
-        description: 'Click rate below average',
-        metric: `${ctaClickRate.toFixed(1)}%`,
-        action: 'Test variations',
+        icon: <AlertCircle size={16} />,
       });
     }
 
@@ -126,35 +139,57 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
         type: 'success',
         title: 'Resume Interest',
         description: 'Strong download activity',
-        metric: `${data.overview.resume_downloads} downloads`,
+        metric: `${data.overview.resume_downloads}`,
+        impact: 'downloads',
+        icon: <FileDown size={16} />,
       });
     }
 
     return generatedInsights;
   }, [data]);
 
-  const getConfig = (type: Insight['type']) => {
+  const getTypeConfig = (type: Insight['type']) => {
     switch (type) {
       case 'success':
         return {
-          dotColor: 'bg-emerald-500',
-          textColor: 'text-emerald-600 dark:text-emerald-400',
+          gradient: 'from-emerald-500 to-tech-accent',
+          glow: 'shadow-emerald-500/20',
+          text: 'text-emerald-400',
+          bg: 'bg-emerald-500/10',
+          border: 'border-emerald-500/30',
+          icon: <CheckCircle2 size={14} className="text-emerald-400" />,
+          label: 'WIN'
         };
       case 'warning':
         return {
-          dotColor: 'bg-amber-500',
-          textColor: 'text-amber-600 dark:text-amber-400',
+          gradient: 'from-amber-500 to-orange-500',
+          glow: 'shadow-amber-500/20',
+          text: 'text-amber-400',
+          bg: 'bg-amber-500/10',
+          border: 'border-amber-500/30',
+          icon: <AlertTriangle size={14} className="text-amber-400" />,
+          label: 'ATTENTION'
         };
       case 'opportunity':
         return {
-          dotColor: 'bg-tech-neon',
-          textColor: 'text-violet-600 dark:text-tech-neon',
+          gradient: 'from-tech-neon to-purple-500',
+          glow: 'shadow-tech-neon/20',
+          text: 'text-tech-neon',
+          bg: 'bg-tech-neon/10',
+          border: 'border-tech-neon/30',
+          icon: <Sparkles size={14} className="text-tech-neon" />,
+          label: 'OPPORTUNITY'
         };
       case 'info':
       default:
         return {
-          dotColor: 'bg-tech-accent',
-          textColor: 'text-cyan-600 dark:text-tech-accent',
+          gradient: 'from-tech-accent to-blue-500',
+          glow: 'shadow-tech-accent/20',
+          text: 'text-tech-accent',
+          bg: 'bg-tech-accent/10',
+          border: 'border-tech-accent/30',
+          icon: <Info size={14} className="text-tech-accent" />,
+          label: 'INSIGHT'
         };
     }
   };
@@ -167,63 +202,89 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
   };
 
   return (
-    <div className="rounded-2xl bg-white/70 dark:bg-tech-glass backdrop-blur-xl border border-black/5 dark:border-white/10 p-4 sm:p-5">
-      {/* Summary Row */}
-      <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-6 pb-4 border-b border-gray-200 dark:border-white/10">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
-          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.success.length} Wins</span>
+    <div className="glass-card !p-0 overflow-hidden">
+      {/* Header Stats Bar */}
+      <div className="flex items-stretch border-b border-white/10">
+        <div className="flex-1 p-3 sm:p-4 text-center border-r border-white/10 group">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xl sm:text-2xl font-bold text-emerald-400">{groupedInsights.success.length}</span>
+          </div>
+          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Wins</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
-          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.warning.length} Warnings</span>
+        <div className="flex-1 p-3 sm:p-4 text-center border-r border-white/10 group">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-xl sm:text-2xl font-bold text-amber-400">{groupedInsights.warning.length}</span>
+          </div>
+          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Risks</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-tech-neon flex-shrink-0" />
-          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.opportunity.length} Opportunities</span>
+        <div className="flex-1 p-3 sm:p-4 text-center border-r border-white/10 group">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-tech-neon animate-pulse" />
+            <span className="text-xl sm:text-2xl font-bold text-tech-neon">{groupedInsights.opportunity.length}</span>
+          </div>
+          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Opportunities</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-tech-accent flex-shrink-0" />
-          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{groupedInsights.info.length} Insights</span>
+        <div className="flex-1 p-3 sm:p-4 text-center group">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-tech-accent animate-pulse" />
+            <span className="text-xl sm:text-2xl font-bold text-tech-accent">{groupedInsights.info.length}</span>
+          </div>
+          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Insights</span>
         </div>
       </div>
 
       {/* Insights List */}
-      <div className="divide-y divide-gray-100 dark:divide-white/5">
-        {insights.map((insight) => {
-          const config = getConfig(insight.type);
+      <div className="p-3 sm:p-4 space-y-2">
+        {insights.map((insight, index) => {
+          const config = getTypeConfig(insight.type);
 
           return (
-            <div
+            <motion.div
               key={insight.id}
-              className="py-3 flex items-start sm:items-center gap-3 sm:gap-4 group hover:bg-gray-50 dark:hover:bg-white/5 -mx-2 sm:-mx-3 px-2 sm:px-3 rounded-lg transition-colors"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className={`relative flex items-center gap-3 p-3 rounded-xl ${config.bg} border ${config.border} group`}
             >
-              {/* Status Dot */}
-              <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 sm:mt-0 ${config.dotColor}`} />
+              {/* Left accent line */}
+              <div className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-gradient-to-b ${config.gradient}`} />
+
+              {/* Icon */}
+              <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${config.bg} border ${config.border} flex items-center justify-center ${config.text}`}>
+                {insight.icon}
+              </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                  <span className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm">{insight.title}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`font-semibold text-sm ${config.text}`}>{insight.title}</span>
                   {insight.metric && (
-                    <span className={`text-xs font-semibold ${config.textColor}`}>
+                    <span className="text-white font-bold text-sm">
                       {insight.metric}
+                      {insight.impact && <span className="text-gray-400 font-normal text-xs ml-1">{insight.impact}</span>}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 sm:truncate">{insight.description}</p>
+                <p className="text-xs text-gray-400 truncate">{insight.description}</p>
               </div>
 
-              {/* Action */}
-              {insight.action && (
-                <div className="hidden sm:flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>{insight.action}</span>
-                  <ChevronRight size={12} />
-                </div>
-              )}
-            </div>
+              {/* Type badge */}
+              <div className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.bg} ${config.text} border ${config.border}`}>
+                {config.icon}
+                <span>{config.label}</span>
+              </div>
+            </motion.div>
           );
         })}
+
+        {insights.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <BarChart3 size={32} className="mx-auto mb-2 opacity-50" />
+            <p className="text-sm">No insights available yet</p>
+          </div>
+        )}
       </div>
     </div>
   );
