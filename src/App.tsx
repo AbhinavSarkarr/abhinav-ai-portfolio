@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ProjectDetail from "./pages/ProjectDetail";
 import ClientDetail from "./pages/ClientDetail";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { RecommenderProvider } from "@/context/RecommenderContext";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/project/:id" element={<ProjectDetail />} />
             <Route path="/client/:experienceId/:clientId" element={<ClientDetail />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <ProjectRecommendation />

@@ -234,6 +234,230 @@ jobs:
             exit 1
           fi
 
+      # ==================== DASHBOARD DATA EXPORT ====================
+      # Export comprehensive dashboard data to a separate Gist
+
+      - name: Export Daily Metrics to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              FORMAT_DATE("%Y-%m-%d", session_date) as date,
+              unique_visitors as visitors,
+              total_sessions as sessions,
+              ROUND(engagement_rate, 1) as engagement_rate,
+              ROUND(bounce_rate, 1) as bounce_rate,
+              ROUND(avg_session_duration_sec, 0) as avg_session_duration_sec,
+              desktop_sessions as desktop,
+              mobile_sessions as mobile,
+              tablet_sessions as tablet
+            FROM `portfolio-483605.analytics_processed.v_daily_metrics`
+            WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+            ORDER BY session_date DESC
+            LIMIT 30
+          ' > /tmp/daily-metrics.json || echo '[]' > /tmp/daily-metrics.json
+
+      - name: Export Traffic Sources to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              traffic_source as source,
+              traffic_medium as medium,
+              SUM(sessions) as sessions,
+              ROUND(AVG(engagement_rate), 1) as engagement_rate
+            FROM `portfolio-483605.analytics_processed.v_traffic_daily_stats`
+            WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+            GROUP BY traffic_source, traffic_medium
+            ORDER BY sessions DESC
+            LIMIT 10
+          ' > /tmp/traffic-sources.json || echo '[]' > /tmp/traffic-sources.json
+
+      - name: Export Top Countries to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              country,
+              COUNT(DISTINCT user_pseudo_id) as visitors
+            FROM `portfolio-483605.analytics_processed.v_sessions`
+            WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+            GROUP BY country
+            ORDER BY visitors DESC
+            LIMIT 10
+          ' > /tmp/top-countries.json || echo '[]' > /tmp/top-countries.json
+
+      - name: Export Visitor Segments Summary to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              COUNTIF(visitor_segment = "converter") as converters,
+              COUNTIF(visitor_segment = "high_intent") as high_intent,
+              COUNTIF(visitor_segment = "engaged_explorer") as engaged_explorers,
+              COUNTIF(visitor_segment = "returning_visitor") as returning_visitors,
+              COUNTIF(visitor_segment = "casual_browser" OR visitor_segment = "engaged_new") as casual_browsers
+            FROM `portfolio-483605.analytics_processed.v_visitor_insights`
+          ' > /tmp/visitor-segments.json || echo '{}' > /tmp/visitor-segments.json
+
+      - name: Export Conversion Funnel to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              SUM(total_cta_views) as cta_views,
+              SUM(total_cta_clicks) as cta_clicks,
+              SUM(contact_form_starts) as form_starts,
+              SUM(contact_form_submissions) as form_submissions,
+              SUM(resume_downloads) as resume_downloads,
+              SUM(social_clicks) as social_clicks
+            FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
+            WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+          ' > /tmp/conversion-funnel.json || echo '{}' > /tmp/conversion-funnel.json
+
+      - name: Export Domain Rankings to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              domain,
+              interest_rank,
+              total_interest_score,
+              demand_tier,
+              portfolio_recommendation
+            FROM `portfolio-483605.analytics_materialized.domain_rankings`
+            ORDER BY interest_rank
+          ' > /tmp/domain-rankings.json || echo '[]' > /tmp/domain-rankings.json
+
+      - name: Export Experience Rankings to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              job_title as role_title,
+              company as company_name,
+              interest_rank,
+              total_interest_score as interest_score
+            FROM `portfolio-483605.analytics_materialized.experience_rankings`
+            ORDER BY interest_rank
+            LIMIT 10
+          ' > /tmp/experience-rankings.json || echo '[]' > /tmp/experience-rankings.json
+
+      - name: Export Recommendation Performance to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              system_health,
+              ROUND(overall_ctr, 1) as overall_ctr,
+              ROUND(position_1_ctr, 1) as position_1_ctr,
+              ROUND(position_2_ctr, 1) as position_2_ctr,
+              ROUND(position_3_ctr, 1) as position_3_ctr,
+              ROUND(user_conversion_rate, 1) as user_conversion_rate,
+              COALESCE(total_impressions, 0) as total_impressions,
+              COALESCE(total_clicks, 0) as total_clicks
+            FROM `portfolio-483605.analytics_materialized.recommendation_performance`
+          ' > /tmp/recommendations.json || echo '{}' > /tmp/recommendations.json
+
+      - name: Export Section Rankings with Full Details to JSON
+        run: |
+          bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              section_id,
+              ROUND(health_score, 1) as health_score,
+              engagement_rank,
+              health_tier,
+              optimization_hint,
+              COALESCE(total_views, 0) as total_views,
+              ROUND(COALESCE(avg_engagement_rate, 0), 1) as avg_engagement_rate,
+              ROUND(COALESCE(avg_exit_rate, 0), 1) as avg_exit_rate
+            FROM `portfolio-483605.analytics_materialized.section_rankings`
+            ORDER BY engagement_rank
+          ' > /tmp/section-rankings-full.json || echo '[]' > /tmp/section-rankings-full.json
+
+      - name: Update Dashboard Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          DASHBOARD_GIST_ID: ${{ secrets.DASHBOARD_GIST_ID }}
+        run: |
+          # Skip if DASHBOARD_GIST_ID is not set
+          if [ -z "$DASHBOARD_GIST_ID" ]; then
+            echo "DASHBOARD_GIST_ID not set, skipping dashboard gist update"
+            echo "To enable: Create a new Gist and add its ID as DASHBOARD_GIST_ID secret"
+            exit 0
+          fi
+
+          # Ensure all files have valid JSON
+          for f in /tmp/daily-metrics.json /tmp/traffic-sources.json /tmp/top-countries.json \
+                   /tmp/visitor-segments.json /tmp/conversion-funnel.json /tmp/domain-rankings.json \
+                   /tmp/experience-rankings.json /tmp/recommendations.json /tmp/section-rankings-full.json; do
+            if ! jq empty "$f" 2>/dev/null; then
+              echo '[]' > "$f"
+            fi
+          done
+
+          # Calculate overview metrics
+          OVERVIEW=$(bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              SUM(unique_visitors) as total_visitors_7d,
+              SUM(total_sessions) as total_sessions_7d,
+              ROUND(AVG(engagement_rate), 1) as engagement_rate,
+              ROUND(AVG(bounce_rate), 1) as bounce_rate,
+              ROUND(AVG(avg_session_duration_sec), 0) as avg_session_duration_sec
+            FROM `portfolio-483605.analytics_processed.v_daily_metrics`
+            WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+          ' 2>/dev/null | jq '.[0] // {}')
+
+          CONVERSIONS=$(bq query --use_legacy_sql=false --format=json --location=US '
+            SELECT
+              SUM(contact_form_submissions) as total_conversions,
+              SUM(resume_downloads) as resume_downloads
+            FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
+            WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+          ' 2>/dev/null | jq '.[0] // {}')
+
+          # Combine into dashboard JSON
+          jq -n \
+            --argjson overview "$(echo $OVERVIEW | jq '. + '"$CONVERSIONS"'')" \
+            --argjson dailyMetrics "$(cat /tmp/daily-metrics.json)" \
+            --argjson trafficSources "$(cat /tmp/traffic-sources.json)" \
+            --argjson topCountries "$(cat /tmp/top-countries.json)" \
+            --argjson visitorSegments "$(cat /tmp/visitor-segments.json | jq '.[0] // {}')" \
+            --argjson conversionFunnel "$(cat /tmp/conversion-funnel.json | jq '.[0] // {}')" \
+            --argjson recommendations "$(cat /tmp/recommendations.json | jq '.[0] // {}')" \
+            --argjson domains "$(cat /tmp/domain-rankings.json)" \
+            --argjson experiences "$(cat /tmp/experience-rankings.json)" \
+            --argjson skills "$(cat /tmp/skill-rankings.json)" \
+            --argjson projects "$(cat /tmp/project-rankings.json)" \
+            --argjson sections "$(cat /tmp/section-rankings-full.json)" \
+            --argjson clients "$(cat /tmp/client-rankings.json)" \
+            --arg updated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{
+              overview: $overview,
+              dailyMetrics: $dailyMetrics,
+              trafficSources: $trafficSources,
+              topCountries: $topCountries,
+              visitorSegments: $visitorSegments,
+              conversionFunnel: $conversionFunnel,
+              recommendations: $recommendations,
+              domains: $domains,
+              experiences: $experiences,
+              skills: $skills,
+              projects: $projects,
+              sections: $sections,
+              clients: $clients,
+              updated_at: $updated_at
+            }' > /tmp/dashboard.json
+
+          echo "Dashboard JSON preview:"
+          cat /tmp/dashboard.json | head -50
+
+          # Update Dashboard Gist
+          RESPONSE=$(curl -s -X PATCH \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/gists/$DASHBOARD_GIST_ID" \
+            -d "$(jq -n --arg content "$(cat /tmp/dashboard.json)" '{files: {"dashboard-analytics.json": {content: $content}}}')")
+
+          if echo "$RESPONSE" | grep -q '"id"'; then
+            echo "Dashboard Gist updated successfully!"
+          else
+            echo "Warning: Dashboard Gist update may have failed"
+            echo "$RESPONSE" | head -20
+          fi
+
       - name: Summary
         run: |
           echo "========================================"
@@ -251,7 +475,8 @@ jobs:
           echo "  - conversion_funnel"
           echo "  - recommendation_performance"
           echo ""
-          echo "GitHub Gist updated with rankings data:"
-          echo "  https://gist.github.com/AbhinavSarkarr/7983bb85c69ec4cc45fe37b6a8d2d391"
+          echo "GitHub Gists updated:"
+          echo "  - Rankings: https://gist.github.com/AbhinavSarkarr/7983bb85c69ec4cc45fe37b6a8d2d391"
+          echo "  - Dashboard: https://gist.github.com/AbhinavSarkarr/dedbbf6ebcb32542e7b724b86f2b214f"
           echo "========================================"
           echo "Timestamp: $(date)"
