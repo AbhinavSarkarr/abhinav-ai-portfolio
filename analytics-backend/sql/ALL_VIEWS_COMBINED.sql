@@ -447,14 +447,37 @@ GROUP BY event_date, domain
 ORDER BY event_date DESC, total_domain_interactions DESC;
 
 -- ----------------------------------------------------------------------------
--- 2.7 Conversion Funnel View
+-- 2.7 Traffic Daily Stats View
+-- ----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW `portfolio-483605.analytics_processed.v_traffic_daily_stats` AS
+SELECT
+  session_date AS event_date,
+  traffic_source,
+  traffic_medium,
+  campaign_name,
+  COUNT(*) AS sessions,
+  COUNT(DISTINCT user_pseudo_id) AS unique_visitors,
+  SUM(page_views) AS total_page_views,
+  ROUND(AVG(page_views), 2) AS avg_pages_per_session,
+  ROUND(AVG(session_duration_seconds), 2) AS avg_session_duration_sec,
+  ROUND(COUNTIF(is_engaged) * 100.0 / NULLIF(COUNT(*), 0), 2) AS engagement_rate,
+  ROUND(COUNTIF(is_bounce) * 100.0 / NULLIF(COUNT(*), 0), 2) AS bounce_rate,
+  COUNTIF(device_category = 'desktop') AS desktop_sessions,
+  COUNTIF(device_category = 'mobile') AS mobile_sessions
+FROM `portfolio-483605.analytics_processed.v_sessions`
+GROUP BY event_date, traffic_source, traffic_medium, campaign_name
+ORDER BY event_date DESC, sessions DESC;
+
+-- ----------------------------------------------------------------------------
+-- 2.8 Conversion Funnel View
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE VIEW `portfolio-483605.analytics_processed.v_conversion_funnel` AS
 SELECT
   event_date,
   COUNT(DISTINCT CONCAT(user_pseudo_id, '-', CAST(session_id AS STRING))) AS total_sessions,
   COUNT(DISTINCT user_pseudo_id) AS unique_visitors,
-  COUNTIF(event_name = 'cta_click') AS cta_clicks,
+  COUNTIF(event_name = 'cta_view') AS total_cta_views,
+  COUNTIF(event_name = 'cta_click') AS total_cta_clicks,
   COUNTIF(event_name = 'contact_form_start') AS contact_form_starts,
   COUNTIF(event_name = 'contact_form_submit') AS contact_form_submissions,
   COUNTIF(event_name = 'social_click') AS social_clicks,
