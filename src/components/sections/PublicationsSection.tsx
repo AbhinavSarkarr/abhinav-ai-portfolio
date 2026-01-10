@@ -144,7 +144,7 @@ export function PublicationsSection() {
                   </div>
 
                   <p className="text-sm text-tech-accent mb-2">{pub.publisher}</p>
-                  <p className="text-muted-foreground mb-4 group-hover:text-foreground/80 transition-colors duration-300">
+                  <p className="text-muted-foreground mb-4 group-hover:text-foreground/80 transition-colors duration-300 text-left">
                     {pub.description || "A detailed publication in the field of AI and machine learning."}
                   </p>
 

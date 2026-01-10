@@ -245,7 +245,7 @@ export function ProjectsSection() {
                         <ArrowUpRight size={18} />
                       </motion.span>
                     </CardTitle>
-                    <CardDescription className="line-clamp-2">
+                    <CardDescription className="line-clamp-2 text-left">
                       {project.description}
                     </CardDescription>
                   </CardHeader>

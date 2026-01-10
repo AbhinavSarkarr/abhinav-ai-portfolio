@@ -183,7 +183,7 @@ export function DataPipelineSection() {
                       <h4 className="font-semibold text-sm mb-2 group-hover:text-tech-accent transition-colors">
                         {step.title}
                       </h4>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
+                      <p className="text-xs text-muted-foreground leading-relaxed text-center">
                         {step.description}
                       </p>
                     </motion.div>
@@ -276,7 +276,7 @@ export function DataPipelineSection() {
                           {step.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground text-center">
                         {step.description}
                       </p>
                     </div>
