@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Particle {
   x: number;
@@ -14,6 +14,18 @@ export function ParticleBackground() {
   const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number>(0);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark') ||
+                !document.documentElement.classList.contains('light'));
+    };
+    checkTheme();
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,12 +55,16 @@ export function ParticleBackground() {
       }
     };
 
+    // Theme-aware colors
+    const particleColor = isDark ? 'rgba(123, 66, 246,' : 'rgba(107, 50, 230,';
+    const connectionColor = isDark ? 'rgba(0, 224, 255,' : 'rgba(8, 145, 178,';
+
     const drawParticle = (particle: Particle) => {
       if (!ctx) return;
 
       ctx.beginPath();
       ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(123, 66, 246, ${particle.opacity})`;
+      ctx.fillStyle = `${particleColor} ${isDark ? particle.opacity : particle.opacity * 0.7})`;
       ctx.fill();
     };
 
@@ -65,11 +81,11 @@ export function ParticleBackground() {
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           if (distance < maxDistance) {
-            const opacity = (1 - distance / maxDistance) * 0.2;
+            const opacity = (1 - distance / maxDistance) * (isDark ? 0.2 : 0.15);
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(0, 224, 255, ${opacity})`;
+            ctx.strokeStyle = `${connectionColor} ${opacity})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -81,11 +97,11 @@ export function ParticleBackground() {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < 200) {
-          const opacity = (1 - distance / 200) * 0.3;
+          const opacity = (1 - distance / 200) * (isDark ? 0.3 : 0.25);
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(mouseRef.current.x, mouseRef.current.y);
-          ctx.strokeStyle = `rgba(123, 66, 246, ${opacity})`;
+          ctx.strokeStyle = `${particleColor} ${opacity})`;
           ctx.lineWidth = 0.8;
           ctx.stroke();
         }
@@ -152,13 +168,13 @@ export function ParticleBackground() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isDark]);
 
   return (
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: isDark ? 0.6 : 0.4 }}
     />
   );
 }

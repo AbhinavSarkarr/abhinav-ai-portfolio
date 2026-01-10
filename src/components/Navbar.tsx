@@ -21,10 +21,25 @@ export function Navbar() {
   const [activeSection, setActiveSection] = useState('home');
 
   const { scrollY } = useScroll();
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark') ||
+                !document.documentElement.classList.contains('light'));
+    };
+    checkTheme();
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
   const navbarBackground = useTransform(
     scrollY,
     [0, 100],
-    ['rgba(10, 10, 20, 0)', 'rgba(10, 10, 20, 0.8)']
+    isDark
+      ? ['rgba(10, 10, 20, 0)', 'rgba(10, 10, 20, 0.85)']
+      : ['rgba(248, 250, 252, 0)', 'rgba(248, 250, 252, 0.9)']
   );
 
   useEffect(() => {
@@ -72,7 +87,7 @@ export function Navbar() {
       style={{ backgroundColor: navbarBackground }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? 'backdrop-blur-xl shadow-lg shadow-tech-neon/5 py-3 border-b border-white/5'
+          ? `backdrop-blur-xl shadow-lg py-3 border-b ${isDark ? 'shadow-tech-neon/5 border-white/5' : 'shadow-purple-500/10 border-gray-200/50'}`
           : 'py-5'
       }`}
     >
@@ -101,7 +116,7 @@ export function Navbar() {
               className={`relative px-4 py-2 font-medium text-sm transition-colors duration-300 rounded-lg
                 ${activeSection === link.href.substring(1)
                   ? 'text-tech-accent'
-                  : 'text-muted-foreground hover:text-white'
+                  : `text-muted-foreground ${isDark ? 'hover:text-white' : 'hover:text-gray-900'}`
                 }`}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -133,7 +148,7 @@ export function Navbar() {
 
         {/* Mobile Menu Button */}
         <motion.button
-          className="md:hidden p-2 text-tech-accent rounded-lg hover:bg-white/5 transition-colors"
+          className={`md:hidden p-2 text-tech-accent rounded-lg transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100'}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
@@ -172,7 +187,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: 'auto', y: 0 }}
             exit={{ opacity: 0, height: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden overflow-hidden backdrop-blur-xl bg-background/80 mx-4 mt-2 rounded-2xl border border-white/10"
+            className={`md:hidden overflow-hidden backdrop-blur-xl mx-4 mt-2 rounded-2xl border ${isDark ? 'bg-background/80 border-white/10' : 'bg-white/90 border-gray-200/50'}`}
           >
             <motion.div
               className="flex flex-col p-4 gap-1"
@@ -196,7 +211,7 @@ export function Navbar() {
                   className={`p-3 rounded-xl transition-all duration-300 ${
                     activeSection === link.href.substring(1)
                       ? 'bg-tech-accent/10 text-tech-accent border border-tech-accent/20'
-                      : 'hover:bg-white/5'
+                      : isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100'
                   }`}
                   variants={{
                     visible: { opacity: 1, x: 0, scale: 1 },

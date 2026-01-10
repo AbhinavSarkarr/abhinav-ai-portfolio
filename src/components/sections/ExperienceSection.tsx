@@ -123,7 +123,7 @@ export function ExperienceSection() {
             >
               {/* Timeline line */}
               <motion.div
-                className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-tech-neon/50 via-tech-accent/30 to-transparent"
+                className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-purple-400 dark:from-tech-neon/50 via-purple-200 dark:via-tech-accent/30 to-transparent"
                 initial={{ scaleY: 0 }}
                 animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.2, ease: 'easeOut' }}
@@ -138,8 +138,8 @@ export function ExperienceSection() {
                 animate={isInView ? 'visible' : 'hidden'}
                 className={`absolute left-0 top-1 w-5 h-5 rounded-full -translate-x-1/2 border-2 ${
                   exp.current
-                    ? 'bg-tech-neon border-tech-neon'
-                    : 'bg-background border-tech-neon/50'
+                    ? 'bg-purple-500 dark:bg-tech-neon border-purple-500 dark:border-tech-neon'
+                    : 'bg-white dark:bg-background border-purple-300 dark:border-tech-neon/50'
                 }`}
               >
                 {exp.current && (
@@ -200,7 +200,7 @@ export function ExperienceSection() {
                       <p className="text-tech-accent">{exp.company}</p>
                     </div>
                     <motion.span
-                      className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tech-glass text-sm font-medium border border-tech-neon/20"
+                      className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 dark:bg-tech-glass text-sm font-medium border border-purple-200 dark:border-tech-neon/20 text-gray-700 dark:text-foreground"
                       whileHover={{ scale: 1.05 }}
                     >
                       <Calendar size={14} />
@@ -242,8 +242,8 @@ export function ExperienceSection() {
                           }}
                         >
                           <motion.div
-                            className="p-4 rounded-lg bg-tech-glass/50 border border-tech-accent/10 hover:border-tech-accent/30 transition-all duration-300"
-                            whileHover={{ x: 5, backgroundColor: 'rgba(var(--tech-accent-rgb), 0.05)' }}
+                            className="p-4 rounded-lg bg-white/50 dark:bg-tech-glass/50 border border-purple-200 dark:border-tech-accent/10 hover:border-purple-400 dark:hover:border-tech-accent/30 transition-all duration-300 shadow-sm"
+                            whileHover={{ x: 5 }}
                           >
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 min-w-0">
@@ -275,7 +275,7 @@ export function ExperienceSection() {
                                 <p className="text-sm text-muted-foreground mb-2">
                                   {client.shortDescription}
                                 </p>
-                                <span className="inline-block px-2.5 py-1 text-xs rounded-full bg-gradient-to-r from-tech-neon/10 to-tech-accent/10 text-tech-accent border border-tech-accent/20">
+                                <span className="inline-block px-2.5 py-1 text-xs rounded-full bg-purple-100 dark:bg-white/5 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-400/30">
                                   {client.domain}
                                 </span>
                               </div>

@@ -298,7 +298,7 @@ export function DataPipelineSection() {
             href="https://analytics.abhinavbuilds.in"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-gradient-to-r from-tech-neon to-tech-accent text-white font-semibold shadow-lg shadow-tech-neon/25 hover:shadow-tech-neon/40 transition-all duration-300"
+            className="gradient-cta"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >

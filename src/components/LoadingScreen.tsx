@@ -4,6 +4,18 @@ import { useEffect, useState, useMemo } from 'react';
 export function LoadingScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark') ||
+                !document.documentElement.classList.contains('light'));
+    };
+    checkTheme();
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -74,16 +86,17 @@ export function LoadingScreen() {
             scale: 1.02,
           }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="fixed inset-0 z-[100] bg-[#0a0a0f] flex flex-col items-center justify-center overflow-hidden"
+          className={`fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden ${isDark ? 'bg-[#0a0a0f]' : 'bg-[#f8fafc]'}`}
         >
           {/* Grid background */}
           <div
-            className="absolute inset-0 opacity-[0.03]"
+            className={`absolute inset-0 ${isDark ? 'opacity-[0.03]' : 'opacity-[0.08]'}`}
             style={{
-              backgroundImage: `
-                linear-gradient(rgba(0, 224, 255, 0.5) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 224, 255, 0.5) 1px, transparent 1px)
-              `,
+              backgroundImage: isDark
+                ? `linear-gradient(rgba(0, 224, 255, 0.5) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(0, 224, 255, 0.5) 1px, transparent 1px)`
+                : `linear-gradient(rgba(107, 50, 230, 0.3) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(107, 50, 230, 0.3) 1px, transparent 1px)`,
               backgroundSize: '50px 50px',
             }}
           />
@@ -92,7 +105,9 @@ export function LoadingScreen() {
           <div
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(ellipse at center, transparent 0%, #0a0a0f 70%)',
+              background: isDark
+                ? 'radial-gradient(ellipse at center, transparent 0%, #0a0a0f 70%)'
+                : 'radial-gradient(ellipse at center, transparent 0%, #f8fafc 70%)',
             }}
           />
 
@@ -299,7 +314,7 @@ export function LoadingScreen() {
 
             {/* Progress bar */}
             <div className="w-72 mx-auto">
-              <div className="h-[2px] bg-white/5 rounded-full overflow-hidden">
+              <div className={`h-[2px] rounded-full overflow-hidden ${isDark ? 'bg-white/5' : 'bg-black/10'}`}>
                 <motion.div
                   className="h-full rounded-full relative"
                   style={{
