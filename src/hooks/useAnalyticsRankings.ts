@@ -186,7 +186,7 @@ export function sortSkillsByRanking(
     const rankB = rankings.get(b.toLowerCase().trim());
 
     if (rankA && rankB) {
-      return rankA.demand_rank - rankB.demand_rank;
+      return Number(rankA.demand_rank) - Number(rankB.demand_rank);
     }
     if (rankA) return -1;
     if (rankB) return 1;
@@ -223,7 +223,7 @@ export function sortProjectsByRanking<T extends { id: string }>(
     const rankB = rankings.get(b.id);
 
     if (rankA && rankB) {
-      return rankA.overall_rank - rankB.overall_rank;
+      return Number(rankA.overall_rank) - Number(rankB.overall_rank);
     }
     if (rankA) return -1;
     if (rankB) return 1;
@@ -239,13 +239,15 @@ export function getProjectBadge(
 
   if (!ranking) return { label: '', type: null };
 
+  const rank = Number(ranking.overall_rank);
+
   // Top 1 project
-  if (ranking.overall_rank === 1) {
+  if (rank === 1) {
     return { label: 'Most Viewed', type: 'popular' };
   }
 
   // Top 2-3 projects
-  if (ranking.overall_rank <= 3) {
+  if (rank <= 3) {
     return { label: 'Popular', type: 'trending' };
   }
 

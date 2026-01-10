@@ -166,29 +166,6 @@ export function ProjectsSection() {
                   className="h-full glass border-tech-neon/20 overflow-hidden group relative cursor-pointer"
                   onClick={() => handleProjectClick(project.id)}
                 >
-                  {/* Analytics Badge */}
-                  {badge.type && (
-                    <div className="absolute top-4 left-4 z-20">
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
-                          badge.type === 'popular'
-                            ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                            : badge.type === 'trending'
-                            ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                            : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-                        }`}
-                      >
-                        {badge.type === 'popular' ? (
-                          <Eye size={12} />
-                        ) : (
-                          <TrendingUp size={12} />
-                        )}
-                        {badge.label}
-                      </motion.div>
-                    </div>
-                  )}
                   {/* Hover glow effect */}
                   <motion.div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
@@ -232,10 +209,31 @@ export function ProjectsSection() {
                   </div>
 
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 flex-wrap">
                       <span className="group-hover:text-tech-accent transition-colors duration-300">
                         {project.title}
                       </span>
+                      {/* Analytics Badge - inline with title */}
+                      {badge.type && (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                            badge.type === 'popular'
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                              : badge.type === 'trending'
+                              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                              : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                          }`}
+                        >
+                          {badge.type === 'popular' ? (
+                            <Eye size={10} />
+                          ) : (
+                            <TrendingUp size={10} />
+                          )}
+                          {badge.label}
+                        </motion.span>
+                      )}
                       <motion.span
                         animate={{
                           rotate: hoveredIndex === index ? 45 : 0,
