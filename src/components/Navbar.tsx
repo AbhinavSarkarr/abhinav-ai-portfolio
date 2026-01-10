@@ -67,23 +67,38 @@ export function Navbar() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
 
-    // Close mobile menu first
-    setMobileMenuOpen(false);
+    const sectionId = href.substring(1);
+    const element = document.getElementById(sectionId);
+    if (!element) return;
 
-    // Small delay to let menu close, then scroll
-    setTimeout(() => {
-      const element = document.getElementById(href.substring(1));
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Adjust for navbar offset after scroll
-        setTimeout(() => {
-          window.scrollBy({ top: -80, behavior: 'smooth' });
-        }, 100);
-      } else {
-        // Fallback: use native hash navigation
-        window.location.hash = href;
-      }
-    }, 200);
+    // Mobile: menu is open, need to close it first and wait for animation
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+
+      // Wait for menu exit animation (300ms) + buffer, then scroll
+      setTimeout(() => {
+        // Calculate position after menu is closed
+        const rect = element.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const targetPosition = rect.top + scrollTop - 80;
+
+        // Use instant scroll to bypass any scroll interception
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'instant'
+        });
+      }, 350);
+    } else {
+      // Desktop: scroll immediately with no delay
+      const rect = element.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetPosition = rect.top + scrollTop - 80;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (

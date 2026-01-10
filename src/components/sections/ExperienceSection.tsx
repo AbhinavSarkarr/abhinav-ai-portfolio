@@ -106,9 +106,6 @@ export function ExperienceSection() {
           <motion.h2 variants={sectionHeading} className="section-heading">
             Work Experience
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
-            My professional journey in AI and machine learning
-          </motion.p>
         </motion.div>
 
         <div className="max-w-4xl mx-auto">

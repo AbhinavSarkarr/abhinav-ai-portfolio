@@ -117,11 +117,8 @@ export function ProjectsSection() {
           className="max-w-3xl mx-auto text-center mb-6 sm:mb-16"
         >
           <motion.h2 variants={sectionHeading} className="section-heading">
-            Projects
+            Personal Projects
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
-            Exploring the intersection of AI, language models, and practical applications
-          </motion.p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">

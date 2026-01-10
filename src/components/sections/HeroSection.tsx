@@ -249,7 +249,7 @@ export function HeroSection() {
             {/* Quick stats */}
             <motion.div
               variants={fadeInUp}
-              className="flex justify-center gap-8 sm:gap-10 pt-4 sm:pt-6 border-t border-white/10"
+              className="flex justify-between pt-4 sm:pt-6 border-t border-white/10"
             >
               {[
                 { value: '2', label: 'YOE' },

@@ -73,9 +73,6 @@ export function PublicationsSection() {
           <motion.h2 variants={sectionHeading} className="section-heading">
             Publications
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
-            Research papers and academic contributions
-          </motion.p>
         </motion.div>
 
         <div className="max-w-4xl mx-auto">

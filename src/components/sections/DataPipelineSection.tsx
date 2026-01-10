@@ -118,13 +118,6 @@ export function DataPipelineSection() {
           <motion.h2 variants={sectionHeading} className="section-heading">
             How This Portfolio Is Different
           </motion.h2>
-
-          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center max-w-3xl mx-auto">
-            This portfolio isn't just a static showcase. It's a living, data-driven system.
-            Every interaction feeds into a complete analytics pipeline that dynamically optimizes
-            content ordering, powers a recommendation engine, and provides real-time insights
-            through a dedicated analytics dashboard.
-          </motion.p>
         </motion.div>
 
         {/* Pipeline Flowchart */}

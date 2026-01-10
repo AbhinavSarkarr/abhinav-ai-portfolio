@@ -99,9 +99,6 @@ export function SkillsSection() {
           <motion.h2 variants={sectionHeading} className="section-heading">
             Technical Skills
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
-            My technical toolkit for building AI and ML solutions
-          </motion.p>
         </motion.div>
 
         {sortedSkills && sortedSkills.length > 0 ? (

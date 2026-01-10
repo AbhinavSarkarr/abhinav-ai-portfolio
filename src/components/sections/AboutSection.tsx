@@ -63,9 +63,6 @@ export function AboutSection() {
           <motion.h2 variants={sectionHeading} className="section-heading">
             About Me
           </motion.h2>
-          <motion.p variants={sectionSubheading} className="hidden sm:block text-lg text-muted-foreground mt-6 text-center">
-            Passionate AI-ML Engineer with expertise in building innovative solutions using cutting-edge technologies.
-          </motion.p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12 items-center">
