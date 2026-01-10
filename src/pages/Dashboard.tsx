@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import {
   useDashboardData,
@@ -31,17 +30,9 @@ import {
   Timer,
   Target,
   Download,
-  ArrowLeft,
   RefreshCw,
   AlertCircle,
   BarChart3,
-  Globe,
-  FolderKanban,
-  Code2,
-  Activity,
-  Building2,
-  Sparkles,
-  MousePointerClick,
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -106,20 +97,10 @@ export default function Dashboard() {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="container py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              to="/"
-              className="flex items-center gap-2 text-muted-foreground hover:text-white transition-colors"
-            >
-              <ArrowLeft size={18} />
-              <span className="hidden sm:inline">Back to Portfolio</span>
-            </Link>
-            <div className="h-6 w-px bg-white/10" />
-            <h1 className="text-xl font-bold bg-gradient-to-r from-tech-neon to-tech-accent bg-clip-text text-transparent">
-              Portfolio Analytics
-            </h1>
-          </div>
+        <div className="container py-5 flex items-center justify-between">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent">
+            Portfolio Analytics
+          </h1>
 
           <div className="flex items-center gap-4">
             {isUsingMockData && (
@@ -305,13 +286,6 @@ export default function Dashboard() {
             <p className="text-xs text-muted-foreground mt-2">
               Data refreshed daily at 2:00 PM IST
             </p>
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 mt-4 text-tech-accent hover:underline text-sm"
-            >
-              <ArrowLeft size={14} />
-              Back to Portfolio
-            </Link>
           </div>
         </footer>
       </main>
