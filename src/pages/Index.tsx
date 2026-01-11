@@ -36,28 +36,28 @@ const Index = () => {
       <div className="flex flex-col min-h-screen relative z-10">
         <Navbar />
         <main>
-          <TrackedSection sectionId="hero" sectionName="Hero">
+          <TrackedSection sectionId="hero" sectionName="Hero" sectionPosition={1}>
             <HeroSection />
           </TrackedSection>
-          <TrackedSection sectionId="about" sectionName="About">
+          <TrackedSection sectionId="about" sectionName="About" sectionPosition={2}>
             <AboutSection />
           </TrackedSection>
-          <TrackedSection sectionId="data-pipeline" sectionName="Data Pipeline">
+          <TrackedSection sectionId="data-pipeline" sectionName="Data Pipeline" sectionPosition={3}>
             <DataPipelineSection />
           </TrackedSection>
-          <TrackedSection sectionId="experience" sectionName="Experience">
+          <TrackedSection sectionId="experience" sectionName="Experience" sectionPosition={4}>
             <ExperienceSection />
           </TrackedSection>
-          <TrackedSection sectionId="projects" sectionName="Projects">
+          <TrackedSection sectionId="projects" sectionName="Projects" sectionPosition={5}>
             <ProjectsSection />
           </TrackedSection>
-          <TrackedSection sectionId="skills" sectionName="Skills">
+          <TrackedSection sectionId="skills" sectionName="Skills" sectionPosition={6}>
             <SkillsSection />
           </TrackedSection>
-          <TrackedSection sectionId="publications" sectionName="Publications">
+          <TrackedSection sectionId="publications" sectionName="Publications" sectionPosition={7}>
             <PublicationsSection />
           </TrackedSection>
-          <TrackedSection sectionId="contact" sectionName="Contact">
+          <TrackedSection sectionId="contact" sectionName="Contact" sectionPosition={8}>
             <ContactSection />
           </TrackedSection>
         </main>

@@ -1,0 +1,439 @@
+================================================================================
+                        trackSessionStart() Function
+================================================================================
+
+Location: src/hooks/useAnalytics.ts
+Trigger:  When user lands on the site
+
+
+================================================================================
+                              RETURNED DATA
+================================================================================
+
+{
+  event: 'session_start',
+
+  referrer: 'https://linkedin.com/',
+  landing_page: '/',
+  utm_source: 'linkedin',
+  utm_medium: 'post',
+  utm_campaign: 'jan_2026',
+
+  device_type: 'mobile',
+  screen_width: 390,
+  screen_height: 844,
+
+  browser: 'Chrome',
+  browser_version: '120.0',
+  operating_system: 'Android',
+
+  language: 'en-IN',
+  color_scheme: 'dark',
+
+  visit_count: 3,
+  days_since_last_visit: 7,
+  is_returning: true,
+
+  day_of_week: 'Tuesday',
+  hour_of_day: 14,
+  local_timezone: 'Asia/Kolkata',
+
+  connection_type: '4g',
+  is_online: true
+}
+
+
+================================================================================
+                        QUESTIONS THIS ANSWERS
+================================================================================
+
+Traffic:
+- Where are visitors coming from?
+- Which platform drives most traffic?
+- Which campaign is working?
+
+Device:
+- Are visitors on mobile or desktop?
+- What screen sizes are common?
+
+Browser & OS:
+- Which browsers do visitors use?
+- What operating systems are popular?
+
+Preferences:
+- Do visitors prefer dark or light mode?
+- What language do they speak?
+
+Retention:
+- Are people coming back?
+- How often do they return?
+
+Timing:
+- When do visitors come?
+- What's the best time to post?
+
+Connection:
+- Are visitors on fast or slow internet?
+
+
+================================================================================
+                           EXAMPLE INSIGHTS
+================================================================================
+
+- "60% of traffic comes from LinkedIn"
+- "70% of visitors are on mobile"
+- "Chrome is used by 65% of visitors"
+- "65% prefer dark mode"
+- "40% are returning visitors"
+- "Peak traffic: Tuesday 10 AM - 2 PM"
+- "Most visitors are from India (IST timezone)"
+- "80% are on 4G connections"
+
+
+================================================================================
+                        trackPageView() Function
+================================================================================
+
+Location: src/hooks/useAnalytics.ts
+Trigger:  Every time user navigates to a new page
+
+
+================================================================================
+                              RETURNED DATA
+================================================================================
+
+{
+  event: 'page_view',
+
+  page_path: '/project/trading-bot',
+  page_title: 'Trading Bot | Abhinav Sarkar',
+  page_location: 'https://yoursite.com/project/trading-bot',
+
+  previous_page: '/',
+  page_type: 'project',
+  page_number: 2,
+  time_on_previous_page: 45,
+  time_since_session_start: 45,
+  viewport_width: 1920,
+  viewport_height: 1080
+}
+
+
+================================================================================
+                           FIELD DESCRIPTIONS
+================================================================================
+
+page_path                Current page URL path
+page_title               Browser tab title
+page_location            Full URL including query params
+
+previous_page            Where user came from (null if first page)
+page_type                Category: home, project, client, dashboard, redirect, other
+page_number              Which page in session (1st, 2nd, 3rd...)
+time_on_previous_page    Seconds spent on previous page before navigating
+time_since_session_start Seconds since user landed on site
+viewport_width           Browser width in pixels
+viewport_height          Browser height in pixels
+
+
+================================================================================
+                        QUESTIONS THIS ANSWERS
+================================================================================
+
+Navigation:
+- Which pages are most viewed?
+- What's the typical user journey?
+- Where do users go after the homepage?
+
+Engagement:
+- How long do users spend on each page?
+- Which pages hold attention longest?
+- At what point do users leave?
+
+Session Depth:
+- How many pages do users view per session?
+- Do users explore or bounce quickly?
+
+Page Performance:
+- Which page types get most traffic?
+- Are project pages more popular than client pages?
+
+
+================================================================================
+                           EXAMPLE INSIGHTS
+================================================================================
+
+- "Home → Projects is the most common navigation path"
+- "Users spend 45 seconds on homepage before clicking"
+- "Average session is 4 pages"
+- "Project pages get 60% of all views"
+- "Users reach contact page within 2 minutes"
+- "80% of users view at least 2 project pages"
+- "Dashboard is rarely visited (2% of views)"
+- "Users who visit 3+ pages are more likely to download resume"
+
+
+================================================================================
+                        SECTION TRACKING (3 Functions)
+================================================================================
+
+Location: src/hooks/useAnalytics.ts
+Component: src/components/TrackedSection.tsx
+
+These 3 functions work together to track how users interact with each
+section on the page (Hero, About, Experience, Projects, Skills, etc.)
+
+
+================================================================================
+                        1. trackSectionView()
+================================================================================
+
+Trigger: When a section enters the viewport (user scrolls to it)
+
+{
+  event: 'section_view',
+
+  section_id: 'projects',
+  section_name: 'Projects',
+  entry_direction: 'down',
+  previous_section: 'experience',
+  view_count: 1,
+  section_position: 5
+}
+
+FIELD DESCRIPTIONS:
+
+section_id           Unique identifier for the section
+section_name         Display name of the section
+entry_direction      'down' = scrolled down to reach, 'up' = scrolled back up
+previous_section     Which section user was viewing before (null if first)
+view_count           How many times user has viewed this section (1 = first time)
+section_position     Position on page (1 = first section, 2 = second, etc.)
+
+
+================================================================================
+                        2. trackSectionEngagement()
+================================================================================
+
+Trigger: Every 10 seconds while user is viewing the section
+
+{
+  event: 'section_engagement',
+
+  section_id: 'projects',
+  section_name: 'Projects',
+  time_spent_seconds: 15,
+  scroll_depth_percent: 60,
+  section_position: 5,
+  view_count: 1
+}
+
+FIELD DESCRIPTIONS:
+
+section_id           Unique identifier for the section
+section_name         Display name of the section
+time_spent_seconds   Total seconds spent in this section
+scroll_depth_percent How far user has scrolled through the section (0-100)
+section_position     Position on page
+view_count           How many times user has viewed this section
+
+
+================================================================================
+                        3. trackSectionExit()
+================================================================================
+
+Trigger: When section leaves viewport (user scrolls away)
+
+{
+  event: 'section_exit',
+
+  section_id: 'projects',
+  section_name: 'Projects',
+  time_spent_seconds: 45,
+  scroll_depth_percent: 100,
+  exit_direction: 'down',
+  section_position: 5,
+  view_count: 1
+}
+
+FIELD DESCRIPTIONS:
+
+section_id           Unique identifier for the section
+section_name         Display name of the section
+time_spent_seconds   Total seconds spent in this section
+scroll_depth_percent Maximum scroll depth reached (0-100)
+exit_direction       'down' = continued to next section, 'up' = went back
+section_position     Position on page
+view_count           How many times user has viewed this section
+
+
+================================================================================
+                        HOW THEY WORK TOGETHER
+================================================================================
+
+User scrolls down the page:
+
+    ┌──────────────────────────────────────────────────────────────────┐
+    │ User scrolls to Projects section                                  │
+    │                           ↓                                       │
+    │ trackSectionView() fires                                          │
+    │   → entry_direction: 'down'                                       │
+    │   → previous_section: 'experience'                                │
+    │   → view_count: 1                                                 │
+    │                           ↓                                       │
+    │ User stays for 10 seconds, scrolls within section                 │
+    │                           ↓                                       │
+    │ trackSectionEngagement() fires                                    │
+    │   → time_spent_seconds: 10                                        │
+    │   → scroll_depth_percent: 40                                      │
+    │                           ↓                                       │
+    │ User stays for 10 more seconds                                    │
+    │                           ↓                                       │
+    │ trackSectionEngagement() fires again                              │
+    │   → time_spent_seconds: 20                                        │
+    │   → scroll_depth_percent: 75                                      │
+    │                           ↓                                       │
+    │ User scrolls to next section                                      │
+    │                           ↓                                       │
+    │ trackSectionExit() fires                                          │
+    │   → time_spent_seconds: 25                                        │
+    │   → scroll_depth_percent: 80 (max reached)                        │
+    │   → exit_direction: 'down'                                        │
+    └──────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+                        HOW SCROLL DEPTH WORKS
+================================================================================
+
+Scroll depth measures how much of a section has passed through the viewport.
+
+VISUAL EXAMPLE:
+
+    Section just entered (scroll_depth = 10%)
+    ─────────────────────────────────────────
+                ┌─────────────────────┐
+                │                     │
+                │   SECTION           │ ← 10% scrolled through
+                │───────────────────────────── VIEWPORT TOP
+                │                     │
+                │                     │
+                │                     │
+                │─────────────────────────────  VIEWPORT BOTTOM
+                └─────────────────────┘
+
+
+    Section halfway (scroll_depth = 50%)
+    ─────────────────────────────────────────
+                ┌─────────────────────┐
+                │                     │ ← 50% scrolled through
+                │   SECTION           │
+                │───────────────────────────── VIEWPORT TOP
+                │                     │
+                │                     │
+                └─────────────────────┘
+
+
+    Section fully viewed (scroll_depth = 100%)
+    ─────────────────────────────────────────
+                ┌─────────────────────┐
+                │                     │ ← 100% scrolled through
+                │   SECTION           │
+                │                     │
+                │                     │
+                └─────────────────────┘
+                ─────────────────────────────── VIEWPORT TOP
+
+
+FORMULA:
+    scroll_depth = (scrolled_through / section_height) × 100
+
+NOTE: We track MAX scroll depth, so if user scrolls to 80% then back to
+      50%, we record 80% (the highest point reached).
+
+
+================================================================================
+                        SECTION POSITIONS
+================================================================================
+
+Position    Section
+────────────────────────
+1           Hero
+2           About
+3           Data Pipeline
+4           Experience
+5           Projects
+6           Skills
+7           Publications
+8           Contact
+
+
+================================================================================
+                        QUESTIONS THIS ANSWERS
+================================================================================
+
+Section Popularity:
+- Which sections get the most views?
+- Which sections are skipped?
+- Which sections do users revisit?
+
+Engagement Depth:
+- How long do users spend on each section?
+- How far do users scroll in each section?
+- Which sections hold attention longest?
+
+Navigation Flow:
+- What's the typical section-to-section journey?
+- Do users scroll down linearly or jump around?
+- Which sections cause users to scroll back up?
+
+Drop-off Analysis:
+- Where do users stop scrolling?
+- Which section is the "exit point"?
+- Do users reach the Contact section?
+
+Re-engagement:
+- Which sections are viewed multiple times?
+- Do users come back to certain sections?
+
+Position Impact:
+- Do sections lower on the page get less engagement?
+- Is there a drop-off after a certain position?
+
+
+================================================================================
+                           EXAMPLE INSIGHTS
+================================================================================
+
+Section Popularity:
+- "Projects section gets 95% view rate, Publications only 40%"
+- "Skills section is viewed 2.3 times on average (high re-engagement)"
+- "30% of users never scroll past Experience section"
+
+Engagement Depth:
+- "Users spend average 45s on Projects, but only 8s on About"
+- "Only 60% of users scroll through entire Projects section"
+- "Experience section has 85% scroll completion rate"
+
+Navigation Flow:
+- "Experience → Projects is the most common flow (78%)"
+- "35% of users scroll BACK UP to Projects from Skills"
+- "Users who reach Contact came from Projects 60% of the time"
+
+Drop-off Analysis:
+- "40% drop-off after position 5 (Projects)"
+- "Publications section has highest exit rate (60% leave after)"
+- "Only 25% of users reach Contact section"
+
+Re-engagement:
+- "Projects section viewed 2.1 times per session"
+- "Users scroll back to Experience 20% of the time"
+- "Skills section has highest re-visit rate"
+
+Position Impact:
+- "Sections after position 6 get 50% less engagement"
+- "Moving Projects from position 5 to 3 increased views by 30%"
+- "Contact at position 8 has only 25% reach rate"
+
+
+================================================================================

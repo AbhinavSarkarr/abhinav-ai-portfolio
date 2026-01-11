@@ -15,6 +15,7 @@ interface TrackedSectionProps {
   children: React.ReactNode;
   sectionId: string;
   sectionName: string;
+  sectionPosition: number;  // 1 = first section, 2 = second, etc.
   className?: string;
 }
 
@@ -22,6 +23,7 @@ export function TrackedSection({
   children,
   sectionId,
   sectionName,
+  sectionPosition,
   className = '',
 }: TrackedSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -62,7 +64,7 @@ export function TrackedSection({
       enterTime.current = Date.now();
 
       if (!hasTrackedView.current) {
-        trackSectionView(sectionId, sectionName);
+        trackSectionView(sectionId, sectionName, sectionPosition);
         hasTrackedView.current = true;
       }
     } else if (enterTime.current !== null) {
@@ -72,11 +74,11 @@ export function TrackedSection({
       const scrollDepth = calculateScrollDepth();
       maxScrollDepth.current = Math.max(maxScrollDepth.current, scrollDepth);
 
-      trackSectionExit(sectionId, sectionName, totalTime.current, maxScrollDepth.current);
+      trackSectionExit(sectionId, sectionName, totalTime.current, maxScrollDepth.current, sectionPosition);
 
       enterTime.current = null;
     }
-  }, [isInView, sectionId, sectionName, calculateScrollDepth]);
+  }, [isInView, sectionId, sectionName, sectionPosition, calculateScrollDepth]);
 
   // Track engagement periodically while in view
   useEffect(() => {
@@ -96,14 +98,15 @@ export function TrackedSection({
           sectionId,
           sectionName,
           totalTime.current + timeSinceEnter,
-          maxScrollDepth.current
+          maxScrollDepth.current,
+          sectionPosition
         );
         lastEngagementSent.current = currentTime;
       }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isInView, sectionId, sectionName, calculateScrollDepth]);
+  }, [isInView, sectionId, sectionName, sectionPosition, calculateScrollDepth]);
 
   // Track scroll depth changes
   useEffect(() => {
@@ -127,11 +130,12 @@ export function TrackedSection({
           sectionId,
           sectionName,
           totalTime.current + timeInSection,
-          maxScrollDepth.current
+          maxScrollDepth.current,
+          sectionPosition
         );
       }
     };
-  }, [sectionId, sectionName]);
+  }, [sectionId, sectionName, sectionPosition]);
 
   return (
     <div

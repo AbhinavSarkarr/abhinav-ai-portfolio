@@ -11,6 +11,36 @@ import NotFound from "./pages/NotFound";
 import { RecommenderProvider } from "@/context/RecommenderContext";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
 import { ProjectRecommendation } from "@/components/ProjectRecommendation";
+import {
+  // LinkedIn
+  LinkedInProfileRedirect,
+  LinkedInPostRedirect,
+  LinkedInMessageRedirect,
+  // Twitter
+  TwitterProfileRedirect,
+  TwitterPostRedirect,
+  TwitterDMRedirect,
+  // GitHub
+  GitHubProfileRedirect,
+  GitHubReadmeRedirect,
+  GitHubRepoRedirect,
+  // Email
+  EmailSignatureRedirect,
+  EmailNewsletterRedirect,
+  EmailColdRedirect,
+  // Resume
+  ResumeRedirect,
+  CoverLetterRedirect,
+  // WhatsApp
+  WhatsAppDirectRedirect,
+  WhatsAppGroupRedirect,
+  WhatsAppStatusRedirect,
+  // Other
+  DiscordRedirect,
+  RedditRedirect,
+  MediumRedirect,
+  QRCodeRedirect,
+} from "@/components/UTMRedirect";
 
 // Check if we're on the analytics subdomain
 const isAnalyticsSubdomain = window.location.hostname.startsWith('analytics.');
@@ -35,6 +65,43 @@ const App = () => (
               <Route path="/project/:id" element={<ProjectDetail />} />
               <Route path="/client/:experienceId/:clientId" element={<ClientDetail />} />
               <Route path="/dashboard" element={<Dashboard />} />
+
+              {/* UTM Redirect Routes - Short URLs with hidden tracking */}
+              {/* LinkedIn */}
+              <Route path="/li" element={<LinkedInProfileRedirect />} />
+              <Route path="/li/p" element={<LinkedInPostRedirect />} />
+              <Route path="/li/m" element={<LinkedInMessageRedirect />} />
+
+              {/* Twitter/X */}
+              <Route path="/tw" element={<TwitterProfileRedirect />} />
+              <Route path="/tw/p" element={<TwitterPostRedirect />} />
+              <Route path="/tw/dm" element={<TwitterDMRedirect />} />
+
+              {/* GitHub */}
+              <Route path="/gh" element={<GitHubProfileRedirect />} />
+              <Route path="/gh/r" element={<GitHubReadmeRedirect />} />
+              <Route path="/gh/repo" element={<GitHubRepoRedirect />} />
+
+              {/* Email */}
+              <Route path="/em" element={<EmailSignatureRedirect />} />
+              <Route path="/em/n" element={<EmailNewsletterRedirect />} />
+              <Route path="/em/c" element={<EmailColdRedirect />} />
+
+              {/* Resume/CV */}
+              <Route path="/cv" element={<ResumeRedirect />} />
+              <Route path="/cl" element={<CoverLetterRedirect />} />
+
+              {/* WhatsApp */}
+              <Route path="/wa" element={<WhatsAppDirectRedirect />} />
+              <Route path="/wa/g" element={<WhatsAppGroupRedirect />} />
+              <Route path="/wa/s" element={<WhatsAppStatusRedirect />} />
+
+              {/* Other Platforms */}
+              <Route path="/dc" element={<DiscordRedirect />} />
+              <Route path="/rd" element={<RedditRedirect />} />
+              <Route path="/md" element={<MediumRedirect />} />
+              <Route path="/qr" element={<QRCodeRedirect />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           )}
