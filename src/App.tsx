@@ -35,11 +35,63 @@ import {
   WhatsAppDirectRedirect,
   WhatsAppGroupRedirect,
   WhatsAppStatusRedirect,
+  // Instagram
+  InstagramBioRedirect,
+  InstagramPostRedirect,
+  InstagramStoryRedirect,
+  InstagramDMRedirect,
+  InstagramReelRedirect,
+  // YouTube
+  YouTubeChannelRedirect,
+  YouTubeVideoRedirect,
+  YouTubeCommentRedirect,
+  // Telegram
+  TelegramDirectRedirect,
+  TelegramGroupRedirect,
+  TelegramChannelRedirect,
+  // Facebook
+  FacebookProfileRedirect,
+  FacebookPostRedirect,
+  FacebookMessengerRedirect,
+  // Threads
+  ThreadsProfileRedirect,
+  ThreadsPostRedirect,
+  // Kaggle
+  KaggleProfileRedirect,
+  KaggleNotebookRedirect,
+  KaggleDiscussionRedirect,
+  // Stack Overflow
+  StackOverflowProfileRedirect,
+  StackOverflowAnswerRedirect,
+  // Developer Blogs
+  DevToRedirect,
+  HashnodeRedirect,
+  // Tech Communities
+  HackerNewsRedirect,
+  ProductHuntRedirect,
+  // Coding Platforms
+  LeetCodeRedirect,
+  HackerRankRedirect,
+  // Design Platforms
+  BehanceRedirect,
+  DribbbleRedirect,
+  // Work Platforms
+  SlackRedirect,
+  SlackDMRedirect,
+  NotionRedirect,
   // Other
   DiscordRedirect,
+  DiscordDMRedirect,
   RedditRedirect,
+  RedditCommentRedirect,
   MediumRedirect,
   QRCodeRedirect,
+  // Misc
+  PortfolioLinkRedirect,
+  ReferralRedirect,
+  PresentationRedirect,
+  ConferenceRedirect,
+  MeetupRedirect,
 } from "@/components/UTMRedirect";
 
 // Check if we're on the analytics subdomain
@@ -96,11 +148,76 @@ const App = () => (
               <Route path="/wa/g" element={<WhatsAppGroupRedirect />} />
               <Route path="/wa/s" element={<WhatsAppStatusRedirect />} />
 
+              {/* Instagram */}
+              <Route path="/ig" element={<InstagramBioRedirect />} />
+              <Route path="/ig/p" element={<InstagramPostRedirect />} />
+              <Route path="/ig/s" element={<InstagramStoryRedirect />} />
+              <Route path="/ig/dm" element={<InstagramDMRedirect />} />
+              <Route path="/ig/r" element={<InstagramReelRedirect />} />
+
+              {/* YouTube */}
+              <Route path="/yt" element={<YouTubeChannelRedirect />} />
+              <Route path="/yt/v" element={<YouTubeVideoRedirect />} />
+              <Route path="/yt/c" element={<YouTubeCommentRedirect />} />
+
+              {/* Telegram */}
+              <Route path="/tg" element={<TelegramDirectRedirect />} />
+              <Route path="/tg/g" element={<TelegramGroupRedirect />} />
+              <Route path="/tg/c" element={<TelegramChannelRedirect />} />
+
+              {/* Facebook */}
+              <Route path="/fb" element={<FacebookProfileRedirect />} />
+              <Route path="/fb/p" element={<FacebookPostRedirect />} />
+              <Route path="/fb/m" element={<FacebookMessengerRedirect />} />
+
+              {/* Threads */}
+              <Route path="/th" element={<ThreadsProfileRedirect />} />
+              <Route path="/th/p" element={<ThreadsPostRedirect />} />
+
+              {/* Kaggle (AI/ML) */}
+              <Route path="/kg" element={<KaggleProfileRedirect />} />
+              <Route path="/kg/n" element={<KaggleNotebookRedirect />} />
+              <Route path="/kg/d" element={<KaggleDiscussionRedirect />} />
+
+              {/* Stack Overflow */}
+              <Route path="/so" element={<StackOverflowProfileRedirect />} />
+              <Route path="/so/a" element={<StackOverflowAnswerRedirect />} />
+
+              {/* Developer Blogs */}
+              <Route path="/dv" element={<DevToRedirect />} />
+              <Route path="/hs" element={<HashnodeRedirect />} />
+
+              {/* Tech Communities */}
+              <Route path="/hn" element={<HackerNewsRedirect />} />
+              <Route path="/ph" element={<ProductHuntRedirect />} />
+
+              {/* Coding Platforms */}
+              <Route path="/lc" element={<LeetCodeRedirect />} />
+              <Route path="/hr" element={<HackerRankRedirect />} />
+
+              {/* Design Platforms */}
+              <Route path="/be" element={<BehanceRedirect />} />
+              <Route path="/dr" element={<DribbbleRedirect />} />
+
+              {/* Work/Collaboration */}
+              <Route path="/sl" element={<SlackRedirect />} />
+              <Route path="/sl/dm" element={<SlackDMRedirect />} />
+              <Route path="/nt" element={<NotionRedirect />} />
+
               {/* Other Platforms */}
               <Route path="/dc" element={<DiscordRedirect />} />
+              <Route path="/dc/dm" element={<DiscordDMRedirect />} />
               <Route path="/rd" element={<RedditRedirect />} />
+              <Route path="/rd/c" element={<RedditCommentRedirect />} />
               <Route path="/md" element={<MediumRedirect />} />
               <Route path="/qr" element={<QRCodeRedirect />} />
+
+              {/* Miscellaneous */}
+              <Route path="/pf" element={<PortfolioLinkRedirect />} />
+              <Route path="/ref" element={<ReferralRedirect />} />
+              <Route path="/ppt" element={<PresentationRedirect />} />
+              <Route path="/conf" element={<ConferenceRedirect />} />
+              <Route path="/meet" element={<MeetupRedirect />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

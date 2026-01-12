@@ -1383,6 +1383,33 @@ export function trackTechStackInterest() {
 }
 
 // ============================================
+// ANALYTICS DASHBOARD TRACKING
+// ============================================
+
+export function trackAnalyticsDashboardClick() {
+  const visitCount = parseInt(localStorage.getItem('portfolio_visit_count') || '1', 10);
+  const isReturning = localStorage.getItem('portfolio_visited') === 'true';
+
+  trackEvent('analytics_dashboard_click', {
+    event_category: 'Conversion',
+    event_label: 'Analytics Dashboard',
+    // Time context
+    time_on_site_seconds: Math.round((Date.now() - sessionStartTime) / 1000),
+    // Scroll context
+    scroll_depth_at_click: maxScrollDepth,
+    // Section engagement
+    pipeline_steps_visible: sectionsViewed.includes('data-pipeline') ? 7 : 0,
+    // Visitor context
+    is_returning_visitor: isReturning,
+    visit_count: visitCount,
+    // Traffic source
+    traffic_source: getUTMParam('utm_source') || 'direct',
+    // Device
+    device_type: getDeviceType(),
+  });
+}
+
+// ============================================
 // SESSION TRACKING
 // ============================================
 
@@ -1785,6 +1812,9 @@ export function useAnalytics() {
     // Content tracking
     trackContentCopy,
     trackTimeThreshold,
+
+    // Analytics dashboard
+    trackAnalyticsDashboardClick,
   };
 }
 

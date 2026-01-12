@@ -17,6 +17,7 @@ import {
   sectionHeading,
   sectionSubheading,
 } from '@/lib/animations';
+import { trackAnalyticsDashboardClick } from '@/hooks/useAnalytics';
 
 const pipelineSteps = [
   {
@@ -294,6 +295,7 @@ export function DataPipelineSection() {
             className="gradient-cta"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
+            onClick={trackAnalyticsDashboardClick}
           >
             <BarChart3 size={20} />
             View Live Analytics Dashboard
