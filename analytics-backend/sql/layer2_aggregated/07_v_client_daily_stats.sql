@@ -54,7 +54,25 @@ SELECT
 
   -- Device breakdown
   COUNTIF(device_category = 'desktop') AS desktop_views,
-  COUNTIF(device_category = 'mobile') AS mobile_views
+  COUNTIF(device_category = 'mobile') AS mobile_views,
+
+  -- Client engagement context (NEW - from enhanced v_client_events)
+  COUNTIF(is_first_view = 'true') AS first_time_views,
+  ROUND(AVG(clients_viewed_before), 1) AS avg_clients_viewed_before,
+
+  -- Deep engagement metrics (NEW)
+  COUNTIF(is_deep_read = 'true') AS deep_reads,
+  ROUND(COUNTIF(is_deep_read = 'true') * 100.0 / NULLIF(COUNTIF(event_name = 'client_case_study_engagement'), 0), 2) AS deep_read_rate,
+  ROUND(AVG(completion_rate), 1) AS avg_completion_rate,
+
+  -- Recommendation performance (NEW)
+  COUNTIF(was_recommended = 'true') AS recommended_client_views,
+
+  -- Contribution engagement (NEW)
+  ROUND(AVG(contributions_read_count), 1) AS avg_contributions_read,
+
+  -- Session context (NEW)
+  ROUND(AVG(time_since_session_start), 1) AS avg_time_into_session
 
 FROM `portfolio-483605.analytics_processed.v_client_events`
 WHERE client_id IS NOT NULL

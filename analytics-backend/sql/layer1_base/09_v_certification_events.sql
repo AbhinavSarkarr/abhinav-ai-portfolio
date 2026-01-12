@@ -14,6 +14,13 @@ SELECT
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'cert_title') AS cert_title,
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'cert_issuer') AS cert_issuer,
 
+  -- Certification context (NEW)
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'cert_year') AS cert_year,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_expired') AS is_expired,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'cert_category') AS cert_category,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_on_site') AS time_on_site_sec,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'current_section') AS current_section,
+
   -- Device
   device.category AS device_category,
   device.browser AS browser,

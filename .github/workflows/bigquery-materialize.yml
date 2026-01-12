@@ -1,5 +1,5 @@
 # BigQuery Analytics Materialization
-# Runs daily at 2:00 PM IST (8:30 UTC) to materialize analytics views into tables
+# Runs daily at 2:00 PM IST (8:30 UTC) to materialize ALL analytics views into tables
 # and export data to GitHub Gists for the portfolio and dashboard
 
 name: Materialize BigQuery Analytics
@@ -8,6 +8,12 @@ on:
   schedule:
     - cron: '30 8 * * *'
   workflow_dispatch:
+
+env:
+  PROJECT_ID: portfolio-483605
+  PROCESSED_DATASET: analytics_processed
+  MATERIALIZED_DATASET: analytics_materialized
+  LOCATION: US
 
 jobs:
   materialize:
@@ -26,71 +32,340 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: portfolio-483605
+          project_id: ${{ env.PROJECT_ID }}
 
       - name: Create materialized dataset if not exists
         run: |
-          bq mk --dataset --location=US portfolio-483605:analytics_materialized || true
+          bq mk --dataset --location=${{ env.LOCATION }} ${{ env.PROJECT_ID }}:${{ env.MATERIALIZED_DATASET }} || true
 
-      # ==================== MATERIALIZE VIEWS ====================
-      - name: Materialize All Rankings Views
+      # ==================== LAYER 1: BASE VIEWS (9 tables) ====================
+      # These contain event-level data from GA4
+
+      - name: Materialize Layer 1 - Sessions
         run: |
-          echo "Materializing section_rankings..."
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.section_rankings` AS
+          echo "Materializing sessions..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.sessions` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_section_rankings`
-          ' || echo "Warning: section_rankings failed"
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_sessions`
+          ' || echo "Warning: sessions failed"
 
-          echo "Materializing project_rankings..."
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.project_rankings` AS
+      - name: Materialize Layer 1 - Page Views
+        run: |
+          echo "Materializing page_views..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.page_views` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_project_rankings`
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_page_views`
+          ' || echo "Warning: page_views failed"
+
+      - name: Materialize Layer 1 - Project Events
+        run: |
+          echo "Materializing project_events..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.project_events` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_project_events`
+          ' || echo "Warning: project_events failed"
+
+      - name: Materialize Layer 1 - Section Events
+        run: |
+          echo "Materializing section_events..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.section_events` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_section_events`
+          ' || echo "Warning: section_events failed"
+
+      - name: Materialize Layer 1 - Skill Events
+        run: |
+          echo "Materializing skill_events..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.skill_events` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_skill_events`
+          ' || echo "Warning: skill_events failed"
+
+      - name: Materialize Layer 1 - Conversion Events
+        run: |
+          echo "Materializing conversion_events..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.conversion_events` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_conversion_events`
+          ' || echo "Warning: conversion_events failed"
+
+      - name: Materialize Layer 1 - Client Events
+        run: |
+          echo "Materializing client_events..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.client_events` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_client_events`
+          ' || echo "Warning: client_events failed"
+
+      - name: Materialize Layer 1 - Recommendation Events
+        run: |
+          echo "Materializing recommendation_events..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.recommendation_events` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_recommendation_events`
+          ' || echo "Warning: recommendation_events failed"
+
+      - name: Materialize Layer 1 - Certification Events
+        run: |
+          echo "Materializing certification_events..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.certification_events` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_certification_events`
+          ' || echo "Warning: certification_events failed"
+
+      - name: Log Layer 1 Complete
+        run: echo "Layer 1 (9 base tables) materialized"
+
+      # ==================== LAYER 2: AGGREGATED VIEWS (11 tables) ====================
+      # Daily aggregated metrics
+
+      - name: Materialize Layer 2 - Daily Metrics
+        run: |
+          echo "Materializing daily_metrics..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.daily_metrics` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_daily_metrics`
+          ' || echo "Warning: daily_metrics failed"
+
+      - name: Materialize Layer 2 - Project Daily Stats
+        run: |
+          echo "Materializing project_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.project_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_project_daily_stats`
+          ' || echo "Warning: project_daily_stats failed"
+
+      - name: Materialize Layer 2 - Section Daily Stats
+        run: |
+          echo "Materializing section_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.section_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_section_daily_stats`
+          ' || echo "Warning: section_daily_stats failed"
+
+      - name: Materialize Layer 2 - Skill Daily Stats
+        run: |
+          echo "Materializing skill_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.skill_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_skill_daily_stats`
+          ' || echo "Warning: skill_daily_stats failed"
+
+      - name: Materialize Layer 2 - Traffic Daily Stats
+        run: |
+          echo "Materializing traffic_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.traffic_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_traffic_daily_stats`
+          ' || echo "Warning: traffic_daily_stats failed"
+
+      - name: Materialize Layer 2 - Conversion Funnel
+        run: |
+          echo "Materializing conversion_funnel..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.conversion_funnel` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_conversion_funnel`
+          ' || echo "Warning: conversion_funnel failed"
+
+      - name: Materialize Layer 2 - Client Daily Stats
+        run: |
+          echo "Materializing client_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.client_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_client_daily_stats`
+          ' || echo "Warning: client_daily_stats failed"
+
+      - name: Materialize Layer 2 - Domain Daily Stats
+        run: |
+          echo "Materializing domain_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.domain_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_domain_daily_stats`
+          ' || echo "Warning: domain_daily_stats failed"
+
+      - name: Materialize Layer 2 - Experience Daily Stats
+        run: |
+          echo "Materializing experience_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.experience_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_experience_daily_stats`
+          ' || echo "Warning: experience_daily_stats failed"
+
+      - name: Materialize Layer 2 - Recommendation Daily Stats
+        run: |
+          echo "Materializing recommendation_daily_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.recommendation_daily_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_recommendation_daily_stats`
+          ' || echo "Warning: recommendation_daily_stats failed"
+
+      - name: Materialize Layer 2 - Content Reading Stats
+        run: |
+          echo "Materializing content_reading_stats..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.content_reading_stats` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_content_reading_stats`
+          ' || echo "Warning: content_reading_stats failed"
+
+      - name: Log Layer 2 Complete
+        run: echo "Layer 2 (11 aggregated tables) materialized"
+
+      # ==================== LAYER 3: RANKINGS & INSIGHTS (10 tables) ====================
+      # 7-day rolling rankings and insights
+
+      - name: Materialize Layer 3 - Project Rankings
+        run: |
+          echo "Materializing project_rankings..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.project_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_project_rankings`
           ' || echo "Warning: project_rankings failed"
 
-          echo "Materializing tech_demand_insights (skills)..."
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.tech_demand_insights` AS
+      - name: Materialize Layer 3 - Skill Rankings
+        run: |
+          echo "Materializing skill_rankings..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.skill_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_tech_demand_insights`
-          ' || echo "Warning: tech_demand_insights failed"
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_skill_rankings`
+          ' || echo "Warning: skill_rankings failed"
 
-          echo "Materializing client_rankings..."
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.client_rankings` AS
+      - name: Materialize Layer 3 - Section Rankings
+        run: |
+          echo "Materializing section_rankings..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.section_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_client_rankings`
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_section_rankings`
+          ' || echo "Warning: section_rankings failed"
+
+      - name: Materialize Layer 3 - Visitor Insights
+        run: |
+          echo "Materializing visitor_insights..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.visitor_insights` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_visitor_insights`
+          ' || echo "Warning: visitor_insights failed"
+
+      - name: Materialize Layer 3 - Recommendations
+        run: |
+          echo "Materializing recommendations..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.recommendations` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_recommendations`
+          ' || echo "Warning: recommendations failed"
+
+      - name: Materialize Layer 3 - Client Rankings
+        run: |
+          echo "Materializing client_rankings..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.client_rankings` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_client_rankings`
           ' || echo "Warning: client_rankings failed"
 
+      - name: Materialize Layer 3 - Domain Rankings
+        run: |
           echo "Materializing domain_rankings..."
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.domain_rankings` AS
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.domain_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_domain_rankings`
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_domain_rankings`
           ' || echo "Warning: domain_rankings failed"
 
+      - name: Materialize Layer 3 - Experience Rankings
+        run: |
           echo "Materializing experience_rankings..."
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.experience_rankings` AS
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.experience_rankings` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_experience_rankings`
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_experience_rankings`
           ' || echo "Warning: experience_rankings failed"
 
+      - name: Materialize Layer 3 - Recommendation Performance
+        run: |
           echo "Materializing recommendation_performance..."
-          bq query --use_legacy_sql=false --location=US '
-            CREATE OR REPLACE TABLE `portfolio-483605.analytics_materialized.recommendation_performance` AS
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.recommendation_performance` AS
             SELECT *, CURRENT_TIMESTAMP() as materialized_at
-            FROM `portfolio-483605.analytics_processed.v_recommendation_performance`
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_recommendation_performance`
           ' || echo "Warning: recommendation_performance failed"
 
-          echo "All materializations complete"
+      - name: Materialize Layer 3 - Tech Demand Insights
+        run: |
+          echo "Materializing tech_demand_insights..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.tech_demand_insights` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.v_tech_demand_insights`
+          ' || echo "Warning: tech_demand_insights failed"
+
+      - name: Log Layer 3 Complete
+        run: echo "Layer 3 (10 ranking tables) materialized"
+
+      # ==================== ML TRAINING DATA (1 table) ====================
+      - name: Materialize ML Training Data
+        run: |
+          echo "Materializing ml_training_data..."
+          bq query --use_legacy_sql=false --location=${{ env.LOCATION }} '
+            CREATE OR REPLACE TABLE `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.ml_training_data` AS
+            SELECT *, CURRENT_TIMESTAMP() as materialized_at
+            FROM `${{ env.PROJECT_ID }}.${{ env.PROCESSED_DATASET }}.ml_training_data`
+          ' || echo "Warning: ml_training_data failed"
+
+      - name: Log All Materialization Complete
+        run: |
+          echo "========================================"
+          echo "All views materialized!"
+          echo "========================================"
+          echo "Layer 1 (9 tables): sessions, page_views, project_events,"
+          echo "  section_events, skill_events, conversion_events,"
+          echo "  client_events, recommendation_events, certification_events"
+          echo ""
+          echo "Layer 2 (11 tables): daily_metrics, project_daily_stats,"
+          echo "  section_daily_stats, skill_daily_stats, traffic_daily_stats,"
+          echo "  conversion_funnel, client_daily_stats, domain_daily_stats,"
+          echo "  experience_daily_stats, recommendation_daily_stats,"
+          echo "  content_reading_stats"
+          echo ""
+          echo "Layer 3 (10 tables): project_rankings, skill_rankings,"
+          echo "  section_rankings, visitor_insights, recommendations,"
+          echo "  client_rankings, domain_rankings, experience_rankings,"
+          echo "  recommendation_performance, tech_demand_insights"
+          echo ""
+          echo "ML (1 table): ml_training_data"
+          echo ""
+          echo "Total: 31 materialized tables"
+          echo "========================================"
 
       # ==================== EXPORT DATA TO JSON ====================
       - name: Export Rankings Data
         run: |
           # Skills
-          bq query --use_legacy_sql=false --format=json --location=US '
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(technology, "Unknown") as skill_name,
               COALESCE(skill_category, "Other") as skill_category,
@@ -98,12 +373,12 @@ jobs:
               COALESCE(demand_rank, 999) as demand_rank,
               COALESCE(demand_tier, "niche") as demand_tier,
               COALESCE(learning_priority, "maintain_expertise") as learning_priority
-            FROM `portfolio-483605.analytics_materialized.tech_demand_insights`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.tech_demand_insights`
             ORDER BY demand_rank
           ' > /tmp/skill-rankings.json 2>/dev/null || echo '[]' > /tmp/skill-rankings.json
 
           # Projects
-          bq query --use_legacy_sql=false --format=json --location=US '
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(project_id, "unknown") as project_id,
               COALESCE(project_title, "Unknown Project") as project_title,
@@ -112,27 +387,25 @@ jobs:
               COALESCE(total_clicks, 0) as total_clicks,
               COALESCE(engagement_score, 0) as engagement_score,
               COALESCE(recommended_position, "primary") as recommended_position
-            FROM `portfolio-483605.analytics_materialized.project_rankings`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.project_rankings`
             ORDER BY overall_rank
           ' > /tmp/project-rankings.json 2>/dev/null || echo '[]' > /tmp/project-rankings.json
 
-          # Sections (use actual column names from deployed view)
-          bq query --use_legacy_sql=false --format=json --location=US '
+          # Sections
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(section_id, "unknown") as section_id,
               ROUND(COALESCE(health_score, 50), 1) as health_score,
               COALESCE(engagement_rank, 999) as engagement_rank,
               COALESCE(health_tier, "needs_attention") as health_tier,
               COALESCE(dropoff_indicator, "moderate_dropoff") as optimization_hint,
-              COALESCE(total_views, 0) as total_views,
-              ROUND(COALESCE(health_score, 0) / 3, 1) as avg_engagement_rate,
-              ROUND(COALESCE(avg_exit_rate, 0), 1) as avg_exit_rate
-            FROM `portfolio-483605.analytics_materialized.section_rankings`
+              COALESCE(total_views, 0) as total_views
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.section_rankings`
             ORDER BY engagement_rank
           ' > /tmp/section-rankings.json 2>/dev/null || echo '[]' > /tmp/section-rankings.json
 
           # Clients
-          bq query --use_legacy_sql=false --format=json --location=US '
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(client_id, "unknown") as client_id,
               COALESCE(client_name, "Unknown Client") as client_name,
@@ -141,58 +414,39 @@ jobs:
               COALESCE(engagement_rank, 999) as engagement_rank,
               COALESCE(total_views, 0) as total_views,
               COALESCE(total_clicks, 0) as total_clicks
-            FROM `portfolio-483605.analytics_materialized.client_rankings`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.client_rankings`
             ORDER BY experience_id, engagement_rank
           ' > /tmp/client-rankings.json 2>/dev/null || echo '[]' > /tmp/client-rankings.json
 
           # Domains
-          bq query --use_legacy_sql=false --format=json --location=US '
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(domain, "Unknown") as domain,
               COALESCE(interest_rank, 999) as interest_rank,
               COALESCE(total_interest_score, 0) as total_interest_score,
               COALESCE(demand_tier, "niche_interest") as demand_tier,
               COALESCE(portfolio_recommendation, "maintain") as portfolio_recommendation
-            FROM `portfolio-483605.analytics_materialized.domain_rankings`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.domain_rankings`
             ORDER BY interest_rank
           ' > /tmp/domain-rankings.json 2>/dev/null || echo '[]' > /tmp/domain-rankings.json
 
-          # Experiences (use actual column names from deployed view)
-          bq query --use_legacy_sql=false --format=json --location=US '
+          # Experiences
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
-              COALESCE(experience_id, "unknown") as role_title,
-              COALESCE(experience_id, "unknown") as company_name,
-              COALESCE(experience_rank, 999) as interest_rank,
-              COALESCE(total_interactions, 0) as interest_score
-            FROM `portfolio-483605.analytics_materialized.experience_rankings`
+              COALESCE(experience_id, "unknown") as experience_id,
+              COALESCE(experience_rank, 999) as experience_rank,
+              COALESCE(total_interactions, 0) as total_interactions
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.experience_rankings`
             ORDER BY experience_rank
             LIMIT 10
           ' > /tmp/experience-rankings.json 2>/dev/null || echo '[]' > /tmp/experience-rankings.json
-
-          # Recommendations (use actual column names from deployed view)
-          bq query --use_legacy_sql=false --format=json --location=US '
-            SELECT
-              CASE WHEN COALESCE(click_through_rate, 0) >= 5 THEN "good"
-                   WHEN COALESCE(click_through_rate, 0) >= 2 THEN "needs_improvement"
-                   ELSE "underperforming" END as system_health,
-              ROUND(COALESCE(click_through_rate, 0), 1) as overall_ctr,
-              0 as position_1_ctr,
-              0 as position_2_ctr,
-              0 as position_3_ctr,
-              0 as user_conversion_rate,
-              COALESCE(times_shown, 0) as total_impressions,
-              COALESCE(times_clicked, 0) as total_clicks
-            FROM `portfolio-483605.analytics_materialized.recommendation_performance`
-            WHERE metric_type = "recommendations"
-            LIMIT 1
-          ' > /tmp/recommendations.json 2>/dev/null || echo '[{}]' > /tmp/recommendations.json
 
           echo "Rankings data exported"
 
       - name: Export Dashboard Metrics
         run: |
-          # Daily metrics (last 30 days, excluding today due to GA4 delay)
-          bq query --use_legacy_sql=false --format=json --location=US '
+          # Daily metrics (last 30 days from materialized table)
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               FORMAT_DATE("%Y-%m-%d", session_date) as date,
               COALESCE(unique_visitors, 0) as visitors,
@@ -203,21 +457,21 @@ jobs:
               COALESCE(desktop_sessions, 0) as desktop,
               COALESCE(mobile_sessions, 0) as mobile,
               COALESCE(tablet_sessions, 0) as tablet
-            FROM `portfolio-483605.analytics_processed.v_daily_metrics`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.daily_metrics`
             WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 31 DAY)
               AND session_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
             ORDER BY session_date DESC
             LIMIT 30
           ' > /tmp/daily-metrics.json 2>/dev/null || echo '[]' > /tmp/daily-metrics.json
 
-          # Traffic sources
-          bq query --use_legacy_sql=false --format=json --location=US '
+          # Traffic sources from materialized table
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(traffic_source, "direct") as source,
               COALESCE(traffic_medium, "none") as medium,
               COALESCE(SUM(sessions), 0) as sessions,
               ROUND(COALESCE(AVG(engagement_rate), 0), 1) as engagement_rate
-            FROM `portfolio-483605.analytics_processed.v_traffic_daily_stats`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.traffic_daily_stats`
             WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
               AND event_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
             GROUP BY traffic_source, traffic_medium
@@ -225,33 +479,31 @@ jobs:
             LIMIT 10
           ' > /tmp/traffic-sources.json 2>/dev/null || echo '[]' > /tmp/traffic-sources.json
 
-          # Top countries
-          bq query --use_legacy_sql=false --format=json --location=US '
+          # Top countries from visitor insights
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
-              COALESCE(country, "Unknown") as country,
+              COALESCE(primary_country, "Unknown") as country,
               COUNT(DISTINCT user_pseudo_id) as visitors
-            FROM `portfolio-483605.analytics_processed.v_sessions`
-            WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
-              AND session_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-            GROUP BY country
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.visitor_insights`
+            GROUP BY primary_country
             HAVING visitors > 0
             ORDER BY visitors DESC
             LIMIT 10
           ' > /tmp/top-countries.json 2>/dev/null || echo '[]' > /tmp/top-countries.json
 
-          # Visitor segments
-          bq query --use_legacy_sql=false --format=json --location=US '
+          # Visitor segments from materialized table
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(COUNTIF(visitor_segment = "converter"), 0) as converters,
               COALESCE(COUNTIF(visitor_segment = "high_intent"), 0) as high_intent,
               COALESCE(COUNTIF(visitor_segment = "engaged_explorer"), 0) as engaged_explorers,
               COALESCE(COUNTIF(visitor_segment = "returning_visitor"), 0) as returning_visitors,
               COALESCE(COUNTIF(visitor_segment = "casual_browser" OR visitor_segment = "engaged_new"), 0) as casual_browsers
-            FROM `portfolio-483605.analytics_processed.v_visitor_insights`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.visitor_insights`
           ' > /tmp/visitor-segments.json 2>/dev/null || echo '[{}]' > /tmp/visitor-segments.json
 
-          # Conversion funnel (event_date is STRING in YYYYMMDD format)
-          bq query --use_legacy_sql=false --format=json --location=US '
+          # Conversion funnel from materialized table
+          bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(SUM(total_cta_views), 0) as cta_views,
               COALESCE(SUM(total_cta_clicks), 0) as cta_clicks,
@@ -259,9 +511,9 @@ jobs:
               COALESCE(SUM(contact_form_submissions), 0) as form_submissions,
               COALESCE(SUM(resume_downloads), 0) as resume_downloads,
               COALESCE(SUM(social_clicks), 0) as social_clicks
-            FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
-            WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY))
-              AND event_date <= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.conversion_funnel`
+            WHERE PARSE_DATE("%Y%m%d", event_date) >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
+              AND PARSE_DATE("%Y%m%d", event_date) <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
           ' > /tmp/conversion-funnel.json 2>/dev/null || echo '[{}]' > /tmp/conversion-funnel.json
 
           echo "Dashboard metrics exported"
@@ -310,30 +562,30 @@ jobs:
                    /tmp/skill-rankings.json /tmp/project-rankings.json /tmp/client-rankings.json; do
             jq empty "$f" 2>/dev/null || echo '[]' > "$f"
           done
-          for f in /tmp/visitor-segments.json /tmp/conversion-funnel.json /tmp/recommendations.json; do
+          for f in /tmp/visitor-segments.json /tmp/conversion-funnel.json; do
             jq empty "$f" 2>/dev/null || echo '[{}]' > "$f"
           done
 
-          # Calculate overview (7-day summary)
-          OVERVIEW=$(bq query --use_legacy_sql=false --format=json --location=US '
+          # Calculate overview (7-day summary) from materialized table
+          OVERVIEW=$(bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(SUM(unique_visitors), 0) as total_visitors_7d,
               COALESCE(SUM(total_sessions), 0) as total_sessions_7d,
               ROUND(COALESCE(AVG(engagement_rate), 0), 1) as engagement_rate,
               ROUND(COALESCE(AVG(bounce_rate), 0), 1) as bounce_rate,
               ROUND(COALESCE(AVG(avg_session_duration_sec), 0), 0) as avg_session_duration_sec
-            FROM `portfolio-483605.analytics_processed.v_daily_metrics`
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.daily_metrics`
             WHERE session_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
               AND session_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
           ' 2>/dev/null | jq '.[0] // {}' || echo '{}')
 
-          CONVERSIONS=$(bq query --use_legacy_sql=false --format=json --location=US '
+          CONVERSIONS=$(bq query --use_legacy_sql=false --format=json --location=${{ env.LOCATION }} '
             SELECT
               COALESCE(SUM(contact_form_submissions), 0) as total_conversions,
               COALESCE(SUM(resume_downloads), 0) as resume_downloads
-            FROM `portfolio-483605.analytics_processed.v_conversion_funnel`
-            WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY))
-              AND event_date <= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
+            FROM `${{ env.PROJECT_ID }}.${{ env.MATERIALIZED_DATASET }}.conversion_funnel`
+            WHERE PARSE_DATE("%Y%m%d", event_date) >= DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
+              AND PARSE_DATE("%Y%m%d", event_date) <= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
           ' 2>/dev/null | jq '.[0] // {}' || echo '{}')
 
           COMBINED_OVERVIEW=$(echo "$OVERVIEW" "$CONVERSIONS" | jq -s '.[0] * .[1]')
@@ -346,7 +598,6 @@ jobs:
             --argjson topCountries "$(cat /tmp/top-countries.json)" \
             --argjson visitorSegments "$(jq '.[0] // {}' /tmp/visitor-segments.json)" \
             --argjson conversionFunnel "$(jq '.[0] // {}' /tmp/conversion-funnel.json)" \
-            --argjson recommendations "$(jq '.[0] // {}' /tmp/recommendations.json)" \
             --argjson domains "$(cat /tmp/domain-rankings.json)" \
             --argjson experiences "$(cat /tmp/experience-rankings.json)" \
             --argjson skills "$(cat /tmp/skill-rankings.json)" \
@@ -361,7 +612,6 @@ jobs:
               topCountries: $topCountries,
               visitorSegments: $visitorSegments,
               conversionFunnel: $conversionFunnel,
-              recommendations: $recommendations,
               domains: $domains,
               experiences: $experiences,
               skills: $skills,
@@ -384,6 +634,19 @@ jobs:
           echo "========================================"
           echo "Materialization Complete!"
           echo "========================================"
+          echo "Materialized Tables (31 total):"
+          echo "  Layer 1 (9): sessions, page_views, project_events, section_events,"
+          echo "    skill_events, conversion_events, client_events,"
+          echo "    recommendation_events, certification_events"
+          echo "  Layer 2 (11): daily_metrics, project_daily_stats, section_daily_stats,"
+          echo "    skill_daily_stats, traffic_daily_stats, conversion_funnel,"
+          echo "    client_daily_stats, domain_daily_stats, experience_daily_stats,"
+          echo "    recommendation_daily_stats, content_reading_stats"
+          echo "  Layer 3 (10): project_rankings, skill_rankings, section_rankings,"
+          echo "    visitor_insights, recommendations, client_rankings, domain_rankings,"
+          echo "    experience_rankings, recommendation_performance, tech_demand_insights"
+          echo "  ML (1): ml_training_data"
+          echo ""
           echo "Gists updated:"
           echo "  - Rankings: https://gist.github.com/AbhinavSarkarr/7983bb85c69ec4cc45fe37b6a8d2d391"
           echo "  - Dashboard: https://gist.github.com/AbhinavSarkarr/dedbbf6ebcb32542e7b724b86f2b214f"

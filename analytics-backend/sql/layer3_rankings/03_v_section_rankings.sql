@@ -16,13 +16,10 @@ WITH section_7day AS (
     AVG(avg_scroll_depth_percent) AS avg_scroll_depth_percent,
     MAX(max_scroll_milestone) AS max_scroll_milestone,
     SUM(exits) AS total_exits,
-    AVG(exit_rate) AS avg_exit_rate,
-
-    -- Navigation flows
-    ARRAY_CONCAT_AGG(top_navigation_flows) AS all_navigation_flows
+    AVG(exit_rate) AS avg_exit_rate
 
   FROM `portfolio-483605.analytics_processed.v_section_daily_stats`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY section_id
 ),
 
@@ -84,9 +81,6 @@ SELECT
     WHEN avg_time_spent_seconds < 3 THEN 'make_more_engaging'
     ELSE 'performing_well'
   END AS optimization_hint,
-
-  -- Navigation context
-  all_navigation_flows,
 
   -- Last updated
   CURRENT_TIMESTAMP() AS ranked_at

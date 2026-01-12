@@ -24,26 +24,20 @@ SELECT
   COUNTIF(device_category = 'desktop') AS desktop_sessions,
   COUNTIF(device_category = 'mobile') AS mobile_sessions,
 
-  -- Top landing pages
-  ARRAY_AGG(
-    STRUCT(landing_page, COUNT(*) AS entries)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_landing_pages,
 
-  -- Geographic distribution
-  ARRAY_AGG(
-    STRUCT(country, COUNT(*) AS sessions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_countries,
 
-  -- Browser distribution
-  ARRAY_AGG(
-    STRUCT(browser, COUNT(*) AS sessions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 3
-  ) AS top_browsers
+
+  -- Engagement quality by source (NEW - from enhanced v_sessions)
+  ROUND(AVG(engagement_score), 1) AS avg_engagement_score,
+  COUNTIF(engagement_level IN ('very_high', 'high')) AS high_engagement_sessions,
+  ROUND(COUNTIF(engagement_level IN ('very_high', 'high')) * 100.0 / NULLIF(COUNT(*), 0), 2) AS high_engagement_rate,
+
+  -- Returning visitors by source (NEW)
+  COUNTIF(is_returning = true) AS returning_visitors,
+  ROUND(COUNTIF(is_returning = true) * 100.0 / NULLIF(COUNT(*), 0), 2) AS returning_visitor_rate,
+
+  -- Scroll depth by source (NEW)
+  ROUND(AVG(max_scroll_depth), 1) AS avg_scroll_depth
 
 FROM `portfolio-483605.analytics_processed.v_sessions`
 GROUP BY event_date, traffic_source, traffic_medium, campaign_name

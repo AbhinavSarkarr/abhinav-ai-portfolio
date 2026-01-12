@@ -36,16 +36,25 @@ SELECT
     2
   ) AS exit_rate,
 
-  -- Navigation patterns
-  ARRAY_AGG(
-    STRUCT(from_section, to_section, COUNT(*) AS transitions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_navigation_flows,
-
   -- Device breakdown
   COUNTIF(device_category = 'desktop') AS desktop_views,
-  COUNTIF(device_category = 'mobile') AS mobile_views
+  COUNTIF(device_category = 'mobile') AS mobile_views,
+
+  -- Section flow context (NEW - from enhanced v_section_events)
+  COUNTIF(entry_direction = 'down') AS entries_from_above,
+  COUNTIF(entry_direction = 'up') AS entries_from_below,
+  COUNTIF(exit_direction = 'down') AS continued_to_next,
+  COUNTIF(exit_direction = 'up') AS went_back_up,
+  ROUND(COUNTIF(exit_direction = 'down') * 100.0 / NULLIF(COUNTIF(event_name = 'section_exit'), 0), 2) AS continue_rate,
+
+  -- Section position analysis (NEW)
+  ROUND(AVG(section_position), 1) AS avg_section_position,
+
+  -- Scroll behavior analysis (NEW)
+  ROUND(AVG(scroll_velocity), 1) AS avg_scroll_velocity,
+  ROUND(AVG(time_to_reach_depth_sec), 1) AS avg_time_to_scroll_depth,
+  COUNTIF(is_bouncing = 'true') AS bouncing_sessions,
+  ROUND(COUNTIF(is_bouncing = 'true') * 100.0 / NULLIF(COUNT(*), 0), 2) AS bounce_rate_from_section,
 
 FROM `portfolio-483605.analytics_processed.v_section_events`
 WHERE section_id IS NOT NULL

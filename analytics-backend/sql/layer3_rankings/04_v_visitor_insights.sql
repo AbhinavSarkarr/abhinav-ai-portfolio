@@ -12,9 +12,9 @@ WITH visitor_sessions AS (
     SUM(page_views) AS total_page_views,
     AVG(session_duration_seconds) AS avg_session_duration,
     COUNTIF(is_engaged) AS engaged_sessions,
-    MODE() WITHIN GROUP (ORDER BY device_category) AS primary_device,
-    MODE() WITHIN GROUP (ORDER BY country) AS primary_country,
-    MODE() WITHIN GROUP (ORDER BY traffic_source) AS primary_traffic_source,
+    ANY_VALUE(device_category) AS primary_device,
+    ANY_VALUE(country) AS primary_country,
+    ANY_VALUE(traffic_source) AS primary_traffic_source,
     ARRAY_AGG(DISTINCT landing_page IGNORE NULLS LIMIT 5) AS landing_pages,
     ARRAY_AGG(DISTINCT exit_page IGNORE NULLS LIMIT 5) AS exit_pages
 
@@ -32,7 +32,7 @@ visitor_projects AS (
     ARRAY_AGG(DISTINCT technology IGNORE NULLS LIMIT 10) AS technologies_explored
 
   FROM `portfolio-483605.analytics_processed.v_project_events`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
   GROUP BY user_pseudo_id
 ),
 
@@ -43,7 +43,7 @@ visitor_skills AS (
     ARRAY_AGG(DISTINCT skill_category IGNORE NULLS LIMIT 5) AS skill_categories
 
   FROM `portfolio-483605.analytics_processed.v_skill_events`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
   GROUP BY user_pseudo_id
 ),
 

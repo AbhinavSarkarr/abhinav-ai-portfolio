@@ -26,3 +26,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+analytics-backend/functions/venv
+
+# Google Cloud credentials (NEVER commit)
+analytics-backend/credentials/
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!tsconfig.*.json
+
+analytics-backend/functions/__pycache__

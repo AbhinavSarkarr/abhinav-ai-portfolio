@@ -12,7 +12,14 @@ WITH reading_events AS (
     client_name,
     domain,
     event_name,
-    read_time_seconds
+    read_time_seconds,
+    -- NEW: Enhanced context fields
+    is_first_view,
+    is_deep_read,
+    completion_rate,
+    was_recommended,
+    time_since_session_start,
+    device_category
   FROM `portfolio-483605.analytics_processed.v_client_events`
   WHERE event_name IN ('problem_statement_read', 'solution_read')
 )
@@ -43,28 +50,28 @@ SELECT
     2
   ) AS problem_to_solution_time_ratio,
 
-  -- Per domain reading patterns
-  ARRAY_AGG(
-    STRUCT(
-      domain,
-      AVG(CASE WHEN event_name = 'problem_statement_read' THEN read_time_seconds END) AS avg_problem_time,
-      AVG(CASE WHEN event_name = 'solution_read' THEN read_time_seconds END) AS avg_solution_time
-    )
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS domain_reading_patterns,
+  -- Reading context (NEW - from enhanced v_client_events)
+  COUNTIF(is_first_view = 'true') AS first_time_readers,
+  ROUND(COUNTIF(is_first_view = 'true') * 100.0 / NULLIF(COUNT(DISTINCT CONCAT(user_pseudo_id, '-', session_id)), 0), 2) AS first_time_reader_rate,
 
-  -- Per client reading patterns
-  ARRAY_AGG(
-    STRUCT(
-      client_name,
-      AVG(CASE WHEN event_name = 'problem_statement_read' THEN read_time_seconds END) AS avg_problem_time,
-      AVG(CASE WHEN event_name = 'solution_read' THEN read_time_seconds END) AS avg_solution_time,
-      COUNT(*) AS total_reads
-    )
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS client_reading_patterns
+  -- Deep reading engagement (NEW)
+  COUNTIF(is_deep_read = 'true') AS deep_read_events,
+  ROUND(AVG(completion_rate), 1) AS avg_content_completion_rate,
+
+  -- Recommendation influence on reading (NEW)
+  COUNTIF(was_recommended = 'true') AS reads_from_recommendations,
+  ROUND(
+    AVG(CASE WHEN was_recommended = 'true' THEN read_time_seconds END) /
+    NULLIF(AVG(CASE WHEN was_recommended = 'false' OR was_recommended IS NULL THEN read_time_seconds END), 0),
+    2
+  ) AS recommended_vs_organic_read_time_ratio,
+
+  -- Session timing context (NEW)
+  ROUND(AVG(time_since_session_start), 1) AS avg_time_into_session_at_read,
+
+  -- Device reading patterns (NEW)
+  ROUND(AVG(CASE WHEN device_category = 'desktop' THEN read_time_seconds END), 1) AS avg_desktop_read_time,
+  ROUND(AVG(CASE WHEN device_category = 'mobile' THEN read_time_seconds END), 1) AS avg_mobile_read_time
 
 FROM reading_events
 GROUP BY event_date

@@ -17,7 +17,7 @@ WITH rec_7day AS (
     AVG(position_3_ctr) AS avg_position_3_ctr
 
   FROM `portfolio-483605.analytics_processed.v_recommendation_daily_stats`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
 ),
 
 project_performance AS (
@@ -32,7 +32,7 @@ project_performance AS (
       2
     ) AS ctr
   FROM `portfolio-483605.analytics_processed.v_recommendation_events`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY recommended_project_id, recommended_project_title
 ),
 
@@ -42,7 +42,7 @@ source_performance AS (
     COUNTIF(event_name = 'recommendation_click') AS clicks_generated,
     COUNT(DISTINCT CASE WHEN event_name = 'recommendation_click' THEN recommended_project_id END) AS unique_projects_clicked
   FROM `portfolio-483605.analytics_processed.v_recommendation_events`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY source_project_id
 )
 

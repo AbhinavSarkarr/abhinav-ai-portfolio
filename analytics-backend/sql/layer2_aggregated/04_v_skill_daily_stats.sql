@@ -21,29 +21,24 @@ SELECT
   (COUNTIF(event_name = 'skill_click') * 3 +
    COUNTIF(event_name = 'skill_hover') * 1) AS weighted_interest_score,
 
-  -- Context (where skill was interacted with)
-  ARRAY_AGG(
-    DISTINCT interaction_context IGNORE NULLS
-    ORDER BY interaction_context
-    LIMIT 5
-  ) AS interaction_contexts,
-
   -- Position impact
   AVG(skill_position) AS avg_position,
 
-  -- Traffic source correlation
-  ARRAY_AGG(
-    STRUCT(traffic_source AS source, COUNT(*) AS interactions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 3
-  ) AS top_traffic_sources,
+  -- Skill level distribution (NEW - from enhanced v_skill_events)
+  COUNTIF(skill_level = 'advanced') AS advanced_skill_clicks,
+  COUNTIF(skill_level = 'intermediate') AS intermediate_skill_clicks,
+  COUNTIF(skill_level = 'beginner') AS beginner_skill_clicks,
 
-  -- Geographic interest
-  ARRAY_AGG(
-    STRUCT(country, COUNT(*) AS interactions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_countries
+  -- Related projects context (NEW)
+  ROUND(AVG(related_projects_count), 1) AS avg_related_projects,
+
+  -- User journey context (NEW)
+  ROUND(AVG(time_on_site_sec), 1) AS avg_time_on_site_before_click,
+  ROUND(AVG(projects_viewed_before), 1) AS avg_projects_viewed_before_click,
+  ROUND(AVG(sections_viewed), 1) AS avg_sections_viewed_before_click,
+
+  -- Viewport visibility (NEW)
+  COUNTIF(was_in_viewport = 'true') AS clicks_while_in_viewport
 
 FROM `portfolio-483605.analytics_processed.v_skill_events`
 WHERE skill_name IS NOT NULL

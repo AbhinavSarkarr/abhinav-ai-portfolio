@@ -20,6 +20,15 @@ SELECT
     r'#([a-zA-Z0-9_-]+)'
   ) AS section_hash,
 
+  -- Navigation context (NEW)
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'previous_page') AS previous_page,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'page_type') AS page_type,
+
+  -- Session depth (NEW)
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'page_number') AS page_number,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_on_previous_page') AS time_on_previous_page_sec,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_since_session_start') AS time_since_session_start_sec,
+
   -- Engagement
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'engagement_time_msec') AS engagement_time_msec,
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'entrances') AS is_entrance,

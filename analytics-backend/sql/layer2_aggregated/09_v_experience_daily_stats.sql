@@ -14,23 +14,17 @@ SELECT
   COUNT(DISTINCT user_pseudo_id) AS unique_interested_users,
   COUNT(DISTINCT session_id) AS unique_sessions,
 
-  -- Traffic source (who's looking at these roles?)
-  ARRAY_AGG(
-    STRUCT(traffic_source AS source, COUNT(*) AS interactions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_traffic_sources,
 
-  -- Geographic interest (where are interested visitors from?)
-  ARRAY_AGG(
-    STRUCT(country, COUNT(*) AS interactions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_countries,
 
   -- Device breakdown
   COUNTIF(device_category = 'desktop') AS desktop_views,
-  COUNTIF(device_category = 'mobile') AS mobile_views
+  COUNTIF(device_category = 'mobile') AS mobile_views,
+
+  -- Experience engagement context (NEW - from enhanced v_client_events)
+  COUNTIF(is_first_view = 'true') AS first_time_views,
+  COUNTIF(is_deep_read = 'true') AS deep_reads,
+  ROUND(AVG(completion_rate), 1) AS avg_completion_rate,
+  ROUND(AVG(time_since_session_start), 1) AS avg_time_into_session
 
 FROM `portfolio-483605.analytics_processed.v_client_events`
 WHERE event_name = 'experience_level_interest'

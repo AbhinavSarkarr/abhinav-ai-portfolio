@@ -16,7 +16,7 @@ WITH experience_7day AS (
     SUM(unique_sessions) AS total_sessions
 
   FROM `portfolio-483605.analytics_processed.v_experience_daily_stats`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY experience_id, experience_title, company
 )
 

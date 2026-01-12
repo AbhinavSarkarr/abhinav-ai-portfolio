@@ -13,16 +13,10 @@ WITH skill_7day AS (
     SUM(hovers) AS total_hovers,
     SUM(unique_users) AS total_unique_users,
     SUM(unique_sessions) AS total_unique_sessions,
-    SUM(weighted_interest_score) AS total_interest_score,
-
-    -- Traffic source aggregation
-    ARRAY_CONCAT_AGG(top_traffic_sources) AS all_traffic_sources,
-
-    -- Geographic aggregation
-    ARRAY_CONCAT_AGG(top_countries) AS all_countries
+    SUM(weighted_interest_score) AS total_interest_score
 
   FROM `portfolio-483605.analytics_processed.v_skill_daily_stats`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY skill_name, skill_category
 )
 
@@ -60,10 +54,6 @@ SELECT
     WHEN ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) <= 10 THEN 'showcase_more'
     ELSE 'consider_highlighting'
   END AS recommendation,
-
-  -- Traffic and geo context
-  all_traffic_sources,
-  all_countries,
 
   -- Last updated
   CURRENT_TIMESTAMP() AS ranked_at

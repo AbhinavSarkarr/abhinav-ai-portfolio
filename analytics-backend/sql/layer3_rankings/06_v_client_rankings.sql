@@ -24,7 +24,7 @@ WITH client_7day AS (
     AVG(case_study_open_rate) AS avg_case_study_open_rate
 
   FROM `portfolio-483605.analytics_processed.v_client_daily_stats`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY client_id, client_name, domain
 ),
 

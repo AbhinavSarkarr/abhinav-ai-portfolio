@@ -123,7 +123,7 @@ client_interactions AS (
     -- Domain interests
     COUNT(DISTINCT domain) AS unique_domains_explored,
     COUNTIF(event_name = 'domain_interest') AS domain_interest_signals,
-    STRING_AGG(DISTINCT domain IGNORE NULLS, ',' ORDER BY domain) AS domains_explored,
+    STRING_AGG(DISTINCT domain, ',' ORDER BY domain) AS domains_explored,
 
     -- Content reading patterns
     COUNTIF(event_name = 'problem_statement_read') AS problem_reads,
@@ -136,7 +136,7 @@ client_interactions AS (
 
     -- Tech stack interest from client work
     COUNTIF(event_name = 'client_tech_stack_click') AS client_tech_clicks,
-    STRING_AGG(DISTINCT technology IGNORE NULLS, ',' ORDER BY technology) AS client_technologies_clicked,
+    STRING_AGG(DISTINCT technology, ',' ORDER BY technology) AS client_technologies_clicked,
 
     -- Experience/role interest
     COUNTIF(event_name = 'experience_level_interest') AS experience_interest_signals

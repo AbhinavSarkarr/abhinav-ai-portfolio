@@ -1,0 +1,5 @@
+fastapi==0.109.*
+uvicorn==0.27.*
+google-cloud-bigquery==3.*
+mangum==0.17.*
+python-dateutil==2.*

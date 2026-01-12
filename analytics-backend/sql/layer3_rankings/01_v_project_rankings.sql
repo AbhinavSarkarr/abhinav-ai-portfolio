@@ -24,7 +24,7 @@ WITH project_7day AS (
     ARRAY_CONCAT_AGG(technologies_clicked) AS all_technologies_clicked
 
   FROM `portfolio-483605.analytics_processed.v_project_daily_stats`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY project_id, project_title, project_category
 ),
 

@@ -36,31 +36,45 @@ SELECT
     2
   ) AS position_3_ctr,
 
-  -- Top performing recommended projects
-  ARRAY_AGG(
-    STRUCT(
-      recommended_project_id,
-      recommended_project_title,
-      COUNTIF(event_name = 'recommendation_shown') AS impressions,
-      COUNTIF(event_name = 'recommendation_click') AS clicks
-    )
-    ORDER BY COUNTIF(event_name = 'recommendation_click') DESC
-    LIMIT 5
-  ) AS top_recommended_projects,
-
-  -- Top source projects (which projects drive most rec clicks)
-  ARRAY_AGG(
-    STRUCT(
-      source_project_id,
-      COUNTIF(event_name = 'recommendation_click') AS clicks_generated
-    )
-    ORDER BY COUNTIF(event_name = 'recommendation_click') DESC
-    LIMIT 5
-  ) AS top_source_projects,
-
   -- Device breakdown
   COUNTIF(device_category = 'desktop' AND event_name = 'recommendation_click') AS desktop_clicks,
-  COUNTIF(device_category = 'mobile' AND event_name = 'recommendation_click') AS mobile_clicks
+  COUNTIF(device_category = 'mobile' AND event_name = 'recommendation_click') AS mobile_clicks,
+
+  -- Algorithm performance (NEW - from enhanced v_recommendation_events)
+  ROUND(
+    COUNTIF(event_name = 'recommendation_click' AND recommendation_algorithm = 'category_match') * 100.0 /
+    NULLIF(COUNTIF(event_name = 'recommendation_shown' AND recommendation_algorithm = 'category_match'), 0),
+    2
+  ) AS category_match_ctr,
+  ROUND(
+    COUNTIF(event_name = 'recommendation_click' AND recommendation_algorithm = 'tech_stack') * 100.0 /
+    NULLIF(COUNTIF(event_name = 'recommendation_shown' AND recommendation_algorithm = 'tech_stack'), 0),
+    2
+  ) AS tech_stack_ctr,
+  ROUND(
+    COUNTIF(event_name = 'recommendation_click' AND recommendation_algorithm = 'popularity') * 100.0 /
+    NULLIF(COUNTIF(event_name = 'recommendation_shown' AND recommendation_algorithm = 'popularity'), 0),
+    2
+  ) AS popularity_ctr,
+
+  -- Visibility impact (NEW)
+  ROUND(
+    COUNTIF(event_name = 'recommendation_click' AND is_above_fold = 'true') * 100.0 /
+    NULLIF(COUNTIF(event_name = 'recommendation_shown' AND is_above_fold = 'true'), 0),
+    2
+  ) AS above_fold_ctr,
+  ROUND(
+    COUNTIF(event_name = 'recommendation_click' AND is_above_fold = 'false') * 100.0 /
+    NULLIF(COUNTIF(event_name = 'recommendation_shown' AND is_above_fold = 'false'), 0),
+    2
+  ) AS below_fold_ctr,
+
+  -- Decision time (NEW)
+  ROUND(AVG(CASE WHEN event_name = 'recommendation_click' THEN time_since_shown_sec END), 1) AS avg_time_to_click_sec,
+
+  -- User context (NEW)
+  ROUND(AVG(projects_viewed_before), 1) AS avg_projects_viewed_before_rec,
+  COUNTIF(user_viewed_similar = 'true' AND event_name = 'recommendation_click') AS clicks_after_viewing_similar
 
 FROM `portfolio-483605.analytics_processed.v_recommendation_events`
 GROUP BY event_date

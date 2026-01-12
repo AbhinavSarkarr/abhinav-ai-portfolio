@@ -18,6 +18,14 @@ SELECT
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'context') AS interaction_context,
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'skill_position') AS skill_position,
 
+  -- Skill engagement context (NEW)
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'skill_level') AS skill_level,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'related_projects_count') AS related_projects_count,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_on_site') AS time_on_site_sec,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'projects_viewed_before') AS projects_viewed_before,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'sections_viewed') AS sections_viewed,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'was_in_viewport') AS was_in_viewport,
+
   -- Device
   device.category AS device_category,
   device.browser AS browser,

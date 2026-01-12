@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import ProjectDetail from "./pages/ProjectDetail";
 import ClientDetail from "./pages/ClientDetail";
 import Dashboard from "./pages/Dashboard";
+import Dashboard2 from "./pages/Dashboard2";
 import NotFound from "./pages/NotFound";
 import { RecommenderProvider } from "@/context/RecommenderContext";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
@@ -117,6 +118,7 @@ const App = () => (
               <Route path="/project/:id" element={<ProjectDetail />} />
               <Route path="/client/:experienceId/:clientId" element={<ClientDetail />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard2" element={<Dashboard2 />} />
 
               {/* UTM Redirect Routes - Short URLs with hidden tracking */}
               {/* LinkedIn */}

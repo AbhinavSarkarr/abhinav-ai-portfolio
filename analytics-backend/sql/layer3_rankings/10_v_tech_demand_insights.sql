@@ -15,7 +15,7 @@ WITH tech_from_clients AS (
   FROM `portfolio-483605.analytics_processed.v_client_events`
   WHERE event_name = 'client_tech_stack_click'
     AND technology IS NOT NULL
-    AND event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+    AND event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY technology, domain
 ),
 
@@ -30,7 +30,7 @@ tech_from_projects AS (
   FROM `portfolio-483605.analytics_processed.v_project_events`
   WHERE event_name = 'technology_interest'
     AND technology IS NOT NULL
-    AND event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+    AND event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY technology, project_category
 ),
 
@@ -43,7 +43,7 @@ tech_from_skills AS (
     COUNT(*) AS interactions,
     COUNT(DISTINCT user_pseudo_id) AS unique_users
   FROM `portfolio-483605.analytics_processed.v_skill_events`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   GROUP BY skill_name, skill_category
 ),
 
@@ -59,20 +59,7 @@ tech_aggregated AS (
   SELECT
     technology,
     SUM(interactions) AS total_interactions,
-    SUM(unique_users) AS total_unique_users,
-
-    -- Domain breakdown
-    ARRAY_AGG(
-      STRUCT(domain, SUM(interactions) AS interactions)
-      ORDER BY SUM(interactions) DESC
-      LIMIT 5
-    ) AS domain_breakdown,
-
-    -- Source breakdown
-    ARRAY_AGG(
-      STRUCT(source, SUM(interactions) AS interactions)
-      ORDER BY SUM(interactions) DESC
-    ) AS source_breakdown
+    SUM(unique_users) AS total_unique_users
 
   FROM all_tech
   WHERE technology IS NOT NULL
@@ -106,10 +93,6 @@ SELECT
     WHEN ROW_NUMBER() OVER (ORDER BY total_interactions DESC) <= 10 THEN 'strengthen_skills'
     ELSE 'maintain_awareness'
   END AS learning_priority,
-
-  -- Context
-  domain_breakdown,
-  source_breakdown,
 
   CURRENT_TIMESTAMP() AS generated_at
 

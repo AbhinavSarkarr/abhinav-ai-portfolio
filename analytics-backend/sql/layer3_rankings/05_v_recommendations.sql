@@ -20,7 +20,7 @@ WITH visitor_project_affinity AS (
      SUM(CASE WHEN event_name = 'project_link_click' THEN 7 ELSE 0 END)) AS affinity_score
 
   FROM `portfolio-483605.analytics_processed.v_project_events`
-  WHERE event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+  WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
     AND project_id IS NOT NULL
   GROUP BY user_pseudo_id, project_id
 ),

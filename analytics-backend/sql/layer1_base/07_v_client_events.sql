@@ -31,6 +31,15 @@ SELECT
   -- Technology from client work
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'technology') AS technology,
 
+  -- Client engagement context (NEW)
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_first_view') AS is_first_view,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'clients_viewed_before') AS clients_viewed_before,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_deep_read') AS is_deep_read,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'completion_rate') AS completion_rate,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'was_recommended') AS was_recommended,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'contributions_read_count') AS contributions_read_count,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_since_session_start') AS time_since_session_start,
+
   -- Device
   device.category AS device_category,
   device.browser AS browser,

@@ -25,23 +25,30 @@ SELECT
   COUNTIF(device_category = 'mobile') AS mobile_sessions,
   COUNTIF(device_category = 'tablet') AS tablet_sessions,
 
-  -- Top traffic sources (as struct)
-  ARRAY_AGG(
-    STRUCT(traffic_source AS source, traffic_medium AS medium)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_traffic_sources,
-
-  -- Top countries
-  ARRAY_AGG(
-    STRUCT(country, COUNT(*) AS sessions)
-    ORDER BY COUNT(*) DESC
-    LIMIT 5
-  ) AS top_countries,
-
   -- Time patterns
   ROUND(AVG(session_hour), 1) AS avg_session_hour,
-  MODE() WITHIN GROUP (ORDER BY session_day_of_week) AS most_common_day
+
+  -- Engagement score metrics (NEW - from enhanced v_sessions)
+  ROUND(AVG(engagement_score), 1) AS avg_engagement_score,
+  COUNTIF(engagement_level = 'very_high') AS very_high_engagement_sessions,
+  COUNTIF(engagement_level = 'high') AS high_engagement_sessions,
+  COUNTIF(engagement_level = 'medium') AS medium_engagement_sessions,
+  COUNTIF(engagement_level = 'low') AS low_engagement_sessions,
+
+  -- Returning visitor metrics (NEW)
+  COUNTIF(is_returning = true) AS returning_visitor_sessions,
+  ROUND(COUNTIF(is_returning = true) * 100.0 / NULLIF(COUNT(*), 0), 2) AS returning_visitor_rate,
+  AVG(CASE WHEN is_returning = true THEN visit_count END) AS avg_visit_count_returning,
+
+  -- User preferences (NEW)
+  COUNTIF(color_scheme = 'dark') AS dark_mode_sessions,
+  COUNTIF(color_scheme = 'light') AS light_mode_sessions,
+  ROUND(COUNTIF(color_scheme = 'dark') * 100.0 / NULLIF(COUNT(*), 0), 2) AS dark_mode_percentage,
+
+  -- Connection quality (NEW)
+  COUNTIF(connection_type = '4g') AS sessions_4g,
+  COUNTIF(connection_type = 'wifi') AS sessions_wifi,
+  COUNTIF(connection_type IN ('3g', '2g')) AS sessions_slow_connection
 
 FROM `portfolio-483605.analytics_processed.v_sessions`
 GROUP BY session_date

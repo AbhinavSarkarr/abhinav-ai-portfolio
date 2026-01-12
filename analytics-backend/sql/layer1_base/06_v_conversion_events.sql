@@ -45,6 +45,26 @@ SELECT
   -- Publication
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'publication_title') AS publication_title,
 
+  -- Conversion context (NEW)
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_on_site_before_start') AS time_on_site_before_start,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'sections_viewed') AS sections_viewed,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'projects_viewed') AS projects_viewed,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'projects_clicked_before') AS projects_clicked_before,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'scroll_depth_at_start') AS scroll_depth_at_start,
+
+  -- Form engagement (NEW)
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'message_length') AS message_length,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_to_submit') AS time_to_submit_sec,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_returning_visitor') AS is_returning_visitor,
+
+  -- Download context (NEW)
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'download_source') AS download_source,
+
+  -- Exit behavior (NEW)
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'exit_trigger') AS exit_trigger,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'was_idle') AS was_idle,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'conversions_count') AS conversions_count,
+
   -- Device
   device.category AS device_category,
   device.browser AS browser,

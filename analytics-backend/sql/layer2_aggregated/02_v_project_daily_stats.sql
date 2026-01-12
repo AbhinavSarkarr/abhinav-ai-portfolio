@@ -48,7 +48,30 @@ SELECT
 
   -- Device breakdown
   COUNTIF(device_category = 'desktop') AS desktop_interactions,
-  COUNTIF(device_category = 'mobile') AS mobile_interactions
+  COUNTIF(device_category = 'mobile') AS mobile_interactions,
+
+  -- First view & discovery metrics (NEW - from enhanced v_project_events)
+  COUNTIF(is_first_view = 'true') AS first_time_views,
+  ROUND(AVG(projects_viewed_before), 1) AS avg_projects_viewed_before,
+
+  -- Recommendation performance (NEW)
+  COUNTIF(was_recommended = 'true') AS recommended_project_views,
+  ROUND(COUNTIF(was_recommended = 'true') * 100.0 / NULLIF(COUNTIF(event_name = 'project_view'), 0), 2) AS recommended_view_rate,
+
+  -- Click behavior (NEW)
+  ROUND(AVG(hover_duration_sec), 1) AS avg_hover_duration_sec,
+  COUNTIF(projects_clicked_before = 0) AS first_project_clicks,
+
+  -- Skill-to-project journey (NEW)
+  COUNTIF(is_from_skill_click = 'true') AS skill_driven_clicks,
+  ROUND(COUNTIF(is_from_skill_click = 'true') * 100.0 / NULLIF(COUNTIF(event_name = 'project_click'), 0), 2) AS skill_driven_click_rate,
+  ARRAY_AGG(DISTINCT source_skill IGNORE NULLS ORDER BY source_skill LIMIT 10) AS source_skills,
+
+  -- Case study engagement quality (NEW)
+  COUNTIF(is_deep_read = 'true') AS deep_reads,
+  ROUND(AVG(scroll_depth_percent), 1) AS avg_case_study_scroll_depth,
+  ROUND(AVG(completion_rate), 1) AS avg_case_study_completion_rate,
+  ROUND(AVG(sections_read_count), 1) AS avg_sections_read
 
 FROM `portfolio-483605.analytics_processed.v_project_events`
 WHERE project_id IS NOT NULL

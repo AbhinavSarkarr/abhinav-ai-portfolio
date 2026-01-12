@@ -22,6 +22,25 @@ SELECT
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'view_duration') AS view_duration_ms,
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_on_page') AS time_on_page_sec,
 
+  -- Project view context (NEW)
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_first_view') AS is_first_view,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'projects_viewed_before') AS projects_viewed_before,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'was_recommended') AS was_recommended,
+
+  -- Click behavior (NEW)
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'hover_duration_seconds') AS hover_duration_sec,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'projects_clicked_before') AS projects_clicked_before,
+
+  -- Skill-to-project journey (NEW)
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_from_skill_click') AS is_from_skill_click,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'source_skill') AS source_skill,
+
+  -- Case study engagement (NEW)
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'scroll_depth_percent') AS scroll_depth_percent,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'sections_read_count') AS sections_read_count,
+  (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'completion_rate') AS completion_rate,
+  (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_deep_read') AS is_deep_read,
+
   -- Link details (for click events)
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'link_type') AS link_type,
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'link_url') AS link_url,
