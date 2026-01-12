@@ -1,7 +1,7 @@
 # GA4 Tracking Functions - Complete Documentation
 
 **Location:** `src/hooks/useAnalytics.ts`
-**Total Functions:** 56 (42 original + 14 new/enhanced)
+**Total Functions:** 57 (42 original + 15 new/enhanced)
 
 ---
 
@@ -15,6 +15,7 @@
    - [Client Tracking](#32-client-tracking)
    - [Recommendation Tracking](#33-recommendation-tracking)
    - [Conversion Tracking](#34-conversion-tracking)
+   - [Analytics Dashboard Tracking](#34-analytics-dashboard-tracking)
    - [Skills & Content Tracking](#35-skills--content-tracking)
    - [Interaction Tracking](#36-interaction-tracking)
 5. [Advanced Engagement Tracking (NEW)](#4-advanced-engagement-tracking-new)
@@ -615,7 +616,51 @@ Resume download = serious consideration for a role:
 
 ---
 
-### 3.4 Skills & Content Tracking
+### 3.4 Analytics Dashboard Tracking
+
+#### `trackAnalyticsDashboardClick()` (NEW)
+
+**Purpose:** Records when someone clicks the "View Live Analytics Dashboard" button
+
+**Returned Data:**
+```json
+{
+  "event": "analytics_dashboard_click",
+
+  "time_on_site_seconds": 120,
+  "scroll_depth_at_click": 45,
+  "pipeline_steps_visible": 7,
+  "is_returning_visitor": true,
+  "visit_count": 2,
+  "traffic_source": "linkedin",
+  "device_type": "desktop"
+}
+```
+
+**Fields Explained:**
+- `time_on_site_seconds`: How long they explored before clicking
+- `scroll_depth_at_click`: Max scroll depth when clicked
+- `pipeline_steps_visible`: 7 if they viewed the data pipeline section, 0 if not
+- `is_returning_visitor`: Have they been here before?
+- `visit_count`: Which visit number (1st, 2nd, 3rd...)
+- `traffic_source`: UTM source or "direct"
+- `device_type`: desktop/mobile/tablet
+
+**Portfolio Role:**
+Clicking the analytics dashboard indicates **technical curiosity** - these visitors:
+- Want to see the "behind the scenes" of your portfolio
+- Are likely developers, data engineers, or technically-minded recruiters
+- Understand and appreciate data-driven approaches
+
+**Real Example:**
+A visitor from LinkedIn (traffic_source: "linkedin") on their 2nd visit (visit_count: 2) clicks the dashboard after spending 2 minutes exploring. This tells you:
+- LinkedIn brings technically curious visitors
+- Returning visitors are more likely to explore deeply
+- Your data pipeline section is compelling
+
+---
+
+### 3.5 Skills & Content Tracking
 
 #### `trackSkillClick()` (Enhanced)
 
@@ -1049,11 +1094,12 @@ The ultimate session report card:
 | **Client Tracking** | 10 | User |
 | **Recommendation Tracking** | 2 | User |
 | **Conversion Tracking** | 5 | User |
+| **Analytics Dashboard (NEW)** | 1 | User |
 | **Skills & Content** | 6 | User |
 | **Interaction Tracking** | 6 | User |
 | **Advanced Engagement (NEW)** | 9 | Mixed |
 | **User Leaves** | 2 | Auto |
-| **TOTAL** | **56** | - |
+| **TOTAL** | **57** | - |
 
 ---
 
