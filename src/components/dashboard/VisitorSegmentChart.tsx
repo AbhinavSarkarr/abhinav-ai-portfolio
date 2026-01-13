@@ -90,9 +90,9 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
   };
 
   return (
-    <div className="flex flex-col lg:flex-row items-center gap-6">
+    <div className="flex flex-col lg:flex-row items-center gap-3">
       {/* Pie Chart */}
-      <div className="w-full lg:w-1/2">
+      <div className="w-full lg:w-2/5">
         <ResponsiveContainer width="100%" height={height}>
           <PieChart>
             <Pie
@@ -101,8 +101,8 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
               cy="50%"
               labelLine={false}
               label={renderCustomLabel}
-              outerRadius={100}
-              innerRadius={60}
+              outerRadius={60}
+              innerRadius={35}
               dataKey="value"
               strokeWidth={0}
             >
@@ -110,9 +110,6 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.color}
-                  style={{
-                    filter: `drop-shadow(0 0 8px ${entry.color}40)`,
-                  }}
                 />
               ))}
             </Pie>
@@ -122,7 +119,7 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
               formatter={(value: number, name: string) => {
                 const segment = chartData.find((d) => d.name === name);
                 return [
-                  `${value} visitors (${((value / total) * 100).toFixed(1)}%)`,
+                  `${value} (${((value / total) * 100).toFixed(1)}%)`,
                   segment?.label || name,
                 ];
               }}
@@ -132,38 +129,33 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
       </div>
 
       {/* Legend */}
-      <div className="w-full lg:w-1/2 space-y-3">
+      <div className="w-full lg:w-3/5 space-y-1.5">
         {chartData.map((segment) => {
           const Icon = segment.icon;
           const percentage = ((segment.value / total) * 100).toFixed(1);
           return (
             <div
               key={segment.name}
-              className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+              className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
             >
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                className="w-6 h-6 rounded flex items-center justify-center"
                 style={{ backgroundColor: `${segment.color}20` }}
               >
-                <Icon size={18} style={{ color: segment.color }} />
+                <Icon size={12} style={{ color: segment.color }} />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-black dark:text-white">
+                  <span className="text-xs font-medium text-black dark:text-white truncate">
                     {segment.label}
                   </span>
-                  <span className="text-sm font-bold text-black dark:text-white">
+                  <span className="text-xs font-bold text-black dark:text-white ml-2">
                     {segment.value}
                   </span>
                 </div>
-                <div className="flex items-center justify-between mt-0.5">
-                  <span className="text-xs text-muted-foreground">
-                    {segment.description}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {percentage}%
-                  </span>
-                </div>
+                <span className="text-[10px] text-muted-foreground">
+                  {segment.description} • {percentage}%
+                </span>
               </div>
             </div>
           );

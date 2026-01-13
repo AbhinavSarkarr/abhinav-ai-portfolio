@@ -137,9 +137,9 @@ export function SectionConclusion({ insights, className = '' }: SectionConclusio
   return (
     <motion.div
       className={`
-        mt-6 p-4 rounded-xl
-        bg-gradient-to-r from-tech-neon/5 via-tech-accent/5 to-transparent
-        border border-tech-accent/20
+        mt-4 p-4 rounded-xl
+        bg-gradient-to-r from-tech-neon/10 via-tech-accent/5 to-transparent
+        border border-tech-accent/30
         ${className}
       `}
       initial={{ opacity: 0, y: 10 }}
@@ -147,19 +147,28 @@ export function SectionConclusion({ insights, className = '' }: SectionConclusio
       transition={{ duration: 0.4 }}
     >
       <div className="flex items-center gap-2 mb-3">
-        <Lightbulb size={16} className="text-tech-accent" />
-        <span className="text-sm font-semibold text-foreground">Key Takeaways</span>
+        <div className="p-1.5 rounded-lg bg-tech-accent/20">
+          <Lightbulb size={16} className="text-tech-accent" />
+        </div>
+        <span className="text-sm font-bold text-foreground">Key Takeaways</span>
       </div>
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {insights.map((insight, index) => {
           const config = insightConfig[insight.type];
+          const Icon = config.icon;
           return (
-            <div key={index} className="flex items-start gap-2">
-              <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${config.iconColor.replace('text-', 'bg-')}`} />
-              <p className="text-xs text-muted-foreground leading-relaxed flex-1">
+            <motion.div
+              key={index}
+              className={`flex items-start gap-2 p-3 rounded-lg bg-white/5 border ${config.borderColor}`}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Icon size={16} className={`${config.iconColor} flex-shrink-0 mt-0.5`} />
+              <p className="text-sm text-foreground leading-relaxed">
                 {insight.text}
               </p>
-            </div>
+            </motion.div>
           );
         })}
       </div>

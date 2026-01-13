@@ -59,7 +59,7 @@ export function DashboardSection({
     <section
       id={id}
       ref={sectionRef}
-      className={`relative py-12 md:py-16 ${className}`}
+      className={`relative py-3 md:py-4 ${className}`}
     >
       <div className="container relative z-10">
         <motion.div
@@ -68,8 +68,8 @@ export function DashboardSection({
           animate={isInView ? 'visible' : 'hidden'}
         >
           {/* Section Header */}
-          <motion.div variants={headingVariants} className="mb-8">
-            <div className="flex items-start gap-4 mb-3">
+          <motion.div variants={headingVariants} className="mb-4">
+            <div className="flex items-center gap-3">
               {/* Icon container */}
               {Icon && (
                 <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-tech-neon/20 to-tech-accent/20 flex items-center justify-center">
@@ -78,51 +78,19 @@ export function DashboardSection({
               )}
 
               <div className="flex-1">
-                {/* Priority indicator */}
-                {priority && (
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`inline-block w-2 h-2 rounded-full bg-gradient-to-r ${priorityColors[priority]}`} />
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {priority === 'high' ? 'Key Metric' : priority === 'medium' ? 'Important' : 'Supporting Data'}
-                    </span>
-                  </div>
-                )}
-
                 {/* Title */}
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                   {title}
-                  <span className="inline-block w-2 h-2 rounded-full bg-tech-accent ml-2 animate-pulse" />
                 </h2>
 
                 {/* Subtitle - technical description */}
                 {subtitle && (
-                  <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base mt-1">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
                     {subtitle}
                   </p>
                 )}
               </div>
             </div>
-
-            {/* Extended description for non-technical stakeholders */}
-            {description && (
-              <motion.div
-                className="mt-4 p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className="flex items-start gap-2">
-                  <HelpCircle size={16} className="text-tech-accent flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    <span className="font-medium text-foreground">What this shows: </span>
-                    {description}
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Gradient underline */}
-            <div className="mt-4 h-1 w-20 bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight rounded-full" />
           </motion.div>
 
           {/* Section Content */}

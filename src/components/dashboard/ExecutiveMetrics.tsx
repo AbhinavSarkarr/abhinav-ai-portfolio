@@ -27,6 +27,7 @@ interface HeroKPIProps {
   icon: React.ElementType;
   color: 'purple' | 'cyan' | 'green' | 'amber' | 'pink';
   tooltip?: string;
+  sparklineData?: number[];
 }
 
 const colorConfig = {
@@ -36,6 +37,7 @@ const colorConfig = {
     border: 'border-purple-500/30',
     text: 'text-purple-400',
     glow: 'shadow-purple-500/20',
+    sparkline: '#a855f7',
   },
   cyan: {
     gradient: 'from-cyan-400 to-blue-500',
@@ -43,6 +45,7 @@ const colorConfig = {
     border: 'border-cyan-500/30',
     text: 'text-cyan-400',
     glow: 'shadow-cyan-500/20',
+    sparkline: '#22d3ee',
   },
   green: {
     gradient: 'from-emerald-400 to-green-500',
@@ -50,6 +53,7 @@ const colorConfig = {
     border: 'border-emerald-500/30',
     text: 'text-emerald-400',
     glow: 'shadow-emerald-500/20',
+    sparkline: '#34d399',
   },
   amber: {
     gradient: 'from-amber-400 to-orange-500',
@@ -57,6 +61,7 @@ const colorConfig = {
     border: 'border-amber-500/30',
     text: 'text-amber-400',
     glow: 'shadow-amber-500/20',
+    sparkline: '#fbbf24',
   },
   pink: {
     gradient: 'from-pink-400 to-rose-500',
@@ -64,36 +69,91 @@ const colorConfig = {
     border: 'border-pink-500/30',
     text: 'text-pink-400',
     glow: 'shadow-pink-500/20',
+    sparkline: '#f472b6',
   },
 };
 
-export function HeroKPI({ title, value, subtitle, trend, icon: Icon, color, tooltip }: HeroKPIProps) {
+// Mini sparkline component
+function Sparkline({ data, color, width = 80, height = 32 }: { data: number[]; color: string; width?: number; height?: number }) {
+  if (!data || data.length < 2) return null;
+
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+
+  const points = data.map((val, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((val - min) / range) * (height - 4) - 2;
+    return `${x},${y}`;
+  }).join(' ');
+
+  const areaPoints = `0,${height} ${points} ${width},${height}`;
+
+  return (
+    <svg width={width} height={height} className="overflow-visible">
+      <defs>
+        <linearGradient id={`spark-grad-${color.replace('#', '')}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon points={areaPoints} fill={`url(#spark-grad-${color.replace('#', '')})`} />
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx={width} cy={parseFloat(points.split(' ').pop()?.split(',')[1] || '0')} r="3" fill={color} />
+    </svg>
+  );
+}
+
+export function HeroKPI({ title, value, subtitle, trend, icon: Icon, color, tooltip, sparklineData }: HeroKPIProps) {
   const config = colorConfig[color];
 
   return (
     <motion.div
       className={`
-        relative overflow-hidden rounded-2xl p-6
+        relative overflow-hidden rounded-xl p-4
         bg-white/70 dark:bg-tech-glass/50
         backdrop-blur-xl border ${config.border}
-        shadow-lg ${config.glow}
-        transition-all duration-300 hover:scale-[1.02]
+        transition-all duration-300
       `}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
     >
-      {/* Background gradient */}
-      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${config.gradient} opacity-10 rounded-full blur-2xl -translate-y-8 translate-x-8`} />
-
-      <div className="relative z-10">
-        {/* Header with icon */}
-        <div className="flex items-start justify-between mb-4">
-          <div className={`w-12 h-12 rounded-xl ${config.bg} flex items-center justify-center`}>
-            <Icon size={24} className={config.text} />
+      <div className="relative z-10 flex items-start justify-between gap-3">
+        {/* Left side: Icon + Metrics */}
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center flex-shrink-0`}>
+            <Icon size={20} className={config.text} />
           </div>
+          <div className="min-w-0 flex-1">
+            <h3 className={`text-2xl font-bold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-tight`}>
+              {value}
+            </h3>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-sm font-medium text-foreground truncate">{title}</span>
+              {tooltip && (
+                <InfoTooltip term={title} definition={tooltip} variant="icon" />
+              )}
+            </div>
+            {subtitle && (
+              <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Right side: Sparkline + Trend */}
+        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+          {sparklineData && sparklineData.length > 1 && (
+            <Sparkline data={sparklineData} color={config.sparkline} width={70} height={28} />
+          )}
           {trend && (
-            <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+            <div className={`flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${
               trend.value > 0 ? 'bg-emerald-500/10 text-emerald-400' :
               trend.value < 0 ? 'bg-red-500/10 text-red-400' :
               'bg-gray-500/10 text-gray-400'
@@ -103,26 +163,6 @@ export function HeroKPI({ title, value, subtitle, trend, icon: Icon, color, tool
             </div>
           )}
         </div>
-
-        {/* Value */}
-        <div className="mb-2">
-          <h3 className={`text-4xl font-bold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
-            {value}
-          </h3>
-        </div>
-
-        {/* Title with optional tooltip */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-foreground">{title}</span>
-          {tooltip && (
-            <InfoTooltip term={title} definition={tooltip} variant="icon" />
-          )}
-        </div>
-
-        {/* Subtitle */}
-        {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-        )}
       </div>
     </motion.div>
   );
