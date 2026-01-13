@@ -69,29 +69,31 @@ export function ProjectMetricsChart({ data }: ProjectAnalyticsProps) {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={380}>
-      <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-        <XAxis
-          dataKey="name"
-          tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }}
-          axisLine={false}
-          tickLine={false}
-          width={30}
-        />
-        <Tooltip {...tooltipStyle} />
-        <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '5px' }} />
-        <Bar dataKey="Views" stackId="a" fill={chartColors.views} radius={[0, 0, 0, 0]} />
-        <Bar dataKey="Clicks" stackId="a" fill={chartColors.clicks} radius={[0, 0, 0, 0]} />
-        <Bar dataKey="GitHub" stackId="a" fill={chartColors.github} radius={[0, 0, 0, 0]} />
-        <Bar dataKey="Demo" stackId="a" fill={chartColors.demo} radius={[4, 4, 0, 0]} />
-      </ComposedChart>
-    </ResponsiveContainer>
+    <div className="h-[250px] md:h-[380px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+          <XAxis
+            dataKey="name"
+            tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+            width={25}
+          />
+          <Tooltip {...tooltipStyle} />
+          <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '5px' }} />
+          <Bar dataKey="Views" stackId="a" fill={chartColors.views} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="Clicks" stackId="a" fill={chartColors.clicks} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="GitHub" stackId="a" fill={chartColors.github} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="Demo" stackId="a" fill={chartColors.demo} radius={[4, 4, 0, 0]} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 

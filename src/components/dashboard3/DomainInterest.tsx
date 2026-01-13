@@ -60,14 +60,14 @@ export function DomainInterest({ data }: DomainInterestProps) {
 
   return (
     <div className="space-y-3">
-      {/* Radar Chart - Larger */}
-      <div className="h-[280px]">
+      {/* Radar Chart */}
+      <div className="h-[180px] md:h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+          <RadarChart data={radarData} margin={{ top: 5, right: 20, bottom: 5, left: 20 }}>
             <PolarGrid stroke="rgba(255,255,255,0.1)" />
             <PolarAngleAxis
               dataKey="domain"
-              tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }}
+              tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
             />
             <Radar
               name="Interest"
@@ -98,22 +98,22 @@ export function DomainInterest({ data }: DomainInterestProps) {
           return (
             <motion.div
               key={domain.domain}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2 md:gap-3"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <span className="text-sm text-muted-foreground w-5">{index + 1}</span>
+              <span className="text-xs md:text-sm text-muted-foreground w-4 md:w-5">{index + 1}</span>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-foreground truncate">
+                  <span className="text-xs md:text-sm font-medium text-foreground truncate">
                     {formatDomain(domain.domain)}
                   </span>
-                  <span className="text-sm font-bold" style={{ color: tierColor }}>
+                  <span className="text-xs md:text-sm font-bold" style={{ color: tierColor }}>
                     {domain.total_interest_score}
                   </span>
                 </div>
-                <div className="h-2 bg-muted/20 rounded-full overflow-hidden">
+                <div className="h-1.5 md:h-2 bg-muted/20 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ backgroundColor: tierColor }}
@@ -130,11 +130,11 @@ export function DomainInterest({ data }: DomainInterestProps) {
 
       {/* Most Interest Badge */}
       {topDomain && (
-        <div className="flex items-center gap-2 pt-2 border-t border-muted/20">
+        <div className="flex flex-wrap items-center gap-1 md:gap-2 pt-2 border-t border-muted/20">
           <TrendingUp size={14} className="text-emerald-400" />
-          <span className="text-sm text-muted-foreground">Most Interest:</span>
-          <span className="text-sm font-semibold text-foreground">{formatDomain(topDomain.domain)}</span>
-          <span className="text-sm font-bold text-emerald-400">({topDomain.total_interest_score})</span>
+          <span className="text-xs md:text-sm text-muted-foreground">Most Interest:</span>
+          <span className="text-xs md:text-sm font-semibold text-foreground">{formatDomain(topDomain.domain)}</span>
+          <span className="text-xs md:text-sm font-bold text-emerald-400">({topDomain.total_interest_score})</span>
         </div>
       )}
     </div>

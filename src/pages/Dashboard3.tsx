@@ -957,11 +957,24 @@ export default function Dashboard3() {
             <GlassCard title="Daily Visitor Trends" subtitle="Traffic over time" className="mb-4">
               <div className="mt-2">
                 <ResponsiveContainer width="100%" height={200}>
-                  <AreaChart data={data.dailyMetrics.map(d => ({
-                    date: format(parseISO(d.date), 'MMM d'),
-                    Visitors: d.visitors,
-                    Sessions: d.sessions,
-                  }))}>
+                  <AreaChart data={data.dailyMetrics
+                    .filter(d => d.date && d.date.trim() !== '' && d.date.includes('-'))
+                    .map(d => {
+                      try {
+                        const parsedDate = parseISO(d.date);
+                        if (isNaN(parsedDate.getTime())) {
+                          return null;
+                        }
+                        return {
+                          date: format(parsedDate, 'MMM d'),
+                          Visitors: d.visitors || 0,
+                          Sessions: d.sessions || 0,
+                        };
+                      } catch {
+                        return null;
+                      }
+                    })
+                    .filter(Boolean)}>
                     <defs>
                       <linearGradient id="visitorsGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={chartColors.primary} stopOpacity={0.4} />
@@ -1083,16 +1096,16 @@ export default function Dashboard3() {
             </GlassCard>
 
             <GlassCard title="Device Usage" subtitle="Access methods">
-              <div className="mt-4 space-y-5">
+              <div className="mt-3 md:mt-4 space-y-3 md:space-y-5">
                 {/* Stacked bar showing distribution */}
-                <div className="h-12 rounded-xl overflow-hidden flex">
+                <div className="h-8 md:h-12 rounded-xl overflow-hidden flex">
                   {devicePieData.map((device, index) => {
                     const total = devicePieData.reduce((sum, d) => sum + d.value, 0);
                     const width = (device.value / total) * 100;
                     return (
                       <div
                         key={index}
-                        className="h-full flex items-center justify-center text-sm font-bold text-white"
+                        className="h-full flex items-center justify-center text-xs md:text-sm font-bold text-white"
                         style={{ width: `${width}%`, backgroundColor: device.color }}
                       >
                         {width > 15 && `${width.toFixed(0)}%`}
@@ -1102,30 +1115,37 @@ export default function Dashboard3() {
                 </div>
 
                 {/* Device breakdown with progress bars */}
-                <div className="space-y-5">
+                <div className="space-y-3 md:space-y-5">
                   {data.devices.categories.map((device) => {
                     const maxSessions = Math.max(...data.devices.categories.map(d => d.sessions));
                     const barWidth = (device.sessions / maxSessions) * 100;
                     const color = device.device_category === 'mobile' ? '#00E0FF' : device.device_category === 'desktop' ? '#7B42F6' : '#F59E0B';
                     return (
-                      <div key={device.device_category} className="space-y-2">
+                      <div key={device.device_category} className="space-y-1.5 md:space-y-2">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 md:gap-3">
                             {device.device_category === 'mobile' ? (
-                              <Smartphone size={20} style={{ color }} />
+                              <Smartphone size={16} className="md:hidden" style={{ color }} />
                             ) : device.device_category === 'desktop' ? (
-                              <Monitor size={20} style={{ color }} />
+                              <Monitor size={16} className="md:hidden" style={{ color }} />
                             ) : (
-                              <Tablet size={20} style={{ color }} />
+                              <Tablet size={16} className="md:hidden" style={{ color }} />
                             )}
-                            <span className="text-base font-medium text-foreground capitalize">{device.device_category}</span>
+                            {device.device_category === 'mobile' ? (
+                              <Smartphone size={20} className="hidden md:block" style={{ color }} />
+                            ) : device.device_category === 'desktop' ? (
+                              <Monitor size={20} className="hidden md:block" style={{ color }} />
+                            ) : (
+                              <Tablet size={20} className="hidden md:block" style={{ color }} />
+                            )}
+                            <span className="text-sm md:text-base font-medium text-foreground capitalize">{device.device_category}</span>
                           </div>
-                          <div className="flex items-center gap-4">
-                            <span className="text-sm text-muted-foreground">{device.engagement_rate?.toFixed(0) || 0}% engaged</span>
-                            <span className="text-base font-bold text-foreground">{device.sessions}</span>
+                          <div className="flex items-center gap-2 md:gap-4">
+                            <span className="text-xs md:text-sm text-muted-foreground">{device.engagement_rate?.toFixed(0) || 0}% engaged</span>
+                            <span className="text-sm md:text-base font-bold text-foreground">{device.sessions}</span>
                           </div>
                         </div>
-                        <div className="h-4 bg-muted/20 rounded-full overflow-hidden">
+                        <div className="h-2.5 md:h-4 bg-muted/20 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{ width: `${barWidth}%`, backgroundColor: color }}

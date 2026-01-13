@@ -90,9 +90,9 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
   };
 
   return (
-    <div className="flex items-center gap-3">
-      {/* Pie Chart - Larger */}
-      <div className="flex-shrink-0 w-[200px] h-[200px]">
+    <div className="flex flex-col md:flex-row items-center gap-3">
+      {/* Pie Chart */}
+      <div className="flex-shrink-0 w-[140px] h-[140px] md:w-[200px] md:h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -101,8 +101,8 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
               cy="50%"
               labelLine={false}
               label={renderCustomLabel}
-              outerRadius={95}
-              innerRadius={55}
+              outerRadius="85%"
+              innerRadius="50%"
               dataKey="value"
               strokeWidth={0}
             >
@@ -128,8 +128,8 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
         </ResponsiveContainer>
       </div>
 
-      {/* Legend - Compact */}
-      <div className="flex-1 space-y-1">
+      {/* Legend */}
+      <div className="flex-1 w-full space-y-1">
         {chartData.map((segment) => {
           const Icon = segment.icon;
           const percentage = ((segment.value / total) * 100).toFixed(1);
@@ -153,7 +153,7 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
                     {segment.value}
                   </span>
                 </div>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground hidden md:block">
                   {segment.description} • {percentage}%
                 </span>
               </div>

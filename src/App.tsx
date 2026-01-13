@@ -6,8 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ProjectDetail from "./pages/ProjectDetail";
 import ClientDetail from "./pages/ClientDetail";
-import Dashboard from "./pages/Dashboard";
-import Dashboard2 from "./pages/Dashboard2";
 import Dashboard3 from "./pages/Dashboard3";
 import NotFound from "./pages/NotFound";
 import { RecommenderProvider } from "@/context/RecommenderContext";
@@ -118,9 +116,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/project/:id" element={<ProjectDetail />} />
               <Route path="/client/:experienceId/:clientId" element={<ClientDetail />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard2" element={<Dashboard2 />} />
-              <Route path="/dashboard3" element={<Dashboard3 />} />
+              <Route path="/dashboard" element={<Dashboard3 />} />
 
               {/* UTM Redirect Routes - Short URLs with hidden tracking */}
               {/* LinkedIn */}

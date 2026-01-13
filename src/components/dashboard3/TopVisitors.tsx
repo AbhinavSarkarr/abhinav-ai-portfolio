@@ -90,15 +90,15 @@ export function TopVisitors({ data }: TopVisitorsProps) {
         return (
           <motion.div
             key={visitor.user_pseudo_id}
-            className="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+            className="p-2 md:p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               {/* Rank */}
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0"
+                className="w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold flex-shrink-0"
                 style={{ backgroundColor: `${segmentConfig.color}20`, color: segmentConfig.color }}
               >
                 {index + 1}
@@ -107,24 +107,24 @@ export function TopVisitors({ data }: TopVisitorsProps) {
               {/* Visitor Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-foreground">
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <span className="text-xs md:text-sm font-semibold text-foreground">
                       {anonymizeId(visitor.user_pseudo_id)}
                     </span>
                     <span
-                      className="px-2 py-0.5 rounded text-xs font-medium"
+                      className="px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium"
                       style={{ backgroundColor: `${segmentConfig.color}20`, color: segmentConfig.color }}
                     >
                       {segmentConfig.label}
                     </span>
                   </div>
-                  <span className="text-sm font-bold text-tech-accent">
+                  <span className="text-xs md:text-sm font-bold text-tech-accent">
                     {visitor.visitor_value_score}
                   </span>
                 </div>
 
                 {/* Score bar */}
-                <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden mb-2">
+                <div className="h-1 md:h-1.5 bg-muted/20 rounded-full overflow-hidden mb-1.5 md:mb-2">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ backgroundColor: segmentConfig.color }}
@@ -135,28 +135,32 @@ export function TopVisitors({ data }: TopVisitorsProps) {
                 </div>
 
                 {/* Compact metrics row */}
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-2 md:gap-4 text-[10px] md:text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Eye size={12} />
-                    {visitor.total_page_views} views
+                    <Eye size={10} className="md:hidden" />
+                    <Eye size={12} className="hidden md:block" />
+                    {visitor.total_page_views}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Clock size={12} />
+                    <Clock size={10} className="md:hidden" />
+                    <Clock size={12} className="hidden md:block" />
                     {formatDuration(visitor.avg_session_duration_sec)}
                   </span>
-                  <span className="flex items-center gap-1">
+                  <span className="hidden md:flex items-center gap-1">
                     <Globe size={12} />
                     {visitor.primary_country}
                   </span>
                   {visitor.resume_downloads > 0 && (
                     <span className="flex items-center gap-1 text-emerald-400">
-                      <Download size={12} />
+                      <Download size={10} className="md:hidden" />
+                      <Download size={12} className="hidden md:block" />
                       {visitor.resume_downloads}
                     </span>
                   )}
                   {visitor.form_submissions > 0 && (
                     <span className="flex items-center gap-1 text-blue-400">
-                      <MessageSquare size={12} />
+                      <MessageSquare size={10} className="md:hidden" />
+                      <MessageSquare size={12} className="hidden md:block" />
                       {visitor.form_submissions}
                     </span>
                   )}

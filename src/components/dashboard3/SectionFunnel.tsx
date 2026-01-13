@@ -92,10 +92,10 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
           >
             {/* Section Row */}
             <div className="relative">
-              <div className="flex items-center gap-3 mb-1">
+              <div className="flex items-center gap-2 md:gap-3 mb-1">
                 {/* Rank Badge */}
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0"
+                  className="w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold flex-shrink-0"
                   style={{ backgroundColor: `${healthColor}20`, color: healthColor }}
                 >
                   {index + 1}
@@ -104,27 +104,28 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
                 {/* Section Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-foreground truncate">
+                    <span className="text-xs md:text-sm font-medium text-foreground truncate">
                       {formatSectionName(section.section_id)}
                     </span>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="text-sm font-semibold text-foreground">
-                        {section.total_views} views
+                    <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
+                      <span className="text-xs md:text-sm font-semibold text-foreground">
+                        {section.total_views}
                       </span>
                       <span
-                        className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${dropoffConfig.bgColor}`}
+                        className={`flex items-center gap-0.5 md:gap-1 px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium ${dropoffConfig.bgColor}`}
                         style={{ color: dropoffConfig.color }}
                       >
-                        <DropoffIcon size={12} />
-                        {section.avg_exit_rate.toFixed(0)}% exit
+                        <DropoffIcon size={10} className="md:hidden" />
+                        <DropoffIcon size={12} className="hidden md:block" />
+                        {section.avg_exit_rate.toFixed(0)}%
                       </span>
                     </div>
                   </div>
 
                   {/* Progress Bar (funnel shape) */}
-                  <div className="h-6 bg-muted/20 rounded-lg overflow-hidden relative">
+                  <div className="h-4 md:h-6 bg-muted/20 rounded-lg overflow-hidden relative">
                     <motion.div
-                      className="h-full rounded-lg flex items-center justify-end pr-3"
+                      className="h-full rounded-lg flex items-center justify-end pr-2 md:pr-3"
                       style={{
                         background: `linear-gradient(90deg, ${healthColor}40, ${healthColor}20)`,
                         borderLeft: `3px solid ${healthColor}`,
@@ -133,9 +134,9 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
                       animate={{ width: `${widthPercent}%` }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
-                      {widthPercent > 30 && (
-                        <span className="text-xs font-medium text-foreground/80">
-                          {section.avg_time_spent_seconds.toFixed(0)}s avg
+                      {widthPercent > 40 && (
+                        <span className="text-[10px] md:text-xs font-medium text-foreground/80">
+                          {section.avg_time_spent_seconds.toFixed(0)}s
                         </span>
                       )}
                     </motion.div>
@@ -143,9 +144,9 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
                 </div>
               </div>
 
-              {/* Drop-off Indicator Arrow */}
+              {/* Drop-off Indicator Arrow - Hidden on mobile */}
               {index < sortedSections.length - 1 && section.total_exits > 0 && (
-                <div className="ml-11 flex items-center gap-2 py-1">
+                <div className="hidden md:flex ml-11 items-center gap-2 py-1">
                   <ChevronDown size={14} className="text-muted-foreground" />
                   <span className="text-sm text-red-400 flex items-center gap-1">
                     <LogOut size={12} />
