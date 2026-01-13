@@ -1,0 +1,57 @@
+name: Sync Analytics Data (BigQuery → Supabase → Gist)
+
+# Runs daily at 8 PM IST (2:30 PM UTC)
+on:
+  schedule:
+    - cron: '30 14 * * *'  # 8 PM IST = 2:30 PM UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  sync-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install google-cloud-bigquery psycopg2-binary python-dotenv requests
+
+      - name: Create GCP credentials file
+        run: |
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > /tmp/gcp-credentials.json
+
+      - name: Run incremental sync (BigQuery → Supabase)
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp-credentials.json
+          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
+          SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
+          SUPABASE_DATABASE: ${{ secrets.SUPABASE_DATABASE }}
+          SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
+          SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+        run: |
+          cd analytics-backend/supabase
+          python incremental_sync.py
+
+      - name: Update Dashboard Gist (Supabase → Gist)
+        env:
+          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
+          SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
+          SUPABASE_DATABASE: ${{ secrets.SUPABASE_DATABASE }}
+          SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
+          SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: dedbbf6ebcb32542e7b724b86f2b214f
+        run: |
+          cd analytics-backend/supabase
+          python update_dashboard_gist.py
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f /tmp/gcp-credentials.json

@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // ==================== TYPE DEFINITIONS ====================
+
+export type DateRangePreset = 'yesterday' | 'last_7_days' | 'last_14_days' | 'last_30_days' | 'all_time' | 'custom';
 
 export type DailyMetric = {
   date: string;
@@ -8,244 +10,237 @@ export type DailyMetric = {
   sessions: number;
   engagement_rate: number;
   bounce_rate: number;
-  avg_session_duration_sec: number;
-  desktop: number;
-  mobile: number;
-  tablet: number;
+  avg_duration: number;
+  desktop_sessions: number;
+  mobile_sessions: number;
+  tablet_sessions: number;
 };
 
 export type TrafficSource = {
-  source: string;
-  medium: string;
+  traffic_source: string;
+  traffic_medium: string;
   sessions: number;
+  unique_visitors: number;
+  engagement_rate: number;
+  bounce_rate: number;
+  avg_duration: number;
+};
+
+export type GeographicData = {
+  country: string;
+  city: string;
+  sessions: number;
+  unique_visitors: number;
   engagement_rate: number;
 };
 
-export type CountryData = {
-  country: string;
-  visitors: number;
+export type VisitorSegmentData = {
+  count: number;
+  avg_value_score: number;
+  avg_sessions: number;
+  avg_engagement_rate: number;
 };
 
 export type VisitorSegments = {
-  converters: number;
-  high_intent: number;
-  engaged_explorers: number;
-  returning_visitors: number;
-  casual_browsers: number;
+  [key: string]: VisitorSegmentData;
 };
 
-export type ConversionFunnel = {
+export type ConversionSummary = {
   cta_views: number;
   cta_clicks: number;
   form_starts: number;
   form_submissions: number;
   resume_downloads: number;
   social_clicks: number;
+  outbound_clicks: number;
+  publication_clicks: number;
+  content_copies: number;
 };
 
-export type RecommendationData = {
-  system_health: 'excellent' | 'good' | 'needs_improvement' | 'underperforming';
-  overall_ctr: number;
-  position_1_ctr: number;
-  position_2_ctr: number;
-  position_3_ctr: number;
-  user_conversion_rate: number;
-  total_impressions: number;
-  total_clicks: number;
-};
-
-export type DomainRanking = {
-  domain: string;
-  interest_rank: number;
-  total_interest_score: number;
-  demand_tier: 'high_demand' | 'moderate_demand' | 'niche_interest';
-  portfolio_recommendation: string;
-};
-
-export type ExperienceRanking = {
-  role_title: string;
-  company_name: string;
-  interest_rank: number;
-  interest_score: number;
-};
-
-export type SkillRanking = {
-  skill_name: string;
-  skill_category: string;
-  clicks: number;
-  demand_rank: number;
-  demand_tier: 'high_demand' | 'moderate_demand' | 'emerging' | 'niche';
-  learning_priority: string;
+export type TopVisitor = {
+  user_pseudo_id: string;
+  total_sessions: number;
+  visitor_tenure_days: number;
+  total_page_views: number;
+  avg_session_duration_sec: number;
+  engagement_rate: number;
+  primary_device: string;
+  primary_country: string;
+  primary_traffic_source: string;
+  projects_viewed: number;
+  cta_clicks: number;
+  form_submissions: number;
+  social_clicks: number;
+  resume_downloads: number;
+  visitor_value_score: number;
+  visitor_segment: string;
+  interest_profile: string;
 };
 
 export type ProjectRanking = {
   project_id: string;
   project_title: string;
-  overall_rank: number;
+  project_category: string;
   total_views: number;
+  total_unique_viewers: number;
   total_clicks: number;
+  total_expands: number;
+  total_link_clicks: number;
+  total_github_clicks: number;
+  total_demo_clicks: number;
   engagement_score: number;
+  overall_rank: number;
+  performance_tier: string;
   recommended_position: string;
+  engagement_percentile: number;
 };
 
 export type SectionRanking = {
   section_id: string;
+  total_views: number;
+  total_unique_viewers: number;
+  total_engaged_views: number;
+  avg_engagement_rate: number;
+  avg_time_spent_seconds: number;
+  avg_scroll_depth_percent: number;
+  total_exits: number;
+  avg_exit_rate: number;
   health_score: number;
   engagement_rank: number;
-  health_tier: 'excellent' | 'good' | 'needs_attention' | 'critical';
+  health_tier: string;
+  dropoff_indicator: string;
   optimization_hint: string;
-  total_views: number;
-  avg_engagement_rate: number;
-  avg_exit_rate: number;
 };
 
-export type ClientRanking = {
-  client_id: string;
-  client_name: string;
-  experience_id: string;
+export type TechDemand = {
+  skill_name: string;
+  total_interactions: number;
+  total_unique_users: number;
+  demand_rank: number;
+  demand_percentile: number;
+  demand_tier: string;
+  learning_priority: string;
+};
+
+export type DomainRanking = {
   domain: string;
-  engagement_rank: number;
-  total_views: number;
-  total_clicks: number;
+  total_explicit_interest: number;
+  total_implicit_interest: number;
+  total_interactions: number;
+  total_unique_users: number;
+  total_interest_score: number;
+  interest_rank: number;
+  interest_percentile: number;
+  demand_tier: string;
+  portfolio_recommendation: string;
+};
+
+export type ExperienceRanking = {
+  experience_id: string;
+  experience_title: string;
+  company: string;
+  total_interactions: number;
+  total_unique_users: number;
+  total_sessions: number;
+  interest_rank: number;
+  interest_percentile: number;
+  role_attractiveness: string;
+  positioning_suggestion: string;
+};
+
+export type HourlyData = {
+  hour: number;
+  sessions: number;
+  unique_visitors: number;
+  avg_engagement: number;
+  engagement_rate: number;
+};
+
+export type DayOfWeekData = {
+  day_name: string;
+  day_number: number;
+  sessions: number;
+  unique_visitors: number;
+  avg_engagement: number;
+  engagement_rate: number;
+};
+
+export type DeviceCategory = {
+  device_category: string;
+  sessions: number;
+  unique_visitors: number;
+  engagement_rate: number;
+  avg_duration: number;
+};
+
+export type BrowserData = {
+  browser: string;
+  sessions: number;
+  unique_visitors: number;
+};
+
+export type OSData = {
+  operating_system: string;
+  sessions: number;
+  unique_visitors: number;
 };
 
 export type OverviewMetrics = {
-  total_visitors_7d: number;
-  total_sessions_7d: number;
-  engagement_rate: number;
-  bounce_rate: number;
-  total_conversions: number;
-  resume_downloads: number;
-  avg_session_duration_sec: number;
+  totalSessions: number;
+  uniqueVisitors: number;
+  avgSessionDuration: number;
+  avgPagesPerSession: number;
+  bounceRate: number;
+  engagementRate: number;
+  avgEngagementScore: number;
+  totalConversions: number;
 };
 
 export type DashboardData = {
   overview: OverviewMetrics;
   dailyMetrics: DailyMetric[];
   trafficSources: TrafficSource[];
-  topCountries: CountryData[];
+  conversionSummary: ConversionSummary;
+  projectRankings: ProjectRanking[];
+  sectionRankings: SectionRanking[];
   visitorSegments: VisitorSegments;
-  conversionFunnel: ConversionFunnel;
-  recommendations: RecommendationData;
-  domains: DomainRanking[];
-  experiences: ExperienceRanking[];
-  skills: SkillRanking[];
-  projects: ProjectRanking[];
-  sections: SectionRanking[];
-  clients: ClientRanking[];
-  updated_at: string;
+  topVisitors: TopVisitor[];
+  techDemand: TechDemand[];
+  domainRankings: DomainRanking[];
+  experienceRankings: ExperienceRanking[];
+  recommendationPerformance: Record<string, unknown>[];
+  temporal: {
+    hourlyDistribution: HourlyData[];
+    dayOfWeekDistribution: DayOfWeekData[];
+  };
+  devices: {
+    categories: DeviceCategory[];
+    browsers: BrowserData[];
+    operatingSystems: OSData[];
+  };
+  geographic: GeographicData[];
+  dateRange: { start: string; end: string };
 };
 
-// ==================== SAMPLE DATA ====================
-// This will be replaced with real Gist data once the export is set up
-
-const SAMPLE_DATA: DashboardData = {
-  overview: {
-    total_visitors_7d: 65,
-    total_sessions_7d: 92,
-    engagement_rate: 52.3,
-    bounce_rate: 14.2,
-    total_conversions: 3,
-    resume_downloads: 12,
-    avg_session_duration_sec: 99,
-  },
-  dailyMetrics: [
-    { date: '2026-01-04', visitors: 8, sessions: 12, engagement_rate: 45.0, bounce_rate: 18.0, avg_session_duration_sec: 85, desktop: 5, mobile: 3, tablet: 0 },
-    { date: '2026-01-05', visitors: 12, sessions: 15, engagement_rate: 48.5, bounce_rate: 15.2, avg_session_duration_sec: 92, desktop: 7, mobile: 5, tablet: 0 },
-    { date: '2026-01-06', visitors: 15, sessions: 18, engagement_rate: 52.0, bounce_rate: 12.0, avg_session_duration_sec: 105, desktop: 9, mobile: 6, tablet: 0 },
-    { date: '2026-01-07', visitors: 55, sessions: 68, engagement_rate: 58.2, bounce_rate: 10.5, avg_session_duration_sec: 120, desktop: 30, mobile: 25, tablet: 0 },
-    { date: '2026-01-08', visitors: 18, sessions: 22, engagement_rate: 50.0, bounce_rate: 14.0, avg_session_duration_sec: 95, desktop: 10, mobile: 8, tablet: 0 },
-    { date: '2026-01-09', visitors: 14, sessions: 17, engagement_rate: 48.0, bounce_rate: 16.0, avg_session_duration_sec: 88, desktop: 8, mobile: 6, tablet: 0 },
-    { date: '2026-01-10', visitors: 10, sessions: 12, engagement_rate: 46.0, bounce_rate: 18.0, avg_session_duration_sec: 82, desktop: 6, mobile: 4, tablet: 0 },
-  ],
-  trafficSources: [
-    { source: 'direct', medium: 'none', sessions: 65, engagement_rate: 48.5 },
-    { source: 'linkedin.com', medium: 'referral', sessions: 12, engagement_rate: 72.1 },
-    { source: 'google', medium: 'organic', sessions: 8, engagement_rate: 55.2 },
-    { source: 'instagram', medium: 'social', sessions: 7, engagement_rate: 42.0 },
-    { source: 'facebook.com', medium: 'referral', sessions: 5, engagement_rate: 38.5 },
-  ],
-  topCountries: [
-    { country: 'United States', visitors: 30 },
-    { country: 'India', visitors: 22 },
-    { country: 'France', visitors: 8 },
-    { country: 'Germany', visitors: 6 },
-    { country: 'Ireland', visitors: 4 },
-    { country: 'Canada', visitors: 3 },
-  ],
-  visitorSegments: {
-    converters: 3,
-    high_intent: 8,
-    engaged_explorers: 15,
-    returning_visitors: 12,
-    casual_browsers: 27,
-  },
-  conversionFunnel: {
-    cta_views: 150,
-    cta_clicks: 45,
-    form_starts: 12,
-    form_submissions: 3,
-    resume_downloads: 12,
-    social_clicks: 25,
-  },
-  recommendations: {
-    system_health: 'good',
-    overall_ctr: 8.5,
-    position_1_ctr: 12.3,
-    position_2_ctr: 7.8,
-    position_3_ctr: 5.2,
-    user_conversion_rate: 15.2,
-    total_impressions: 120,
-    total_clicks: 10,
-  },
-  domains: [
-    { domain: 'Healthcare', interest_rank: 1, total_interest_score: 45, demand_tier: 'high_demand', portfolio_recommendation: 'primary_strength' },
-    { domain: 'Fintech', interest_rank: 2, total_interest_score: 38, demand_tier: 'high_demand', portfolio_recommendation: 'showcase_more' },
-    { domain: 'E-commerce', interest_rank: 3, total_interest_score: 25, demand_tier: 'moderate_demand', portfolio_recommendation: 'showcase_more' },
-    { domain: 'Trading', interest_rank: 4, total_interest_score: 18, demand_tier: 'niche_interest', portfolio_recommendation: 'consider_expanding' },
-  ],
-  experiences: [
-    { role_title: 'Data Scientist', company_name: 'BioFi', interest_rank: 1, interest_score: 42 },
-    { role_title: 'ML Engineer', company_name: 'RetailStack', interest_rank: 2, interest_score: 35 },
-    { role_title: 'AI Consultant', company_name: 'In20', interest_rank: 3, interest_score: 28 },
-  ],
-  skills: [
-    { skill_name: 'Python', skill_category: 'Languages', clicks: 45, demand_rank: 1, demand_tier: 'high_demand', learning_priority: 'maintain_expertise' },
-    { skill_name: 'TensorFlow', skill_category: 'ML/AI', clicks: 38, demand_rank: 2, demand_tier: 'high_demand', learning_priority: 'maintain_expertise' },
-    { skill_name: 'React', skill_category: 'Frontend', clicks: 32, demand_rank: 3, demand_tier: 'high_demand', learning_priority: 'maintain_expertise' },
-    { skill_name: 'LangChain', skill_category: 'GenAI', clicks: 28, demand_rank: 4, demand_tier: 'moderate_demand', learning_priority: 'showcase_more' },
-    { skill_name: 'PostgreSQL', skill_category: 'Databases', clicks: 22, demand_rank: 5, demand_tier: 'moderate_demand', learning_priority: 'maintain_expertise' },
-    { skill_name: 'Docker', skill_category: 'DevOps', clicks: 18, demand_rank: 6, demand_tier: 'emerging', learning_priority: 'showcase_more' },
-  ],
-  projects: [
-    { project_id: 'virtual-try-on', project_title: 'WhatsApp Virtual Try-On Bot', overall_rank: 1, total_views: 39, total_clicks: 15, engagement_score: 85.2, recommended_position: 'featured' },
-    { project_id: 'visa-approval-prediction', project_title: 'H-1B Visa Approval Prediction', overall_rank: 2, total_views: 31, total_clicks: 12, engagement_score: 72.5, recommended_position: 'featured' },
-    { project_id: 'autonomous-trading-system', project_title: 'Autonomous Trading System', overall_rank: 3, total_views: 18, total_clicks: 8, engagement_score: 58.3, recommended_position: 'primary' },
-    { project_id: 'finetuned-llms', project_title: 'Fine-tuned LLMs', overall_rank: 4, total_views: 12, total_clicks: 5, engagement_score: 45.8, recommended_position: 'primary' },
-  ],
-  sections: [
-    { section_id: 'hero', health_score: 95, engagement_rank: 1, health_tier: 'excellent', optimization_hint: 'performing_well', total_views: 65, avg_engagement_rate: 85, avg_exit_rate: 5 },
-    { section_id: 'about', health_score: 82, engagement_rank: 2, health_tier: 'good', optimization_hint: 'performing_well', total_views: 58, avg_engagement_rate: 72, avg_exit_rate: 12 },
-    { section_id: 'experience', health_score: 78, engagement_rank: 3, health_tier: 'good', optimization_hint: 'add_cta_or_navigation', total_views: 45, avg_engagement_rate: 65, avg_exit_rate: 18 },
-    { section_id: 'projects', health_score: 72, engagement_rank: 4, health_tier: 'good', optimization_hint: 'hook_earlier', total_views: 52, avg_engagement_rate: 58, avg_exit_rate: 22 },
-    { section_id: 'skills', health_score: 58, engagement_rank: 5, health_tier: 'needs_attention', optimization_hint: 'make_more_engaging', total_views: 38, avg_engagement_rate: 42, avg_exit_rate: 35 },
-    { section_id: 'contact', health_score: 45, engagement_rank: 6, health_tier: 'needs_attention', optimization_hint: 'improve_content', total_views: 25, avg_engagement_rate: 35, avg_exit_rate: 55 },
-  ],
-  clients: [
-    { client_id: 'biofi', client_name: 'BioFi', experience_id: 'exp1', domain: 'Healthcare', engagement_rank: 1, total_views: 28, total_clicks: 12 },
-    { client_id: 'retailstack', client_name: 'RetailStack', experience_id: 'exp2', domain: 'E-commerce', engagement_rank: 2, total_views: 22, total_clicks: 8 },
-    { client_id: 'hiremeup', client_name: 'HireMeUp', experience_id: 'exp1', domain: 'HR Tech', engagement_rank: 3, total_views: 15, total_clicks: 5 },
-    { client_id: 'in20', client_name: 'In20', experience_id: 'exp1', domain: 'Fintech', engagement_rank: 4, total_views: 10, total_clicks: 3 },
-  ],
-  updated_at: new Date().toISOString(),
+export type GistData = {
+  metadata: {
+    updated_at: string;
+    data_start_date: string;
+    data_end_date: string;
+  };
+  yesterday: DashboardData;
+  last_7_days: DashboardData;
+  last_14_days: DashboardData;
+  last_30_days: DashboardData;
+  all_time: DashboardData;
 };
 
-// ==================== GIST URL ====================
-// Dashboard data Gist - updated daily by GitHub Actions
+// ==================== CONFIG ====================
+
 const DASHBOARD_GIST_URL = 'https://gist.githubusercontent.com/AbhinavSarkarr/dedbbf6ebcb32542e7b724b86f2b214f/raw/dashboard-analytics.json';
+const BACKEND_API_URL = import.meta.env.VITE_ANALYTICS_API_URL || 'https://portfolio-analytics-api.onrender.com';
 
 // ==================== DATA NORMALIZATION ====================
-// BigQuery returns numbers as strings, so we need to convert them
 
 function toNumber(val: unknown, defaultVal = 0): number {
   if (typeof val === 'number') return val;
@@ -256,249 +251,463 @@ function toNumber(val: unknown, defaultVal = 0): number {
   return defaultVal;
 }
 
-function normalizeData(raw: Record<string, unknown>): DashboardData {
+function normalizeOverview(raw: Record<string, unknown>): OverviewMetrics {
+  return {
+    totalSessions: toNumber(raw.totalSessions),
+    uniqueVisitors: toNumber(raw.uniqueVisitors),
+    avgSessionDuration: toNumber(raw.avgSessionDuration),
+    avgPagesPerSession: toNumber(raw.avgPagesPerSession),
+    bounceRate: toNumber(raw.bounceRate),
+    engagementRate: toNumber(raw.engagementRate),
+    avgEngagementScore: toNumber(raw.avgEngagementScore),
+    totalConversions: toNumber(raw.totalConversions),
+  };
+}
+
+function normalizeDashboardData(raw: Record<string, unknown>): DashboardData {
   const data = raw as Record<string, unknown>;
 
   // Normalize overview
-  const overview = (data.overview || {}) as Record<string, unknown>;
-  const normalizedOverview: OverviewMetrics = {
-    total_visitors_7d: toNumber(overview.total_visitors_7d),
-    total_sessions_7d: toNumber(overview.total_sessions_7d),
-    engagement_rate: toNumber(overview.engagement_rate),
-    bounce_rate: toNumber(overview.bounce_rate),
-    total_conversions: toNumber(overview.total_conversions),
-    resume_downloads: toNumber(overview.resume_downloads),
-    avg_session_duration_sec: toNumber(overview.avg_session_duration_sec),
-  };
+  const overview = normalizeOverview((data.overview || {}) as Record<string, unknown>);
 
   // Normalize dailyMetrics
-  const dailyMetrics = (data.dailyMetrics || []) as Record<string, unknown>[];
-  const normalizedDailyMetrics: DailyMetric[] = dailyMetrics.map(d => ({
+  const dailyMetrics = ((data.dailyMetrics || []) as Record<string, unknown>[]).map(d => ({
     date: String(d.date || ''),
     visitors: toNumber(d.visitors),
     sessions: toNumber(d.sessions),
     engagement_rate: toNumber(d.engagement_rate),
     bounce_rate: toNumber(d.bounce_rate),
-    avg_session_duration_sec: toNumber(d.avg_session_duration_sec),
-    desktop: toNumber(d.desktop),
-    mobile: toNumber(d.mobile),
-    tablet: toNumber(d.tablet),
+    avg_duration: toNumber(d.avg_duration),
+    desktop_sessions: toNumber(d.desktop_sessions),
+    mobile_sessions: toNumber(d.mobile_sessions),
+    tablet_sessions: toNumber(d.tablet_sessions),
   }));
 
   // Normalize trafficSources
-  const trafficSources = (data.trafficSources || []) as Record<string, unknown>[];
-  const normalizedTrafficSources: TrafficSource[] = trafficSources.map(d => ({
-    source: String(d.source || 'direct'),
-    medium: String(d.medium || 'none'),
+  const trafficSources = ((data.trafficSources || []) as Record<string, unknown>[]).map(d => ({
+    traffic_source: String(d.traffic_source || 'direct'),
+    traffic_medium: String(d.traffic_medium || 'none'),
     sessions: toNumber(d.sessions),
+    unique_visitors: toNumber(d.unique_visitors),
+    engagement_rate: toNumber(d.engagement_rate),
+    bounce_rate: toNumber(d.bounce_rate),
+    avg_duration: toNumber(d.avg_duration),
+  }));
+
+  // Normalize conversionSummary
+  const conv = (data.conversionSummary || {}) as Record<string, unknown>;
+  const conversionSummary: ConversionSummary = {
+    cta_views: toNumber(conv.cta_views),
+    cta_clicks: toNumber(conv.cta_clicks),
+    form_starts: toNumber(conv.form_starts),
+    form_submissions: toNumber(conv.form_submissions),
+    resume_downloads: toNumber(conv.resume_downloads),
+    social_clicks: toNumber(conv.social_clicks),
+    outbound_clicks: toNumber(conv.outbound_clicks),
+    publication_clicks: toNumber(conv.publication_clicks),
+    content_copies: toNumber(conv.content_copies),
+  };
+
+  // Normalize projectRankings
+  const projectRankings = ((data.projectRankings || []) as Record<string, unknown>[]).map(d => ({
+    project_id: String(d.project_id || ''),
+    project_title: String(d.project_title || ''),
+    project_category: String(d.project_category || ''),
+    total_views: toNumber(d.total_views),
+    total_unique_viewers: toNumber(d.total_unique_viewers),
+    total_clicks: toNumber(d.total_clicks),
+    total_expands: toNumber(d.total_expands),
+    total_link_clicks: toNumber(d.total_link_clicks),
+    total_github_clicks: toNumber(d.total_github_clicks),
+    total_demo_clicks: toNumber(d.total_demo_clicks),
+    engagement_score: toNumber(d.engagement_score),
+    overall_rank: toNumber(d.overall_rank),
+    performance_tier: String(d.performance_tier || ''),
+    recommended_position: String(d.recommended_position || ''),
+    engagement_percentile: toNumber(d.engagement_percentile),
+  }));
+
+  // Normalize sectionRankings
+  const sectionRankings = ((data.sectionRankings || []) as Record<string, unknown>[]).map(d => ({
+    section_id: String(d.section_id || ''),
+    total_views: toNumber(d.total_views),
+    total_unique_viewers: toNumber(d.total_unique_viewers),
+    total_engaged_views: toNumber(d.total_engaged_views),
+    avg_engagement_rate: toNumber(d.avg_engagement_rate),
+    avg_time_spent_seconds: toNumber(d.avg_time_spent_seconds),
+    avg_scroll_depth_percent: toNumber(d.avg_scroll_depth_percent),
+    total_exits: toNumber(d.total_exits),
+    avg_exit_rate: toNumber(d.avg_exit_rate),
+    health_score: toNumber(d.health_score),
+    engagement_rank: toNumber(d.engagement_rank),
+    health_tier: String(d.health_tier || ''),
+    dropoff_indicator: String(d.dropoff_indicator || ''),
+    optimization_hint: String(d.optimization_hint || ''),
+  }));
+
+  // Normalize visitorSegments
+  const rawSegments = (data.visitorSegments || {}) as Record<string, Record<string, unknown>>;
+  const visitorSegments: VisitorSegments = {};
+  for (const [key, value] of Object.entries(rawSegments)) {
+    visitorSegments[key] = {
+      count: toNumber(value.count),
+      avg_value_score: toNumber(value.avg_value_score),
+      avg_sessions: toNumber(value.avg_sessions),
+      avg_engagement_rate: toNumber(value.avg_engagement_rate),
+    };
+  }
+
+  // Normalize topVisitors
+  const topVisitors = ((data.topVisitors || []) as Record<string, unknown>[]).map(d => ({
+    user_pseudo_id: String(d.user_pseudo_id || ''),
+    total_sessions: toNumber(d.total_sessions),
+    visitor_tenure_days: toNumber(d.visitor_tenure_days),
+    total_page_views: toNumber(d.total_page_views),
+    avg_session_duration_sec: toNumber(d.avg_session_duration_sec),
+    engagement_rate: toNumber(d.engagement_rate),
+    primary_device: String(d.primary_device || ''),
+    primary_country: String(d.primary_country || ''),
+    primary_traffic_source: String(d.primary_traffic_source || ''),
+    projects_viewed: toNumber(d.projects_viewed),
+    cta_clicks: toNumber(d.cta_clicks),
+    form_submissions: toNumber(d.form_submissions),
+    social_clicks: toNumber(d.social_clicks),
+    resume_downloads: toNumber(d.resume_downloads),
+    visitor_value_score: toNumber(d.visitor_value_score),
+    visitor_segment: String(d.visitor_segment || ''),
+    interest_profile: String(d.interest_profile || ''),
+  }));
+
+  // Normalize techDemand
+  const techDemand = ((data.techDemand || []) as Record<string, unknown>[]).map(d => ({
+    skill_name: String(d.skill_name || ''),
+    total_interactions: toNumber(d.total_interactions),
+    total_unique_users: toNumber(d.total_unique_users),
+    demand_rank: toNumber(d.demand_rank),
+    demand_percentile: toNumber(d.demand_percentile),
+    demand_tier: String(d.demand_tier || ''),
+    learning_priority: String(d.learning_priority || ''),
+  }));
+
+  // Normalize domainRankings
+  const domainRankings = ((data.domainRankings || []) as Record<string, unknown>[]).map(d => ({
+    domain: String(d.domain || ''),
+    total_explicit_interest: toNumber(d.total_explicit_interest),
+    total_implicit_interest: toNumber(d.total_implicit_interest),
+    total_interactions: toNumber(d.total_interactions),
+    total_unique_users: toNumber(d.total_unique_users),
+    total_interest_score: toNumber(d.total_interest_score),
+    interest_rank: toNumber(d.interest_rank),
+    interest_percentile: toNumber(d.interest_percentile),
+    demand_tier: String(d.demand_tier || ''),
+    portfolio_recommendation: String(d.portfolio_recommendation || ''),
+  }));
+
+  // Normalize experienceRankings
+  const experienceRankings = ((data.experienceRankings || []) as Record<string, unknown>[]).map(d => ({
+    experience_id: String(d.experience_id || ''),
+    experience_title: String(d.experience_title || ''),
+    company: String(d.company || ''),
+    total_interactions: toNumber(d.total_interactions),
+    total_unique_users: toNumber(d.total_unique_users),
+    total_sessions: toNumber(d.total_sessions),
+    interest_rank: toNumber(d.interest_rank),
+    interest_percentile: toNumber(d.interest_percentile),
+    role_attractiveness: String(d.role_attractiveness || ''),
+    positioning_suggestion: String(d.positioning_suggestion || ''),
+  }));
+
+  // Normalize temporal
+  const temporal = (data.temporal || {}) as Record<string, unknown>;
+  const hourlyDistribution = ((temporal.hourlyDistribution || []) as Record<string, unknown>[]).map(d => ({
+    hour: toNumber(d.hour),
+    sessions: toNumber(d.sessions),
+    unique_visitors: toNumber(d.unique_visitors),
+    avg_engagement: toNumber(d.avg_engagement),
+    engagement_rate: toNumber(d.engagement_rate),
+  }));
+  const dayOfWeekDistribution = ((temporal.dayOfWeekDistribution || []) as Record<string, unknown>[]).map(d => ({
+    day_name: String(d.day_name || ''),
+    day_number: toNumber(d.day_number),
+    sessions: toNumber(d.sessions),
+    unique_visitors: toNumber(d.unique_visitors),
+    avg_engagement: toNumber(d.avg_engagement),
     engagement_rate: toNumber(d.engagement_rate),
   }));
 
-  // Normalize topCountries
-  const topCountries = (data.topCountries || []) as Record<string, unknown>[];
-  const normalizedTopCountries: CountryData[] = topCountries
-    .filter(d => d.country && String(d.country).trim() !== '')
-    .map(d => ({
-      country: String(d.country),
-      visitors: toNumber(d.visitors),
-    }));
-
-  // Normalize visitorSegments
-  const segments = (data.visitorSegments || {}) as Record<string, unknown>;
-  const normalizedVisitorSegments: VisitorSegments = {
-    converters: toNumber(segments.converters),
-    high_intent: toNumber(segments.high_intent),
-    engaged_explorers: toNumber(segments.engaged_explorers),
-    returning_visitors: toNumber(segments.returning_visitors),
-    casual_browsers: toNumber(segments.casual_browsers),
-  };
-
-  // Normalize conversionFunnel
-  const funnel = (data.conversionFunnel || {}) as Record<string, unknown>;
-  const normalizedConversionFunnel: ConversionFunnel = {
-    cta_views: toNumber(funnel.cta_views),
-    cta_clicks: toNumber(funnel.cta_clicks),
-    form_starts: toNumber(funnel.form_starts),
-    form_submissions: toNumber(funnel.form_submissions),
-    resume_downloads: toNumber(funnel.resume_downloads),
-    social_clicks: toNumber(funnel.social_clicks),
-  };
-
-  // Normalize recommendations
-  const recs = (data.recommendations || {}) as Record<string, unknown>;
-  const normalizedRecommendations: RecommendationData = {
-    system_health: (recs.system_health as RecommendationData['system_health']) || 'needs_improvement',
-    overall_ctr: toNumber(recs.overall_ctr),
-    position_1_ctr: toNumber(recs.position_1_ctr),
-    position_2_ctr: toNumber(recs.position_2_ctr),
-    position_3_ctr: toNumber(recs.position_3_ctr),
-    user_conversion_rate: toNumber(recs.user_conversion_rate),
-    total_impressions: toNumber(recs.total_impressions),
-    total_clicks: toNumber(recs.total_clicks),
-  };
-
-  // Normalize domains
-  const domains = (data.domains || []) as Record<string, unknown>[];
-  const normalizedDomains: DomainRanking[] = domains.map(d => ({
-    domain: String(d.domain || 'Unknown'),
-    interest_rank: toNumber(d.interest_rank, 999),
-    total_interest_score: toNumber(d.total_interest_score),
-    demand_tier: (d.demand_tier as DomainRanking['demand_tier']) || 'niche_interest',
-    portfolio_recommendation: String(d.portfolio_recommendation || 'maintain'),
+  // Normalize devices
+  const devices = (data.devices || {}) as Record<string, unknown>;
+  const categories = ((devices.categories || []) as Record<string, unknown>[]).map(d => ({
+    device_category: String(d.device_category || ''),
+    sessions: toNumber(d.sessions),
+    unique_visitors: toNumber(d.unique_visitors),
+    engagement_rate: toNumber(d.engagement_rate),
+    avg_duration: toNumber(d.avg_duration),
+  }));
+  const browsers = ((devices.browsers || []) as Record<string, unknown>[]).map(d => ({
+    browser: String(d.browser || ''),
+    sessions: toNumber(d.sessions),
+    unique_visitors: toNumber(d.unique_visitors),
+  }));
+  const operatingSystems = ((devices.operatingSystems || []) as Record<string, unknown>[]).map(d => ({
+    operating_system: String(d.operating_system || ''),
+    sessions: toNumber(d.sessions),
+    unique_visitors: toNumber(d.unique_visitors),
   }));
 
-  // Normalize experiences
-  const experiences = (data.experiences || []) as Record<string, unknown>[];
-  const normalizedExperiences: ExperienceRanking[] = experiences.map(d => ({
-    role_title: String(d.role_title || 'Unknown'),
-    company_name: String(d.company_name || 'Unknown'),
-    interest_rank: toNumber(d.interest_rank, 999),
-    interest_score: toNumber(d.interest_score),
+  // Normalize geographic
+  const geographic = ((data.geographic || []) as Record<string, unknown>[]).map(d => ({
+    country: String(d.country || ''),
+    city: String(d.city || ''),
+    sessions: toNumber(d.sessions),
+    unique_visitors: toNumber(d.unique_visitors),
+    engagement_rate: toNumber(d.engagement_rate),
   }));
 
-  // Normalize skills
-  const skills = (data.skills || []) as Record<string, unknown>[];
-  const normalizedSkills: SkillRanking[] = skills.map(d => ({
-    skill_name: String(d.skill_name || 'Unknown'),
-    skill_category: String(d.skill_category || 'Other'),
-    clicks: toNumber(d.clicks),
-    demand_rank: toNumber(d.demand_rank, 999),
-    demand_tier: (d.demand_tier as SkillRanking['demand_tier']) || 'niche',
-    learning_priority: String(d.learning_priority || 'maintain_expertise'),
-  }));
-
-  // Normalize projects
-  const projects = (data.projects || []) as Record<string, unknown>[];
-  const normalizedProjects: ProjectRanking[] = projects.map(d => ({
-    project_id: String(d.project_id || 'unknown'),
-    project_title: String(d.project_title || 'Unknown Project'),
-    overall_rank: toNumber(d.overall_rank, 999),
-    total_views: toNumber(d.total_views),
-    total_clicks: toNumber(d.total_clicks),
-    engagement_score: toNumber(d.engagement_score),
-    recommended_position: String(d.recommended_position || 'primary'),
-  }));
-
-  // Normalize sections
-  const sections = (data.sections || []) as Record<string, unknown>[];
-  const normalizedSections: SectionRanking[] = sections.map(d => ({
-    section_id: String(d.section_id || 'unknown'),
-    health_score: toNumber(d.health_score, 50),
-    engagement_rank: toNumber(d.engagement_rank, 999),
-    health_tier: (d.health_tier as SectionRanking['health_tier']) || 'needs_attention',
-    optimization_hint: String(d.optimization_hint || 'review_content'),
-    total_views: toNumber(d.total_views),
-    avg_engagement_rate: toNumber(d.avg_engagement_rate),
-    avg_exit_rate: toNumber(d.avg_exit_rate),
-  }));
-
-  // Normalize clients
-  const clients = (data.clients || []) as Record<string, unknown>[];
-  const normalizedClients: ClientRanking[] = clients.map(d => ({
-    client_id: String(d.client_id || 'unknown'),
-    client_name: String(d.client_name || 'Unknown Client'),
-    experience_id: String(d.experience_id || 'exp1'),
-    domain: String(d.domain || 'Other'),
-    engagement_rank: toNumber(d.engagement_rank, 999),
-    total_views: toNumber(d.total_views),
-    total_clicks: toNumber(d.total_clicks),
-  }));
+  // Normalize dateRange
+  const dateRange = (data.dateRange || {}) as Record<string, unknown>;
 
   return {
-    overview: normalizedOverview,
-    dailyMetrics: normalizedDailyMetrics,
-    trafficSources: normalizedTrafficSources,
-    topCountries: normalizedTopCountries,
-    visitorSegments: normalizedVisitorSegments,
-    conversionFunnel: normalizedConversionFunnel,
-    recommendations: normalizedRecommendations,
-    domains: normalizedDomains,
-    experiences: normalizedExperiences,
-    skills: normalizedSkills,
-    projects: normalizedProjects,
-    sections: normalizedSections,
-    clients: normalizedClients,
-    updated_at: String(data.updated_at || new Date().toISOString()),
+    overview,
+    dailyMetrics,
+    trafficSources,
+    conversionSummary,
+    projectRankings,
+    sectionRankings,
+    visitorSegments,
+    topVisitors,
+    techDemand,
+    domainRankings,
+    experienceRankings,
+    recommendationPerformance: (data.recommendationPerformance || []) as Record<string, unknown>[],
+    temporal: { hourlyDistribution, dayOfWeekDistribution },
+    devices: { categories, browsers, operatingSystems },
+    geographic,
+    dateRange: {
+      start: String(dateRange.start || ''),
+      end: String(dateRange.end || ''),
+    },
   };
 }
 
-// Module-level cache
-let cachedData: DashboardData | null = null;
-let fetchPromise: Promise<DashboardData> | null = null;
+// ==================== CACHE ====================
 
-async function fetchDashboardData(): Promise<DashboardData> {
-  // Return cached data if available
-  if (cachedData) return cachedData;
+let gistCache: GistData | null = null;
+let gistFetchPromise: Promise<GistData> | null = null;
 
-  // If fetch is in progress, wait for it
-  if (fetchPromise) return fetchPromise;
+async function fetchGistData(): Promise<GistData | null> {
+  if (gistCache) return gistCache;
+  if (gistFetchPromise) return gistFetchPromise;
 
-  // If no Gist URL configured, use sample data
-  if (!DASHBOARD_GIST_URL) {
-    cachedData = SAMPLE_DATA;
-    return SAMPLE_DATA;
-  }
-
-  // Start new fetch
-  fetchPromise = fetch(DASHBOARD_GIST_URL)
+  gistFetchPromise = fetch(DASHBOARD_GIST_URL)
     .then(response => {
-      if (!response.ok) throw new Error('Failed to fetch');
+      if (!response.ok) throw new Error('Failed to fetch Gist');
       return response.json();
     })
-    .then(rawData => {
-      // Normalize data to ensure correct types (BigQuery returns strings)
-      const normalized = normalizeData(rawData);
-      cachedData = normalized;
-      return normalized;
+    .then((rawData: GistData) => {
+      // Check if it's the new format with metadata
+      if (rawData.metadata && rawData.last_7_days) {
+        gistCache = rawData;
+        return rawData;
+      }
+      // Old format - not supported
+      console.warn('Gist data is in old format, will use backend API');
+      return null;
     })
-    .catch(() => {
-      // Fallback to sample data on error
-      cachedData = SAMPLE_DATA;
-      return SAMPLE_DATA;
+    .catch(err => {
+      console.error('Failed to fetch Gist:', err);
+      return null;
     })
     .finally(() => {
-      fetchPromise = null;
+      gistFetchPromise = null;
     });
 
-  return fetchPromise;
+  return gistFetchPromise;
+}
+
+async function fetchFromBackend(startDate: string, endDate: string): Promise<DashboardData | null> {
+  try {
+    const url = `${BACKEND_API_URL}/api/dashboard3?start_date=${startDate}&end_date=${endDate}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Backend API error');
+    const rawData = await response.json();
+    return normalizeDashboardData(rawData);
+  } catch (err) {
+    console.error('Failed to fetch from backend:', err);
+    return null;
+  }
+}
+
+// ==================== MAIN FETCH FUNCTION ====================
+
+export async function fetchDashboardData(
+  preset: DateRangePreset,
+  customStartDate?: string,
+  customEndDate?: string
+): Promise<{ data: DashboardData | null; source: 'gist' | 'backend' | 'error' }> {
+
+  // For preset ranges, try Gist first
+  if (preset !== 'custom') {
+    const gistData = await fetchGistData();
+    if (gistData && gistData[preset]) {
+      return {
+        data: normalizeDashboardData(gistData[preset] as unknown as Record<string, unknown>),
+        source: 'gist',
+      };
+    }
+  }
+
+  // For custom range or if Gist failed, use backend
+  if (preset === 'custom' && customStartDate && customEndDate) {
+    const data = await fetchFromBackend(customStartDate, customEndDate);
+    return { data, source: data ? 'backend' : 'error' };
+  }
+
+  // Fallback: calculate dates for preset and use backend
+  const { startDate, endDate } = getPresetDates(preset);
+  const data = await fetchFromBackend(startDate, endDate);
+  return { data, source: data ? 'backend' : 'error' };
+}
+
+// ==================== DATE HELPERS ====================
+
+function getPresetDates(preset: DateRangePreset): { startDate: string; endDate: string } {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const formatDate = (d: Date) => d.toISOString().split('T')[0];
+
+  switch (preset) {
+    case 'yesterday': {
+      return { startDate: formatDate(yesterday), endDate: formatDate(yesterday) };
+    }
+    case 'last_7_days': {
+      const start = new Date(yesterday);
+      start.setDate(start.getDate() - 6);
+      return { startDate: formatDate(start), endDate: formatDate(yesterday) };
+    }
+    case 'last_14_days': {
+      const start = new Date(yesterday);
+      start.setDate(start.getDate() - 13);
+      return { startDate: formatDate(start), endDate: formatDate(yesterday) };
+    }
+    case 'last_30_days': {
+      const start = new Date(yesterday);
+      start.setDate(start.getDate() - 29);
+      return { startDate: formatDate(start), endDate: formatDate(yesterday) };
+    }
+    case 'all_time':
+    default: {
+      // Will be handled by backend or Gist
+      return { startDate: '2020-01-01', endDate: formatDate(yesterday) };
+    }
+  }
+}
+
+export function getPresetLabel(preset: DateRangePreset): string {
+  switch (preset) {
+    case 'yesterday': return 'Yesterday';
+    case 'last_7_days': return 'Last 7 Days';
+    case 'last_14_days': return 'Last 14 Days';
+    case 'last_30_days': return 'Last 30 Days';
+    case 'all_time': return 'All Time';
+    case 'custom': return 'Custom Range';
+    default: return 'Last 7 Days';
+  }
 }
 
 // ==================== HOOK ====================
+
+type UseDashboardDataOptions = {
+  preset?: DateRangePreset;
+  customStartDate?: string;
+  customEndDate?: string;
+};
 
 type DashboardDataHook = {
   data: DashboardData | null;
   isLoading: boolean;
   error: Error | null;
-  isUsingMockData: boolean;
+  source: 'gist' | 'backend' | 'error' | null;
+  metadata: { dataStartDate: string; dataEndDate: string; updatedAt: string } | null;
+  refetch: () => void;
+  setDateRange: (preset: DateRangePreset, customStart?: string, customEnd?: string) => void;
+  currentPreset: DateRangePreset;
+  customStartDate: string | null;
+  customEndDate: string | null;
 };
 
-export function useDashboardData(): DashboardDataHook {
+export function useDashboardData(options: UseDashboardDataOptions = {}): DashboardDataHook {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [source, setSource] = useState<'gist' | 'backend' | 'error' | null>(null);
+  const [metadata, setMetadata] = useState<{ dataStartDate: string; dataEndDate: string; updatedAt: string } | null>(null);
+
+  const [currentPreset, setCurrentPreset] = useState<DateRangePreset>(options.preset || 'last_7_days');
+  const [customStartDate, setCustomStartDate] = useState<string | null>(options.customStartDate || null);
+  const [customEndDate, setCustomEndDate] = useState<string | null>(options.customEndDate || null);
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // First, try to get metadata from Gist
+      const gistData = await fetchGistData();
+      if (gistData?.metadata) {
+        setMetadata({
+          dataStartDate: gistData.metadata.data_start_date,
+          dataEndDate: gistData.metadata.data_end_date,
+          updatedAt: gistData.metadata.updated_at,
+        });
+      }
+
+      // Fetch data based on preset
+      const result = await fetchDashboardData(currentPreset, customStartDate || undefined, customEndDate || undefined);
+
+      if (result.data) {
+        setData(result.data);
+        setSource(result.source);
+      } else {
+        setError(new Error('Failed to load dashboard data'));
+        setSource('error');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+      setSource('error');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPreset, customStartDate, customEndDate]);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const dashboardData = await fetchDashboardData();
-        setData(dashboardData);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to load dashboard data'));
-        // Still set sample data as fallback
-        setData(SAMPLE_DATA);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     loadData();
+  }, [loadData]);
+
+  const setDateRange = useCallback((preset: DateRangePreset, customStart?: string, customEnd?: string) => {
+    setCurrentPreset(preset);
+    if (preset === 'custom' && customStart && customEnd) {
+      setCustomStartDate(customStart);
+      setCustomEndDate(customEnd);
+    } else {
+      setCustomStartDate(null);
+      setCustomEndDate(null);
+    }
   }, []);
 
   return {
     data,
     isLoading,
     error,
-    isUsingMockData: !DASHBOARD_GIST_URL,
+    source,
+    metadata,
+    refetch: loadData,
+    setDateRange,
+    currentPreset,
+    customStartDate,
+    customEndDate,
   };
 }
 
@@ -526,21 +735,21 @@ export function formatDuration(seconds: number): string {
 
 export function getHealthColor(tier: string): string {
   switch (tier) {
-    case 'excellent': return '#10B981'; // green
-    case 'good': return '#7B42F6'; // purple
-    case 'needs_attention': return '#F59E0B'; // amber
-    case 'critical': return '#EF4444'; // red
-    default: return '#6B7280'; // gray
+    case 'excellent': return '#10B981';
+    case 'good': return '#7B42F6';
+    case 'needs_attention': return '#F59E0B';
+    case 'critical': return '#EF4444';
+    default: return '#6B7280';
   }
 }
 
 export function getDemandColor(tier: string): string {
   switch (tier) {
-    case 'high_demand': return '#F97316'; // orange
-    case 'moderate_demand': return '#10B981'; // green
-    case 'emerging': return '#3B82F6'; // blue
-    case 'niche': return '#8B5CF6'; // purple
-    default: return '#6B7280'; // gray
+    case 'high_demand': return '#F97316';
+    case 'moderate_demand': return '#10B981';
+    case 'emerging': return '#3B82F6';
+    case 'niche': return '#8B5CF6';
+    default: return '#6B7280';
   }
 }
 
@@ -552,4 +761,13 @@ export function getDemandLabel(tier: string): string {
     case 'niche': return 'Niche';
     default: return '';
   }
+}
+
+// ==================== API WARM-UP ====================
+
+export function warmUpBackendAPI(): void {
+  // Fire and forget - warm up the backend API
+  fetch(`${BACKEND_API_URL}/health`)
+    .then(() => console.log('Backend API warmed up'))
+    .catch(() => console.log('Backend API warm-up failed (may be cold starting)'));
 }

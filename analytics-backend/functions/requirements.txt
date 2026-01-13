@@ -1,5 +1,4 @@
 fastapi==0.109.*
 uvicorn==0.27.*
-google-cloud-bigquery==3.*
-mangum==0.17.*
-python-dateutil==2.*
+psycopg2-binary==2.9.*
+python-dotenv==1.0.*

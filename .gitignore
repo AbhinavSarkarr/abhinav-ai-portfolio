@@ -37,3 +37,4 @@ analytics-backend/credentials/
 !tsconfig.*.json
 
 analytics-backend/functions/__pycache__
+analytics-backend/.venv
