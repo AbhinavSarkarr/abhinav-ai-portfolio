@@ -1183,30 +1183,51 @@ export default function Dashboard3() {
           {data.projectRankings && data.projectRankings.length > 0 ? (
             <>
               {/* Top Projects Visual */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+              <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-3 md:gap-3 mb-4">
                 {data.projectRankings.slice(0, 3).map((project, index) => (
                   <motion.div
                     key={project.project_id}
-                    className={`p-3 rounded-xl border ${
+                    className={`p-2 md:p-3 rounded-xl border ${
                       index === 0 ? 'bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/30' :
                       index === 1 ? 'bg-gradient-to-br from-gray-400/10 to-gray-400/5 border-gray-400/30' :
                       'bg-gradient-to-br from-orange-600/10 to-orange-600/5 border-orange-600/30'
                     }`}
                     whileHover={{ scale: 1.02, y: -2 }}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider">#{index + 1}</span>
-                    </div>
-                    <h4 className="text-base font-bold text-foreground mb-3 line-clamp-1">{project.project_title}</h4>
-                    <div className="grid grid-cols-2 gap-2 text-center">
-                      <div>
-                        <div className="text-xl font-bold text-tech-neon">{project.total_unique_viewers}</div>
-                        <div className="text-sm text-muted-foreground">Views</div>
+                    {/* Mobile: Horizontal compact layout */}
+                    <div className="flex md:hidden items-center gap-3">
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <span className="text-base">{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
+                        <span className="text-[10px] text-muted-foreground">#{index + 1}</span>
                       </div>
-                      <div>
-                        <div className="text-xl font-bold text-tech-accent">{project.total_clicks}</div>
-                        <div className="text-sm text-muted-foreground">Clicks</div>
+                      <h4 className="text-xs font-bold text-foreground flex-1 truncate">{project.project_title}</h4>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="text-center">
+                          <div className="text-sm font-bold text-tech-neon">{project.total_unique_viewers}</div>
+                          <div className="text-[10px] text-muted-foreground">Views</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-sm font-bold text-tech-accent">{project.total_clicks}</div>
+                          <div className="text-[10px] text-muted-foreground">Clicks</div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Desktop: Vertical card layout */}
+                    <div className="hidden md:block">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider">#{index + 1}</span>
+                      </div>
+                      <h4 className="text-base font-bold text-foreground mb-3 line-clamp-1">{project.project_title}</h4>
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div>
+                          <div className="text-xl font-bold text-tech-neon">{project.total_unique_viewers}</div>
+                          <div className="text-sm text-muted-foreground">Views</div>
+                        </div>
+                        <div>
+                          <div className="text-xl font-bold text-tech-accent">{project.total_clicks}</div>
+                          <div className="text-sm text-muted-foreground">Clicks</div>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
