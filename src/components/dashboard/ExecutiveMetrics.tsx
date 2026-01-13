@@ -117,7 +117,7 @@ export function HeroKPI({ title, value, subtitle, trend, icon: Icon, color, tool
   return (
     <motion.div
       className={`
-        relative overflow-hidden rounded-xl p-4
+        relative overflow-hidden rounded-xl p-3 md:p-4
         bg-white/70 dark:bg-tech-glass/50
         backdrop-blur-xl border ${config.border}
         transition-all duration-300
@@ -125,30 +125,31 @@ export function HeroKPI({ title, value, subtitle, trend, icon: Icon, color, tool
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="relative z-10 flex items-start justify-between gap-3">
+      <div className="relative z-10 flex items-start justify-between gap-2 md:gap-3">
         {/* Left side: Icon + Metrics */}
-        <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center flex-shrink-0`}>
-            <Icon size={20} className={config.text} />
+        <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+          <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl ${config.bg} flex items-center justify-center flex-shrink-0`}>
+            <Icon size={16} className={`${config.text} md:hidden`} />
+            <Icon size={20} className={`${config.text} hidden md:block`} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className={`text-2xl font-bold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-tight`}>
+            <h3 className={`text-xl md:text-2xl font-bold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-tight`}>
               {value}
             </h3>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-sm font-medium text-foreground truncate">{title}</span>
+            <div className="flex items-center gap-1 md:gap-1.5 mt-0.5">
+              <span className="text-xs md:text-sm font-medium text-foreground truncate">{title}</span>
               {tooltip && (
                 <InfoTooltip term={title} definition={tooltip} variant="icon" />
               )}
             </div>
             {subtitle && (
-              <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 truncate">{subtitle}</p>
             )}
           </div>
         </div>
 
-        {/* Right side: Sparkline + Trend */}
-        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+        {/* Right side: Sparkline + Trend - Hidden on mobile */}
+        <div className="hidden md:flex flex-col items-end gap-1 flex-shrink-0">
           {sparklineData && sparklineData.length > 1 && (
             <Sparkline data={sparklineData} color={config.sparkline} width={70} height={28} />
           )}
@@ -163,6 +164,18 @@ export function HeroKPI({ title, value, subtitle, trend, icon: Icon, color, tool
             </div>
           )}
         </div>
+
+        {/* Mobile: Only show trend badge */}
+        {trend && (
+          <div className={`md:hidden flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 ${
+            trend.value > 0 ? 'bg-emerald-500/10 text-emerald-400' :
+            trend.value < 0 ? 'bg-red-500/10 text-red-400' :
+            'bg-gray-500/10 text-gray-400'
+          }`}>
+            {trend.value > 0 ? <ArrowUpRight size={10} /> : trend.value < 0 ? <ArrowDownRight size={10} /> : <Minus size={10} />}
+            {Math.abs(trend.value)}%
+          </div>
+        )}
       </div>
     </motion.div>
   );

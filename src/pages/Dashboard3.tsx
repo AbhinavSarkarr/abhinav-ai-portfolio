@@ -678,14 +678,14 @@ export default function Dashboard3() {
           priority="high"
         >
           {/* Conversion Cards with inline progress bars */}
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3 mb-4">
             {[
               { label: 'Resume', sublabel: 'Downloads', value: data.conversionSummary.resume_downloads, icon: Download, color: 'emerald', max: 10 },
               { label: 'Contact', sublabel: 'Submissions', value: data.conversionSummary.form_submissions, icon: MessageSquare, color: 'blue', max: 5 },
-              { label: 'Social', sublabel: 'Profile Clicks', value: data.conversionSummary.social_clicks, icon: Share2, color: 'purple', max: 20 },
-              { label: 'Publications', sublabel: 'Views', value: data.conversionSummary.publication_clicks, icon: BookOpen, color: 'amber', max: 15 },
-              { label: 'Outbound', sublabel: 'External Links', value: data.conversionSummary.outbound_clicks, icon: ExternalLink, color: 'cyan', max: 30 },
-              { label: 'Copied', sublabel: 'Content Copies', value: data.conversionSummary.content_copies, icon: FileText, color: 'pink', max: 10 },
+              { label: 'Social', sublabel: 'Clicks', value: data.conversionSummary.social_clicks, icon: Share2, color: 'purple', max: 20 },
+              { label: 'Pubs', sublabel: 'Views', value: data.conversionSummary.publication_clicks, icon: BookOpen, color: 'amber', max: 15 },
+              { label: 'Outbound', sublabel: 'Links', value: data.conversionSummary.outbound_clicks, icon: ExternalLink, color: 'cyan', max: 30 },
+              { label: 'Copied', sublabel: 'Content', value: data.conversionSummary.content_copies, icon: FileText, color: 'pink', max: 10 },
             ].map((item, index) => {
               const colorClasses = {
                 emerald: { bg: 'from-emerald-500/10 to-emerald-500/5', border: 'border-emerald-500/30', icon: 'bg-emerald-500/20', text: 'text-emerald-400', bar: 'bg-emerald-500' },
@@ -700,22 +700,23 @@ export default function Dashboard3() {
               return (
                 <motion.div
                   key={item.label}
-                  className={`p-4 rounded-xl bg-gradient-to-br ${colorClasses.bg} border ${colorClasses.border}`}
+                  className={`p-2 md:p-4 rounded-xl bg-gradient-to-br ${colorClasses.bg} border ${colorClasses.border}`}
                   whileHover={{ scale: 1.02, y: -2 }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg ${colorClasses.icon} flex items-center justify-center`}>
-                        <Icon size={20} className={colorClasses.text} />
+                  <div className="flex items-center justify-between mb-2 md:mb-3">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className={`w-7 h-7 md:w-10 md:h-10 rounded-lg ${colorClasses.icon} flex items-center justify-center flex-shrink-0`}>
+                        <Icon size={14} className={`${colorClasses.text} md:hidden`} />
+                        <Icon size={20} className={`${colorClasses.text} hidden md:block`} />
                       </div>
-                      <span className="text-sm font-medium text-foreground">{item.label}</span>
+                      <span className="text-xs md:text-sm font-medium text-foreground">{item.label}</span>
                     </div>
-                    <span className={`text-2xl font-bold ${colorClasses.text}`}>{item.value}</span>
+                    <span className={`text-lg md:text-2xl font-bold ${colorClasses.text}`}>{item.value}</span>
                   </div>
-                  <div className="h-2 bg-muted/30 rounded-full overflow-hidden">
+                  <div className="h-1.5 md:h-2 bg-muted/30 rounded-full overflow-hidden">
                     <motion.div
                       className={`h-full rounded-full ${colorClasses.bar}`}
                       initial={{ width: 0 }}
@@ -723,7 +724,7 @@ export default function Dashboard3() {
                       transition={{ duration: 0.8, delay: 0.2 + index * 0.1 }}
                     />
                   </div>
-                  <div className="text-sm text-muted-foreground mt-2">{item.sublabel}</div>
+                  <div className="text-[10px] md:text-sm text-muted-foreground mt-1 md:mt-2">{item.sublabel}</div>
                 </motion.div>
               );
             })}
@@ -1481,7 +1482,7 @@ export default function Dashboard3() {
             priority="low"
           >
             <GlassCard title="Experience Rankings" subtitle="By visitor interest">
-              <div className="space-y-3 mt-2">
+              <div className="space-y-2 md:space-y-3 mt-2">
                 {data.experienceRankings.map((exp, index) => {
                   const attractivenessColor = exp.role_attractiveness === 'high' ? 'text-emerald-400 bg-emerald-500/20' :
                                               exp.role_attractiveness === 'medium' ? 'text-blue-400 bg-blue-500/20' :
@@ -1489,14 +1490,14 @@ export default function Dashboard3() {
                   return (
                     <motion.div
                       key={exp.experience_id}
-                      className="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                      className="p-2 md:p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <span className={`w-8 h-8 rounded flex items-center justify-center text-sm font-bold ${
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
+                          <span className={`w-6 h-6 md:w-8 md:h-8 rounded flex items-center justify-center text-xs md:text-sm font-bold flex-shrink-0 ${
                             exp.interest_rank === 1 ? 'bg-amber-500/20 text-amber-400' :
                             exp.interest_rank === 2 ? 'bg-gray-400/20 text-gray-400' :
                             exp.interest_rank === 3 ? 'bg-orange-500/20 text-orange-400' :
@@ -1504,23 +1505,23 @@ export default function Dashboard3() {
                           }`}>
                             {exp.interest_rank}
                           </span>
-                          <div>
-                            <h4 className="text-sm font-semibold text-foreground">{exp.experience_title}</h4>
-                            <p className="text-sm text-muted-foreground">{exp.company}</p>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-xs md:text-sm font-semibold text-foreground truncate">{exp.experience_title}</h4>
+                            <p className="text-[10px] md:text-sm text-muted-foreground truncate">{exp.company}</p>
+                            {exp.positioning_suggestion && (
+                              <p className="text-[10px] md:text-xs text-muted-foreground mt-1 hidden md:block">
+                                💡 {exp.positioning_suggestion}
+                              </p>
+                            )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${attractivenessColor}`}>
+                        <div className="flex flex-col md:flex-row items-end md:items-center gap-1 md:gap-2 flex-shrink-0">
+                          <span className={`px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium ${attractivenessColor} hidden md:block`}>
                             {exp.role_attractiveness || 'N/A'}
                           </span>
-                          <span className="text-sm text-muted-foreground">{exp.total_interactions} views</span>
+                          <span className="text-xs md:text-sm text-muted-foreground whitespace-nowrap">{exp.total_interactions} views</span>
                         </div>
                       </div>
-                      {exp.positioning_suggestion && (
-                        <p className="text-xs text-muted-foreground ml-11">
-                          💡 {exp.positioning_suggestion}
-                        </p>
-                      )}
                     </motion.div>
                   );
                 })}
