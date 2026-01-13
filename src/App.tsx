@@ -107,8 +107,8 @@ const App = () => (
           {isAnalyticsSubdomain ? (
             // Analytics subdomain: only show dashboard
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="*" element={<Dashboard />} />
+              <Route path="/" element={<Dashboard3 />} />
+              <Route path="*" element={<Dashboard3 />} />
             </Routes>
           ) : (
             // Main domain: full portfolio
