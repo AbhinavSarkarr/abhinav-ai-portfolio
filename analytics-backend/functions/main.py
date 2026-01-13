@@ -677,11 +677,8 @@ async def get_traffic_daily_stats(
         traffic_source,
         traffic_medium,
         SUM(sessions) as total_sessions,
-        SUM(unique_visitors) as unique_visitors,
         ROUND(AVG(engagement_rate), 2) as avg_engagement_rate,
-        ROUND(AVG(bounce_rate), 2) as avg_bounce_rate,
-        ROUND(AVG(avg_session_duration_sec), 1) as avg_session_duration,
-        SUM(conversions) as total_conversions
+        ROUND(AVG(bounce_rate), 2) as avg_bounce_rate
     FROM `{PROJECT_ID}.{DATASET}.traffic_daily_stats`
     WHERE event_date BETWEEN @start_date AND @end_date
     GROUP BY traffic_source, traffic_medium
@@ -714,8 +711,6 @@ async def get_conversion_funnel(
 
     query = f"""
     SELECT
-        SUM(total_sessions) as total_sessions,
-        SUM(unique_visitors) as unique_visitors,
         SUM(total_cta_views) as cta_views,
         SUM(total_cta_clicks) as cta_clicks,
         ROUND(SUM(total_cta_clicks) * 100.0 / NULLIF(SUM(total_cta_views), 0), 2) as cta_click_rate,
@@ -723,22 +718,19 @@ async def get_conversion_funnel(
         SUM(contact_form_submissions) as form_submissions,
         ROUND(SUM(contact_form_submissions) * 100.0 / NULLIF(SUM(contact_form_starts), 0), 2) as form_completion_rate,
         SUM(social_clicks) as social_clicks,
-        SUM(resume_downloads) as resume_downloads,
-        SUM(publication_clicks) as publication_clicks,
-        SUM(content_copies) as content_copies
+        SUM(resume_downloads) as resume_downloads
     FROM `{PROJECT_ID}.{DATASET}.conversion_funnel`
-    WHERE PARSE_DATE('%Y%m%d', event_date) BETWEEN @start_date AND @end_date
+    WHERE event_date BETWEEN @start_date AND @end_date
     """
 
     daily_query = f"""
     SELECT
-        FORMAT_DATE('%Y-%m-%d', PARSE_DATE('%Y%m%d', event_date)) as date,
+        FORMAT_DATE('%Y-%m-%d', event_date) as date,
         contact_form_submissions,
         resume_downloads,
-        social_clicks,
-        ROUND(avg_conversion_score, 3) as conversion_score
+        social_clicks
     FROM `{PROJECT_ID}.{DATASET}.conversion_funnel`
-    WHERE PARSE_DATE('%Y%m%d', event_date) BETWEEN @start_date AND @end_date
+    WHERE event_date BETWEEN @start_date AND @end_date
     ORDER BY event_date DESC
     """
 
@@ -842,10 +834,11 @@ async def get_project_rankings():
 
 @app.get("/api/skill-rankings")
 async def get_skill_rankings():
-    """Get skill rankings from materialized table"""
+    """Get skill rankings from tech_demand_insights materialized table"""
     query = f"""
-    SELECT * FROM `{PROJECT_ID}.{DATASET}.skill_rankings`
-    ORDER BY skill_rank
+    SELECT *
+    FROM `{PROJECT_ID}.{DATASET}.tech_demand_insights`
+    ORDER BY demand_rank
     """
 
     try:
@@ -869,8 +862,7 @@ async def get_section_rankings():
         ROUND(health_score, 1) as health_score,
         health_tier,
         engagement_rank,
-        dropoff_indicator,
-        optimization_priority
+        dropoff_indicator as optimization_hint
     FROM `{PROJECT_ID}.{DATASET}.section_rankings`
     ORDER BY engagement_rank
     """
@@ -928,13 +920,13 @@ async def get_tech_demand_insights():
     query = f"""
     SELECT
         technology as skill_name,
-        skill_category,
-        total_interest_signals,
-        unique_interested_users,
+        total_interactions,
+        total_unique_users,
         demand_rank,
+        demand_percentile,
         demand_tier,
         learning_priority,
-        market_position
+        generated_at
     FROM `{PROJECT_ID}.{DATASET}.tech_demand_insights`
     ORDER BY demand_rank
     """
@@ -958,16 +950,12 @@ async def get_client_rankings():
     SELECT
         client_id,
         client_name,
-        experience_id,
         domain,
         total_views,
         total_clicks,
-        unique_viewers,
-        ROUND(engagement_score, 2) as engagement_score,
-        engagement_rank,
         engagement_tier
     FROM `{PROJECT_ID}.{DATASET}.client_rankings`
-    ORDER BY engagement_rank
+    ORDER BY total_views DESC
     """
 
     try:
@@ -988,7 +976,6 @@ async def get_domain_rankings():
     SELECT
         domain,
         total_interest_score,
-        unique_interested_visitors,
         interest_rank,
         demand_tier,
         portfolio_recommendation
@@ -1013,12 +1000,9 @@ async def get_experience_rankings():
     query = f"""
     SELECT
         experience_id,
-        total_interactions,
-        unique_viewers,
-        experience_rank,
-        interest_tier
+        total_interactions
     FROM `{PROJECT_ID}.{DATASET}.experience_rankings`
-    ORDER BY experience_rank
+    ORDER BY total_interactions DESC
     """
 
     try:
@@ -1036,21 +1020,208 @@ async def get_experience_rankings():
 async def get_recommendation_performance():
     """Get recommendation performance from materialized table"""
     query = f"""
-    SELECT
-        metric_type,
-        metric_name,
-        times_shown,
-        times_clicked,
-        ROUND(click_through_rate, 2) as ctr,
-        performance_tier
+    SELECT *
     FROM `{PROJECT_ID}.{DATASET}.recommendation_performance`
-    ORDER BY times_shown DESC
+    LIMIT 100
     """
 
     try:
         results = run_query(query)
         return {
             "performance": results,
+            "source": "materialized_table",
+            "updated_at": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==============================================================================
+# TEMPORAL & DEVICE ANALYTICS (for Dashboard3 Section 12)
+# ==============================================================================
+
+@app.get("/api/temporal-patterns")
+async def get_temporal_patterns(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None)
+):
+    """Get temporal patterns - hourly distribution and day of week analysis"""
+    start, end = get_date_filter(start_date, end_date)
+
+    # Hourly distribution query
+    hourly_query = f"""
+    SELECT
+        hour_of_day as hour,
+        COUNT(*) as sessions,
+        COUNT(DISTINCT user_pseudo_id) as unique_visitors,
+        ROUND(AVG(engagement_score), 2) as avg_engagement
+    FROM `{PROJECT_ID}.{DATASET}.sessions`
+    WHERE session_date BETWEEN @start_date AND @end_date
+    GROUP BY hour_of_day
+    ORDER BY hour_of_day
+    """
+
+    # Day of week distribution query
+    dow_query = f"""
+    SELECT
+        FORMAT_DATE('%A', session_date) as day_name,
+        EXTRACT(DAYOFWEEK FROM session_date) as day_number,
+        COUNT(*) as sessions,
+        COUNT(DISTINCT user_pseudo_id) as unique_visitors,
+        ROUND(AVG(engagement_score), 2) as avg_engagement,
+        ROUND(COUNTIF(is_engaged) * 100.0 / COUNT(*), 2) as engagement_rate
+    FROM `{PROJECT_ID}.{DATASET}.sessions`
+    WHERE session_date BETWEEN @start_date AND @end_date
+    GROUP BY day_name, day_number
+    ORDER BY day_number
+    """
+
+    try:
+        params = [
+            bigquery.ScalarQueryParameter("start_date", "DATE", start),
+            bigquery.ScalarQueryParameter("end_date", "DATE", end),
+        ]
+        hourly = run_query(hourly_query, params)
+        day_of_week = run_query(dow_query, params)
+
+        return {
+            "hourlyDistribution": hourly,
+            "dayOfWeekDistribution": day_of_week,
+            "dateRange": {"start": str(start), "end": str(end)},
+            "source": "materialized_table",
+            "updated_at": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/device-analytics")
+async def get_device_analytics(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None)
+):
+    """Get detailed device and browser analytics"""
+    start, end = get_date_filter(start_date, end_date)
+
+    # Device categories query
+    device_query = f"""
+    SELECT
+        device_category,
+        COUNT(*) as sessions,
+        COUNT(DISTINCT user_pseudo_id) as unique_visitors,
+        ROUND(COUNTIF(is_engaged) * 100.0 / COUNT(*), 2) as engagement_rate,
+        ROUND(AVG(session_duration_seconds), 0) as avg_duration
+    FROM `{PROJECT_ID}.{DATASET}.sessions`
+    WHERE session_date BETWEEN @start_date AND @end_date
+    GROUP BY device_category
+    ORDER BY sessions DESC
+    """
+
+    # Browser query
+    browser_query = f"""
+    SELECT
+        browser,
+        COUNT(*) as sessions,
+        COUNT(DISTINCT user_pseudo_id) as unique_visitors,
+        ROUND(COUNTIF(is_engaged) * 100.0 / COUNT(*), 2) as engagement_rate
+    FROM `{PROJECT_ID}.{DATASET}.sessions`
+    WHERE session_date BETWEEN @start_date AND @end_date
+    GROUP BY browser
+    ORDER BY sessions DESC
+    LIMIT 10
+    """
+
+    # Operating system query
+    os_query = f"""
+    SELECT
+        os as operating_system,
+        COUNT(*) as sessions,
+        COUNT(DISTINCT user_pseudo_id) as unique_visitors
+    FROM `{PROJECT_ID}.{DATASET}.sessions`
+    WHERE session_date BETWEEN @start_date AND @end_date
+    GROUP BY os
+    ORDER BY sessions DESC
+    LIMIT 10
+    """
+
+    try:
+        params = [
+            bigquery.ScalarQueryParameter("start_date", "DATE", start),
+            bigquery.ScalarQueryParameter("end_date", "DATE", end),
+        ]
+        devices = run_query(device_query, params)
+        browsers = run_query(browser_query, params)
+        operating_systems = run_query(os_query, params)
+
+        return {
+            "deviceCategories": devices,
+            "browsers": browsers,
+            "operatingSystems": operating_systems,
+            "dateRange": {"start": str(start), "end": str(end)},
+            "source": "materialized_table",
+            "updated_at": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/geographic-details")
+async def get_geographic_details(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None)
+):
+    """Get detailed geographic analytics"""
+    start, end = get_date_filter(start_date, end_date)
+
+    # Countries query
+    countries_query = f"""
+    SELECT
+        country,
+        COUNT(*) as sessions,
+        COUNT(DISTINCT user_pseudo_id) as unique_visitors,
+        ROUND(COUNTIF(is_engaged) * 100.0 / COUNT(*), 2) as engagement_rate,
+        ROUND(AVG(session_duration_seconds), 0) as avg_duration
+    FROM `{PROJECT_ID}.{DATASET}.sessions`
+    WHERE session_date BETWEEN @start_date AND @end_date
+      AND country IS NOT NULL
+    GROUP BY country
+    ORDER BY sessions DESC
+    LIMIT 20
+    """
+
+    # Regions/cities query (if available)
+    cities_query = f"""
+    SELECT
+        city,
+        region,
+        country,
+        COUNT(*) as sessions,
+        COUNT(DISTINCT user_pseudo_id) as unique_visitors
+    FROM `{PROJECT_ID}.{DATASET}.sessions`
+    WHERE session_date BETWEEN @start_date AND @end_date
+      AND city IS NOT NULL
+    GROUP BY city, region, country
+    ORDER BY sessions DESC
+    LIMIT 15
+    """
+
+    try:
+        params = [
+            bigquery.ScalarQueryParameter("start_date", "DATE", start),
+            bigquery.ScalarQueryParameter("end_date", "DATE", end),
+        ]
+        countries = run_query(countries_query, params)
+
+        # Cities might not exist in all schemas, handle gracefully
+        try:
+            cities = run_query(cities_query, params)
+        except:
+            cities = []
+
+        return {
+            "countries": countries,
+            "cities": cities,
+            "dateRange": {"start": str(start), "end": str(end)},
             "source": "materialized_table",
             "updated_at": datetime.utcnow().isoformat() + "Z"
         }
