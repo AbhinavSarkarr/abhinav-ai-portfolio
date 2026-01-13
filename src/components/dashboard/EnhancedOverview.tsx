@@ -70,7 +70,7 @@ function MetricTooltip({
             className={`absolute z-50 ${side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'} left-1/2 -translate-x-1/2 w-max max-w-[250px]`}
           >
             <div className="relative px-3 py-2 rounded-lg bg-gray-900 dark:bg-gray-900 border border-tech-accent/30 shadow-lg">
-              <p className="text-[11px] text-gray-200 leading-relaxed">{content}</p>
+              <p className="text-xs text-gray-200 leading-relaxed">{content}</p>
               {/* Arrow */}
               <div
                 className={`absolute left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-gray-900 border-tech-accent/30 ${
@@ -268,7 +268,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
                     <Icon size={18} className="text-white hidden sm:block" />
                   </div>
                   {metric.trend && TrendIcon && (
-                    <div className={`flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-semibold ${getTrendStyles(metric.trend.direction)}`}>
+                    <div className={`flex items-center gap-0.5 sm:gap-1 text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-semibold ${getTrendStyles(metric.trend.direction)}`}>
                       <TrendIcon size={10} className="sm:hidden" />
                       <TrendIcon size={12} className="hidden sm:block" />
                       <span className="hidden xs:inline">{metric.trend.value.toFixed(1)}%</span>
@@ -278,7 +278,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
                 <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{metric.value}</p>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium leading-tight">{metric.label}</p>
                 {metric.subtitle && (
-                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 mt-0.5 sm:mt-1 hidden xs:block">
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5 sm:mt-1 hidden xs:block">
                     {metric.subtitle}
                   </p>
                 )}
@@ -342,7 +342,7 @@ export function EnhancedOverview({ data }: EnhancedOverviewProps) {
                 </MetricTooltip>
               </div>
               {metric.subtitle && (
-                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 mt-1.5 sm:mt-2 truncate">
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1.5 sm:mt-2 truncate">
                   {metric.subtitle}
                 </p>
               )}

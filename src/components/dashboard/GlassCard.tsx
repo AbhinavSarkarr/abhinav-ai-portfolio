@@ -47,10 +47,10 @@ export function GlassCard({
         {(title || subtitle) && (
           <div className={noPadding ? 'px-3 pt-3' : 'mb-2'}>
             {title && (
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{title}</h3>
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">{title}</h3>
             )}
             {subtitle && (
-              <p className="text-[10px] text-gray-500 dark:text-gray-400">{subtitle}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
             )}
           </div>
         )}
@@ -197,7 +197,7 @@ export function ProgressRing({
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-lg font-bold text-gray-900 dark:text-white">{Math.round(value)}</span>
         {label && (
-          <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             {label}
           </span>
         )}

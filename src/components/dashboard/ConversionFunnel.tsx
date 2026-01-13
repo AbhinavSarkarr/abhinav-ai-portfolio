@@ -95,7 +95,7 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
                         transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
                       >
                         {width > 25 && (
-                          <span className="text-[10px] sm:text-xs font-medium text-black dark:text-white">
+                          <span className="text-xs font-medium text-black dark:text-white">
                             {width.toFixed(0)}%
                           </span>
                         )}
@@ -106,7 +106,7 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
 
                 {/* Drop-off indicator */}
                 {dropOffRate && parseFloat(dropOffRate) > 0 && (
-                  <div className="ml-10 sm:ml-14 mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-red-400">
+                  <div className="ml-10 sm:ml-14 mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-2 text-xs text-red-400">
                     <ChevronRight size={10} className="rotate-90 sm:hidden" />
                     <ChevronRight size={12} className="rotate-90 hidden sm:block" />
                     <span>-{dropOff} ({dropOffRate}% drop-off)</span>
@@ -121,19 +121,19 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
       {/* Conversion Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
         <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
-          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">CTA Click Rate</p>
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">CTA Click Rate</p>
           <p className="text-sm sm:text-lg font-bold text-tech-neon">{ctaClickRate.toFixed(1)}%</p>
         </div>
         <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
-          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Start Rate</p>
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Start Rate</p>
           <p className="text-sm sm:text-lg font-bold text-tech-accent">{formStartRate.toFixed(1)}%</p>
         </div>
         <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
-          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Completion</p>
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Completion</p>
           <p className="text-sm sm:text-lg font-bold text-tech-highlight">{formCompletionRate.toFixed(1)}%</p>
         </div>
         <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
-          <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">Overall Conversion</p>
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Overall Conversion</p>
           <p className="text-sm sm:text-lg font-bold text-green-400">{overallConversionRate.toFixed(2)}%</p>
         </div>
       </div>

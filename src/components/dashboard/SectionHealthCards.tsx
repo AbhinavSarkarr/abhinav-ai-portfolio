@@ -110,13 +110,13 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
                   <span className="block text-sm font-semibold text-black dark:text-white">
                     {section.total_views}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">Views</span>
+                  <span className="text-xs text-muted-foreground">Views</span>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-white/5">
                   <span className="block text-sm font-semibold text-green-400">
                     {section.avg_engagement_rate.toFixed(0)}%
                   </span>
-                  <span className="text-[10px] text-muted-foreground">Engaged</span>
+                  <span className="text-xs text-muted-foreground">Engaged</span>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-white/5">
                   <div className="flex items-center justify-center gap-1">
@@ -125,7 +125,7 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
                       {section.avg_exit_rate.toFixed(0)}%
                     </span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground">Exit</span>
+                  <span className="text-xs text-muted-foreground">Exit</span>
                 </div>
               </div>
 

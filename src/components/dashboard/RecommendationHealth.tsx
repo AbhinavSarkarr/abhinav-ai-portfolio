@@ -96,7 +96,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
             <p className="text-xs sm:text-sm text-muted-foreground">Overall CTR</p>
           </div>
           <p className="text-xl sm:text-3xl font-bold text-black dark:text-white">{data.overall_ctr.toFixed(1)}%</p>
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
+          <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
             {data.total_clicks}/{data.total_impressions}
           </p>
         </motion.div>
@@ -114,7 +114,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
             <p className="text-xs sm:text-sm text-muted-foreground">User Conv.</p>
           </div>
           <p className="text-xl sm:text-3xl font-bold text-black dark:text-white">{data.user_conversion_rate.toFixed(1)}%</p>
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">
+          <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">
             % of users who click
           </p>
         </motion.div>
@@ -135,7 +135,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
             <p className="text-xl sm:text-3xl font-bold text-black dark:text-white">{formatNumber(data.total_clicks)}</p>
             <p className="text-xs sm:text-sm text-muted-foreground">clicks</p>
           </div>
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">
+          <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1 hidden sm:block">
             from {formatNumber(data.total_impressions)} impressions
           </p>
         </motion.div>
@@ -244,13 +244,13 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-black dark:text-white">{pos.position}</p>
                     {isTopPerformer && (
-                      <span className="text-[10px] text-green-400">Best performer</span>
+                      <span className="text-xs text-green-400">Best performer</span>
                     )}
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-lg sm:text-xl font-bold text-black dark:text-white">{pos.ctr.toFixed(1)}%</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">CTR</p>
+                  <p className="text-xs text-muted-foreground">CTR</p>
                 </div>
               </motion.div>
             );
@@ -258,7 +258,7 @@ export function RecommendationHealth({ data }: RecommendationHealthProps) {
 
           {/* Insight */}
           <div className="p-2 sm:p-3 rounded-md sm:rounded-lg bg-tech-neon/10 border border-tech-neon/20">
-            <p className="text-[10px] sm:text-xs text-tech-accent">
+            <p className="text-xs text-tech-accent">
               {positionData[0].ctr > positionData[1].ctr && positionData[0].ctr > positionData[2].ctr
                 ? 'Position 1 performs best - visitors prefer the first recommendation'
                 : positionData[1].ctr > positionData[2].ctr

@@ -1,0 +1,279 @@
+import { motion } from 'framer-motion';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Treemap } from 'recharts';
+import { Chrome, Apple, Monitor, Smartphone, Tablet } from 'lucide-react';
+
+interface BrowserData {
+  browser: string;
+  sessions: number;
+  unique_visitors: number;
+}
+
+interface OSData {
+  operating_system: string;
+  sessions: number;
+  unique_visitors: number;
+}
+
+interface TechBreakdownProps {
+  browsers: BrowserData[];
+  operatingSystems: OSData[];
+}
+
+const browserColors: Record<string, string> = {
+  'chrome': '#4285F4',
+  'safari': '#000000',
+  'firefox': '#FF7139',
+  'edge': '#0078D7',
+  'opera': '#FF1B2D',
+  'samsung internet': '#1428A0',
+  'android webview': '#3DDC84',
+  'other': '#6B7280',
+};
+
+const osColors: Record<string, string> = {
+  'windows': '#00A4EF',
+  'macos': '#A3AAAE',
+  'ios': '#000000',
+  'android': '#3DDC84',
+  'linux': '#FCC624',
+  'chrome os': '#4285F4',
+  'other': '#6B7280',
+};
+
+function getBrowserColor(browser: string): string {
+  const key = browser.toLowerCase();
+  return browserColors[key] || browserColors['other'];
+}
+
+function getOSColor(os: string): string {
+  const key = os.toLowerCase();
+  return osColors[key] || osColors['other'];
+}
+
+// Combined donut chart showing both browser and OS
+export function TechBreakdown({ browsers, operatingSystems }: TechBreakdownProps) {
+  const hasBrowsers = browsers && browsers.length > 0;
+  const hasOS = operatingSystems && operatingSystems.length > 0;
+
+  if (!hasBrowsers && !hasOS) {
+    return (
+      <div className="text-center text-muted-foreground py-6">
+        <p className="text-sm">No tech data available</p>
+      </div>
+    );
+  }
+
+  // Prepare browser data
+  const browserData = (browsers || []).slice(0, 5).map(b => ({
+    name: b.browser,
+    value: b.sessions,
+    color: getBrowserColor(b.browser),
+  }));
+
+  // Prepare OS data
+  const osData = (operatingSystems || []).slice(0, 5).map(os => ({
+    name: os.operating_system,
+    value: os.sessions,
+    color: getOSColor(os.operating_system),
+  }));
+
+  const totalBrowserSessions = browserData.reduce((s, b) => s + b.value, 0);
+  const totalOSSessions = osData.reduce((s, o) => s + o.value, 0);
+
+  return (
+    <div className="flex items-start gap-4">
+      {/* Nested Donut Chart - Compact */}
+      <div className="flex-shrink-0 w-[120px] h-[120px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            {/* Outer ring - Browsers */}
+            <Pie
+              data={browserData}
+              cx="50%"
+              cy="50%"
+              innerRadius={35}
+              outerRadius={55}
+              dataKey="value"
+              stroke="none"
+            >
+              {browserData.map((entry, index) => (
+                <Cell key={index} fill={entry.color} />
+              ))}
+            </Pie>
+            {/* Inner ring - OS */}
+            <Pie
+              data={osData}
+              cx="50%"
+              cy="50%"
+              innerRadius={15}
+              outerRadius={30}
+              dataKey="value"
+              stroke="none"
+            >
+              {osData.map((entry, index) => (
+                <Cell key={index} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(17, 17, 27, 0.95)',
+                border: '1px solid rgba(123, 66, 246, 0.3)',
+                borderRadius: '8px',
+                fontSize: '12px',
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legend - Side by side */}
+      <div className="flex-1 grid grid-cols-2 gap-4">
+        {/* Browsers */}
+        <div>
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Browsers</h4>
+          <div className="space-y-1.5">
+            {browserData.slice(0, 3).map((browser) => (
+              <div key={browser.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: browser.color }} />
+                  <span className="text-sm text-foreground">{browser.name}</span>
+                </div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {((browser.value / totalBrowserSessions) * 100).toFixed(0)}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* OS */}
+        <div>
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Operating Systems</h4>
+          <div className="space-y-1.5">
+            {osData.slice(0, 3).map((os) => (
+              <div key={os.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: os.color }} />
+                  <span className="text-sm text-foreground">{os.name}</span>
+                </div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {((os.value / totalOSSessions) * 100).toFixed(0)}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Compact inline version
+export function TechBreakdownCompact({ browsers, operatingSystems }: TechBreakdownProps) {
+  const topBrowser = browsers?.[0];
+  const topOS = operatingSystems?.[0];
+
+  if (!topBrowser && !topOS) return null;
+
+  return (
+    <div className="flex items-center gap-4">
+      {topBrowser && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getBrowserColor(topBrowser.browser) }} />
+          <span className="text-sm text-foreground">{topBrowser.browser}</span>
+          <span className="text-sm font-bold text-muted-foreground">{topBrowser.sessions}</span>
+        </div>
+      )}
+      {topOS && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getOSColor(topOS.operating_system) }} />
+          <span className="text-sm text-foreground">{topOS.operating_system}</span>
+          <span className="text-sm font-bold text-muted-foreground">{topOS.sessions}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Stacked bar showing both together
+export function TechStackedBar({ browsers, operatingSystems }: TechBreakdownProps) {
+  const hasBrowsers = browsers && browsers.length > 0;
+  const hasOS = operatingSystems && operatingSystems.length > 0;
+
+  if (!hasBrowsers && !hasOS) return null;
+
+  const browserTotal = browsers?.reduce((s, b) => s + b.sessions, 0) || 0;
+  const osTotal = operatingSystems?.reduce((s, o) => s + o.sessions, 0) || 0;
+
+  return (
+    <div className="space-y-4">
+      {/* Browser bar */}
+      {hasBrowsers && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Browsers</span>
+            <span className="text-sm font-medium text-muted-foreground">{browserTotal} sessions</span>
+          </div>
+          <div className="h-6 rounded-lg overflow-hidden flex">
+            {browsers.slice(0, 5).map((browser, index) => {
+              const width = (browser.sessions / browserTotal) * 100;
+              return (
+                <motion.div
+                  key={browser.browser}
+                  className="h-full relative group"
+                  style={{ width: `${width}%`, backgroundColor: getBrowserColor(browser.browser) }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${width}%` }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  title={`${browser.browser}: ${browser.sessions}`}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* OS bar */}
+      {hasOS && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Operating Systems</span>
+            <span className="text-sm font-medium text-muted-foreground">{osTotal} sessions</span>
+          </div>
+          <div className="h-6 rounded-lg overflow-hidden flex">
+            {operatingSystems.slice(0, 5).map((os, index) => {
+              const width = (os.sessions / osTotal) * 100;
+              return (
+                <motion.div
+                  key={os.operating_system}
+                  className="h-full relative"
+                  style={{ width: `${width}%`, backgroundColor: getOSColor(os.operating_system) }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${width}%` }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  title={`${os.operating_system}: ${os.sessions}`}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Combined legend */}
+      <div className="flex flex-wrap gap-3 pt-2">
+        {browsers?.slice(0, 3).map(b => (
+          <div key={b.browser} className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getBrowserColor(b.browser) }} />
+            <span className="text-sm text-muted-foreground">{b.browser}</span>
+          </div>
+        ))}
+        {operatingSystems?.slice(0, 3).map(os => (
+          <div key={os.operating_system} className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getOSColor(os.operating_system) }} />
+            <span className="text-sm text-muted-foreground">{os.operating_system}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

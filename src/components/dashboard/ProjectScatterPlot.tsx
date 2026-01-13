@@ -52,7 +52,7 @@ export function ProjectScatterPlot({ data, height = 350 }: ProjectScatterPlotPro
         <h4 className="text-xs sm:text-sm font-medium text-black dark:text-white mb-0.5 sm:mb-1">
           Project Performance Matrix
         </h4>
-        <p className="text-[10px] sm:text-xs text-muted-foreground mb-3 sm:mb-4">
+        <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
           Views vs Engagement Score (bubble size = clicks)
         </p>
         {/* Mobile Scatter Chart */}
@@ -90,7 +90,7 @@ export function ProjectScatterPlot({ data, height = 350 }: ProjectScatterPlotPro
                   return (
                     <div className="p-2 rounded-lg bg-[rgba(10,4,38,0.95)] border border-white/20">
                       <p className="font-semibold text-black dark:text-white text-xs mb-1 truncate max-w-[150px]">{project.project_title}</p>
-                      <div className="space-y-0.5 text-[10px]">
+                      <div className="space-y-0.5 text-xs">
                         <p><span className="text-muted-foreground">Views:</span> <span className="text-black dark:text-white">{project.total_views}</span></p>
                         <p><span className="text-muted-foreground">Score:</span> <span className="text-tech-neon">{project.engagement_score.toFixed(0)}</span></p>
                       </div>
@@ -212,7 +212,7 @@ export function ProjectScatterPlot({ data, height = 350 }: ProjectScatterPlotPro
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-medium text-black dark:text-white truncate">{project.project_title}</p>
                     <span
-                      className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full inline-flex items-center gap-0.5 sm:gap-1 mt-0.5 sm:mt-1"
+                      className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full inline-flex items-center gap-0.5 sm:gap-1 mt-0.5 sm:mt-1"
                       style={{ backgroundColor: `${tier.color}20`, color: tier.color }}
                     >
                       <TierIcon size={8} className="sm:hidden" />
@@ -228,33 +228,33 @@ export function ProjectScatterPlot({ data, height = 350 }: ProjectScatterPlotPro
                   <Eye size={12} className="mx-auto mb-0.5 sm:mb-1 text-blue-400 sm:hidden" />
                   <Eye size={14} className="mx-auto mb-0.5 sm:mb-1 text-blue-400 hidden sm:block" />
                   <p className="text-sm sm:text-lg font-bold text-black dark:text-white">{project.total_views}</p>
-                  <p className="text-[8px] sm:text-[10px] text-muted-foreground">Views</p>
+                  <p className="text-xs text-muted-foreground">Views</p>
                 </div>
                 <div className="text-center p-1.5 sm:p-2 rounded-md sm:rounded-lg bg-white/5">
                   <MousePointerClick size={12} className="mx-auto mb-0.5 sm:mb-1 text-green-400 sm:hidden" />
                   <MousePointerClick size={14} className="mx-auto mb-0.5 sm:mb-1 text-green-400 hidden sm:block" />
                   <p className="text-sm sm:text-lg font-bold text-black dark:text-white">{project.total_clicks}</p>
-                  <p className="text-[8px] sm:text-[10px] text-muted-foreground">Clicks</p>
+                  <p className="text-xs text-muted-foreground">Clicks</p>
                 </div>
                 <div className="text-center p-1.5 sm:p-2 rounded-md sm:rounded-lg bg-white/5">
                   <TrendingUp size={12} className="mx-auto mb-0.5 sm:mb-1 text-cyan-400 sm:hidden" />
                   <TrendingUp size={14} className="mx-auto mb-0.5 sm:mb-1 text-cyan-400 hidden sm:block" />
                   <p className="text-sm sm:text-lg font-bold text-black dark:text-white">{project.ctr.toFixed(1)}%</p>
-                  <p className="text-[8px] sm:text-[10px] text-muted-foreground">CTR</p>
+                  <p className="text-xs text-muted-foreground">CTR</p>
                 </div>
                 <div className="text-center p-1.5 sm:p-2 rounded-md sm:rounded-lg bg-white/5">
                   <Sparkles size={12} className="mx-auto mb-0.5 sm:mb-1 text-purple-400 sm:hidden" />
                   <Sparkles size={14} className="mx-auto mb-0.5 sm:mb-1 text-purple-400 hidden sm:block" />
                   <p className="text-sm sm:text-lg font-bold text-black dark:text-white">{project.engagement_score.toFixed(0)}</p>
-                  <p className="text-[8px] sm:text-[10px] text-muted-foreground">Score</p>
+                  <p className="text-xs text-muted-foreground">Score</p>
                 </div>
               </div>
 
               {/* Position badge */}
               <div className="mt-2 sm:mt-3 flex items-center gap-1.5 sm:gap-2">
-                <span className="text-[10px] sm:text-xs text-muted-foreground">Recommended:</span>
+                <span className="text-xs text-muted-foreground">Recommended:</span>
                 <span
-                  className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full capitalize"
+                  className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full capitalize"
                   style={{
                     backgroundColor: project.recommended_position === 'featured' ? '#FFD70020' : 'rgba(255,255,255,0.1)',
                     color: project.recommended_position === 'featured' ? '#FFD700' : 'rgba(255,255,255,0.7)',

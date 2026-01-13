@@ -212,7 +212,7 @@ export function SectionRadarChart({ data, height = 350 }: SectionRadarChartProps
                       <span className="text-xs sm:text-sm font-medium text-black dark:text-white capitalize">{section.section_id}</span>
                     </div>
                     <span
-                      className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full border"
+                      className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full border"
                       style={{
                         backgroundColor: `${healthColor}15`,
                         borderColor: `${healthColor}40`,
@@ -222,7 +222,7 @@ export function SectionRadarChart({ data, height = 350 }: SectionRadarChartProps
                       {section.health_tier.replace('_', ' ')}
                     </span>
                   </div>
-                  <div className="grid grid-cols-4 gap-1 sm:gap-2 text-[10px] sm:text-xs">
+                  <div className="grid grid-cols-4 gap-1 sm:gap-2 text-xs">
                     <div>
                       <p className="text-muted-foreground">Health</p>
                       <p className="font-semibold text-black dark:text-white">{section.health_score}%</p>
@@ -243,7 +243,7 @@ export function SectionRadarChart({ data, height = 350 }: SectionRadarChartProps
                     </div>
                   </div>
                   {section.optimization_hint !== 'performing_well' && (
-                    <p className="text-[10px] sm:text-xs text-amber-400 mt-1.5 sm:mt-2 flex items-center gap-1">
+                    <p className="text-xs text-amber-400 mt-1.5 sm:mt-2 flex items-center gap-1">
                       <TrendingUp size={10} className="sm:hidden" />
                       <TrendingUp size={12} className="hidden sm:block" />
                       <span className="truncate">{section.optimization_hint.replace(/_/g, ' ')}</span>
@@ -269,7 +269,7 @@ export function SectionRadarChart({ data, height = 350 }: SectionRadarChartProps
             <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
               <metric.icon size={12} className="sm:hidden" style={{ color: metric.color }} />
               <metric.icon size={16} className="hidden sm:block" style={{ color: metric.color }} />
-              <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{metric.label}</span>
+              <span className="text-xs text-muted-foreground truncate">{metric.label}</span>
             </div>
             <p className="text-lg sm:text-2xl font-bold" style={{ color: metric.color }}>
               {metric.value}{metric.suffix}

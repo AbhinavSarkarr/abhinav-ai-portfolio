@@ -127,7 +127,7 @@ export function SkillDemandChart({ data, height = 350 }: SkillDemandChartProps) 
               </div>
               <div className="flex items-center gap-2">
                 <span
-                  className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border"
+                  className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border"
                   style={{
                     backgroundColor: `${demandColor}20`,
                     borderColor: `${demandColor}40`,

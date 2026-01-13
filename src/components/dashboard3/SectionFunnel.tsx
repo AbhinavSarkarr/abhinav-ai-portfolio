@@ -147,8 +147,8 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
               {index < sortedSections.length - 1 && section.total_exits > 0 && (
                 <div className="ml-11 flex items-center gap-2 py-1">
                   <ChevronDown size={14} className="text-muted-foreground" />
-                  <span className="text-xs text-red-400 flex items-center gap-1">
-                    <LogOut size={10} />
+                  <span className="text-sm text-red-400 flex items-center gap-1">
+                    <LogOut size={12} />
                     {section.total_exits} visitors left here
                   </span>
                 </div>
@@ -158,27 +158,6 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
         );
       })}
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-muted/20">
-        <div className="text-center p-3 rounded-lg bg-emerald-500/10">
-          <div className="text-lg font-bold text-emerald-400">
-            {sortedSections.filter(s => s.dropoff_indicator === 'low_dropoff').length}
-          </div>
-          <div className="text-xs text-muted-foreground">Good Retention</div>
-        </div>
-        <div className="text-center p-3 rounded-lg bg-amber-500/10">
-          <div className="text-lg font-bold text-amber-400">
-            {sortedSections.filter(s => s.dropoff_indicator === 'moderate_dropoff').length}
-          </div>
-          <div className="text-xs text-muted-foreground">Moderate Drop-off</div>
-        </div>
-        <div className="text-center p-3 rounded-lg bg-red-500/10">
-          <div className="text-lg font-bold text-red-400">
-            {sortedSections.filter(s => s.dropoff_indicator === 'high_dropoff').length}
-          </div>
-          <div className="text-xs text-muted-foreground">High Drop-off</div>
-        </div>
-      </div>
     </div>
   );
 }

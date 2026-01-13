@@ -40,6 +40,10 @@ import {
 import { HealthScoreGauge, HealthScoreCard } from '@/components/dashboard3/HealthScoreGauge';
 import { AlertBanner, type Alert } from '@/components/dashboard3/AlertBanner';
 import { SectionFunnel, SectionDropoffSummary } from '@/components/dashboard3/SectionFunnel';
+import { TopVisitors, TopVisitorsSummary } from '@/components/dashboard3/TopVisitors';
+import { DomainInterest, DomainInterestBars } from '@/components/dashboard3/DomainInterest';
+import { TechStackedBar } from '@/components/dashboard3/TechBreakdown';
+import { ProjectMetricsChart, ProjectDetailedBreakdown, ProjectActionsSummary } from '@/components/dashboard3/ProjectAnalyticsAdvanced';
 import { InfoTooltip, analyticsDictionary } from '@/components/dashboard/InfoTooltip';
 import {
   useDashboardData,
@@ -74,6 +78,7 @@ import {
   MousePointer,
   Smartphone,
   Monitor,
+  Tablet,
   BookOpen,
   Award,
   MapPin,
@@ -673,18 +678,22 @@ export default function Dashboard3() {
           priority="high"
         >
           {/* Conversion Cards with inline progress bars */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
             {[
               { label: 'Resume', sublabel: 'Downloads', value: data.conversionSummary.resume_downloads, icon: Download, color: 'emerald', max: 10 },
               { label: 'Contact', sublabel: 'Submissions', value: data.conversionSummary.form_submissions, icon: MessageSquare, color: 'blue', max: 5 },
               { label: 'Social', sublabel: 'Profile Clicks', value: data.conversionSummary.social_clicks, icon: Share2, color: 'purple', max: 20 },
               { label: 'Publications', sublabel: 'Views', value: data.conversionSummary.publication_clicks, icon: BookOpen, color: 'amber', max: 15 },
+              { label: 'Outbound', sublabel: 'External Links', value: data.conversionSummary.outbound_clicks, icon: ExternalLink, color: 'cyan', max: 30 },
+              { label: 'Copied', sublabel: 'Content Copies', value: data.conversionSummary.content_copies, icon: FileText, color: 'pink', max: 10 },
             ].map((item, index) => {
               const colorClasses = {
                 emerald: { bg: 'from-emerald-500/10 to-emerald-500/5', border: 'border-emerald-500/30', icon: 'bg-emerald-500/20', text: 'text-emerald-400', bar: 'bg-emerald-500' },
                 blue: { bg: 'from-blue-500/10 to-blue-500/5', border: 'border-blue-500/30', icon: 'bg-blue-500/20', text: 'text-blue-400', bar: 'bg-blue-500' },
                 purple: { bg: 'from-purple-500/10 to-purple-500/5', border: 'border-purple-500/30', icon: 'bg-purple-500/20', text: 'text-purple-400', bar: 'bg-purple-500' },
                 amber: { bg: 'from-amber-500/10 to-amber-500/5', border: 'border-amber-500/30', icon: 'bg-amber-500/20', text: 'text-amber-400', bar: 'bg-amber-500' },
+                cyan: { bg: 'from-cyan-500/10 to-cyan-500/5', border: 'border-cyan-500/30', icon: 'bg-cyan-500/20', text: 'text-cyan-400', bar: 'bg-cyan-500' },
+                pink: { bg: 'from-pink-500/10 to-pink-500/5', border: 'border-pink-500/30', icon: 'bg-pink-500/20', text: 'text-pink-400', bar: 'bg-pink-500' },
               }[item.color];
               const percentage = Math.min(100, (item.value / item.max) * 100);
               const Icon = item.icon;
@@ -878,7 +887,62 @@ export default function Dashboard3() {
         )}
 
         {/* ============================================ */}
-        {/* SECTION 4: TRAFFIC SOURCES */}
+        {/* SECTION 4: AUDIENCE INSIGHTS (NEW - Combined View) */}
+        {/* ============================================ */}
+        <DashboardSection
+          id="audience"
+          title="Audience Insights"
+          subtitle="Top visitors, interests, and technology"
+          description="Deep dive into your audience: who are your most valuable visitors, what domains interest them, and what technology they use."
+          icon={Users}
+          priority="medium"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            {/* Top Visitors */}
+            <GlassCard title="Top Visitors" subtitle="Most engaged audience">
+              <div className="mt-2">
+                <TopVisitors data={data.topVisitors || []} />
+              </div>
+            </GlassCard>
+
+            {/* Domain Interest */}
+            <GlassCard title="Domain Interest" subtitle="What industries are interested">
+              <div className="mt-2">
+                <DomainInterest data={data.domainRankings || []} />
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* Browser/OS Stacked Bars - Full Width */}
+          <GlassCard title="Tech Distribution" subtitle="Combined browser and OS breakdown">
+            <div className="mt-2">
+              <TechStackedBar
+                browsers={data.devices.browsers || []}
+                operatingSystems={data.devices.operatingSystems || []}
+              />
+            </div>
+          </GlassCard>
+
+          <SectionConclusion
+            insights={[
+              {
+                type: (data.topVisitors?.filter(v => v.visitor_segment === 'converter').length || 0) > 0 ? 'positive' as const : 'neutral' as const,
+                text: `${data.topVisitors?.filter(v => v.visitor_segment === 'converter').length || 0} converters among ${data.topVisitors?.length || 0} tracked visitors.`
+              },
+              {
+                type: 'neutral' as const,
+                text: `Top domain interest: ${data.domainRankings?.[0]?.domain || 'N/A'} with score ${data.domainRankings?.[0]?.total_interest_score || 0}.`
+              },
+              {
+                type: 'neutral' as const,
+                text: `Primary browser: ${data.devices.browsers?.[0]?.browser || 'N/A'}, Primary OS: ${data.devices.operatingSystems?.[0]?.operating_system || 'N/A'}.`
+              },
+            ]}
+          />
+        </DashboardSection>
+
+        {/* ============================================ */}
+        {/* SECTION 5: TRAFFIC SOURCES */}
         {/* ============================================ */}
         <DashboardSection
           id="traffic"
@@ -924,16 +988,16 @@ export default function Dashboard3() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Traffic Sources Pie */}
             <GlassCard title="Traffic Breakdown" subtitle="Discovery channels">
-              <div className="flex flex-col lg:flex-row items-center gap-4 mt-2">
-                <div className="w-full lg:w-1/2">
-                  <ResponsiveContainer width="100%" height={160}>
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex-shrink-0 w-[180px] h-[180px]">
+                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={trafficSourcePieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={35}
-                        outerRadius={60}
+                        innerRadius={50}
+                        outerRadius={85}
                         dataKey="value"
                         labelLine={false}
                       >
@@ -945,7 +1009,7 @@ export default function Dashboard3() {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="w-full lg:w-1/2 space-y-2">
+                <div className="flex-1 space-y-1.5">
                   {trafficSourcePieData.map((source) => (
                     <div key={source.name} className="flex items-center justify-between p-2 rounded-lg bg-white/5">
                       <div className="flex items-center gap-2">
@@ -1019,43 +1083,57 @@ export default function Dashboard3() {
             </GlassCard>
 
             <GlassCard title="Device Usage" subtitle="Access methods">
-              <div className="flex flex-col lg:flex-row items-center gap-4 mt-2">
-                <div className="w-full lg:w-1/2">
-                  <ResponsiveContainer width="100%" height={140}>
-                    <PieChart>
-                      <Pie
-                        data={devicePieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={30}
-                        outerRadius={50}
-                        dataKey="value"
+              <div className="mt-4 space-y-5">
+                {/* Stacked bar showing distribution */}
+                <div className="h-12 rounded-xl overflow-hidden flex">
+                  {devicePieData.map((device, index) => {
+                    const total = devicePieData.reduce((sum, d) => sum + d.value, 0);
+                    const width = (device.value / total) * 100;
+                    return (
+                      <div
+                        key={index}
+                        className="h-full flex items-center justify-center text-sm font-bold text-white"
+                        style={{ width: `${width}%`, backgroundColor: device.color }}
                       >
-                        {devicePieData.map((entry, index) => (
-                          <Cell key={index} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip {...tooltipStyle} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                        {width > 15 && `${width.toFixed(0)}%`}
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="w-full lg:w-1/2 space-y-2">
-                  {data.devices.categories.map((device) => (
-                    <div key={device.device_category} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
-                      <div className="flex items-center gap-3">
-                        {device.device_category === 'mobile' ? (
-                          <Smartphone size={18} className="text-tech-neon" />
-                        ) : (
-                          <Monitor size={18} className="text-tech-accent" />
-                        )}
-                        <span className="text-sm font-medium text-foreground capitalize">{device.device_category}</span>
+
+                {/* Device breakdown with progress bars */}
+                <div className="space-y-5">
+                  {data.devices.categories.map((device) => {
+                    const maxSessions = Math.max(...data.devices.categories.map(d => d.sessions));
+                    const barWidth = (device.sessions / maxSessions) * 100;
+                    const color = device.device_category === 'mobile' ? '#00E0FF' : device.device_category === 'desktop' ? '#7B42F6' : '#F59E0B';
+                    return (
+                      <div key={device.device_category} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {device.device_category === 'mobile' ? (
+                              <Smartphone size={20} style={{ color }} />
+                            ) : device.device_category === 'desktop' ? (
+                              <Monitor size={20} style={{ color }} />
+                            ) : (
+                              <Tablet size={20} style={{ color }} />
+                            )}
+                            <span className="text-base font-medium text-foreground capitalize">{device.device_category}</span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-sm text-muted-foreground">{device.engagement_rate?.toFixed(0) || 0}% engaged</span>
+                            <span className="text-base font-bold text-foreground">{device.sessions}</span>
+                          </div>
+                        </div>
+                        <div className="h-4 bg-muted/20 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{ width: `${barWidth}%`, backgroundColor: color }}
+                          />
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-foreground">{device.sessions}</div>
-                        <div className="text-xs text-muted-foreground">{device.engagement_rate?.toFixed(0) || 0}% engaged</div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </GlassCard>
@@ -1114,26 +1192,29 @@ export default function Dashboard3() {
                 ))}
               </div>
 
-              {/* Project Performance Chart */}
-              <GlassCard title="Project Engagement" subtitle="Views vs clicks comparison" className="mb-4">
+              {/* Project Actions Summary */}
+              <GlassCard title="Project Actions Overview" subtitle="Total interactions breakdown" className="mb-4">
                 <div className="mt-2">
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={data.projectRankings.slice(0, 5).map(p => ({
-                      name: p.project_title.length > 15 ? p.project_title.slice(0, 12) + '...' : p.project_title,
-                      Views: p.total_unique_viewers,
-                      Clicks: p.total_clicks,
-                    }))}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                      <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} axisLine={false} tickLine={false} width={35} />
-                      <Tooltip {...tooltipStyle} />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Bar dataKey="Views" fill={chartColors.primary} radius={[3, 3, 0, 0]} />
-                      <Bar dataKey="Clicks" fill={chartColors.accent} radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <ProjectActionsSummary data={data.projectRankings} />
                 </div>
               </GlassCard>
+
+              {/* Advanced Project Analytics - Side by Side */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                {/* Stacked Multi-Metric Chart */}
+                <GlassCard title="Project Metrics" subtitle="Views, clicks, GitHub, demo combined">
+                  <div className="mt-2">
+                    <ProjectMetricsChart data={data.projectRankings} />
+                  </div>
+                </GlassCard>
+
+                {/* Detailed Breakdown per Project */}
+                <GlassCard title="Action Breakdown" subtitle="Per-project interactions">
+                  <div className="mt-2">
+                    <ProjectDetailedBreakdown data={data.projectRankings} />
+                  </div>
+                </GlassCard>
+              </div>
 
               {/* Project Rankings Table */}
               <GlassCard title="All Projects" subtitle="Ranked by engagement">
@@ -1192,8 +1273,8 @@ export default function Dashboard3() {
             <SectionConclusion
               insights={[
                 { type: 'positive' as const, text: `Top project: "${data.projectRankings[0].project_title}" with ${data.projectRankings[0].total_clicks} clicks.` },
-                { type: 'neutral' as const, text: `${data.projectRankings.reduce((s, p) => s + p.total_clicks, 0)} total clicks across ${data.projectRankings.length} projects.` },
-                { type: 'neutral' as const, text: `${data.projectRankings.reduce((s, p) => s + p.total_unique_viewers, 0)} unique project views.` },
+                { type: 'neutral' as const, text: `${data.projectRankings.reduce((s, p) => s + p.total_github_clicks, 0)} GitHub clicks, ${data.projectRankings.reduce((s, p) => s + p.total_demo_clicks, 0)} demo clicks across all projects.` },
+                { type: 'neutral' as const, text: `${data.projectRankings.reduce((s, p) => s + p.total_expands, 0)} card expands, ${data.projectRankings.reduce((s, p) => s + p.total_link_clicks, 0)} link clicks total.` },
               ]}
             />
           )}
@@ -1381,33 +1462,48 @@ export default function Dashboard3() {
           >
             <GlassCard title="Experience Rankings" subtitle="By visitor interest">
               <div className="space-y-3 mt-2">
-                {data.experienceRankings.map((exp, index) => (
-                  <motion.div
-                    key={exp.experience_id}
-                    className="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className={`w-8 h-8 rounded flex items-center justify-center text-sm font-bold ${
-                          exp.interest_rank === 1 ? 'bg-amber-500/20 text-amber-400' :
-                          exp.interest_rank === 2 ? 'bg-gray-400/20 text-gray-400' :
-                          exp.interest_rank === 3 ? 'bg-orange-500/20 text-orange-400' :
-                          'bg-muted text-muted-foreground'
-                        }`}>
-                          {exp.interest_rank}
-                        </span>
-                        <div>
-                          <h4 className="text-sm font-semibold text-foreground">{exp.experience_title}</h4>
-                          <p className="text-sm text-muted-foreground">{exp.company}</p>
+                {data.experienceRankings.map((exp, index) => {
+                  const attractivenessColor = exp.role_attractiveness === 'high' ? 'text-emerald-400 bg-emerald-500/20' :
+                                              exp.role_attractiveness === 'medium' ? 'text-blue-400 bg-blue-500/20' :
+                                              'text-gray-400 bg-gray-500/20';
+                  return (
+                    <motion.div
+                      key={exp.experience_id}
+                      className="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-8 h-8 rounded flex items-center justify-center text-sm font-bold ${
+                            exp.interest_rank === 1 ? 'bg-amber-500/20 text-amber-400' :
+                            exp.interest_rank === 2 ? 'bg-gray-400/20 text-gray-400' :
+                            exp.interest_rank === 3 ? 'bg-orange-500/20 text-orange-400' :
+                            'bg-muted text-muted-foreground'
+                          }`}>
+                            {exp.interest_rank}
+                          </span>
+                          <div>
+                            <h4 className="text-sm font-semibold text-foreground">{exp.experience_title}</h4>
+                            <p className="text-sm text-muted-foreground">{exp.company}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${attractivenessColor}`}>
+                            {exp.role_attractiveness || 'N/A'}
+                          </span>
+                          <span className="text-sm text-muted-foreground">{exp.total_interactions} views</span>
                         </div>
                       </div>
-                      <span className="text-sm text-muted-foreground">{exp.total_interactions} views</span>
-                    </div>
-                  </motion.div>
-                ))}
+                      {exp.positioning_suggestion && (
+                        <p className="text-xs text-muted-foreground ml-11">
+                          💡 {exp.positioning_suggestion}
+                        </p>
+                      )}
+                    </motion.div>
+                  );
+                })}
               </div>
             </GlassCard>
 

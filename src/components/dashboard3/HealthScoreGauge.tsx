@@ -13,7 +13,7 @@ export function HealthScoreGauge({ score, label = 'Portfolio Health', size = 'md
   const dimensions = {
     sm: { size: 70, stroke: 5, fontSize: 'text-sm' },
     md: { size: 90, stroke: 6, fontSize: 'text-lg' },
-    lg: { size: 110, stroke: 8, fontSize: 'text-xl' },
+    lg: { size: 160, stroke: 12, fontSize: 'text-3xl' },
   };
 
   const { size: gaugeSize, stroke, fontSize } = dimensions[size];
@@ -111,28 +111,28 @@ export function HealthScoreCard({ score, engagementRate, bounceRate, totalConver
   ];
 
   return (
-    <div className="flex items-center gap-6 p-4">
+    <div className="flex items-center gap-10 p-5">
       {/* Gauge on left */}
       <div className="flex-shrink-0">
         <HealthScoreGauge score={score} size="lg" />
       </div>
 
       {/* Metrics on right */}
-      <div className="flex-1 space-y-3">
+      <div className="flex-1 space-y-6">
         {metrics.map((metric, index) => {
           const Icon = metric.icon;
           const percentage = (metric.current / metric.max) * 100;
           return (
             <motion.div
               key={metric.label}
-              className="flex items-center gap-3"
+              className="flex items-center gap-4"
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Icon size={18} style={{ color: metric.color }} className="flex-shrink-0" />
-              <span className="text-sm text-muted-foreground w-24 flex-shrink-0">{metric.label}</span>
-              <div className="flex-1 h-2 bg-muted/30 rounded-full overflow-hidden">
+              <Icon size={22} style={{ color: metric.color }} className="flex-shrink-0" />
+              <span className="text-sm text-muted-foreground w-28 flex-shrink-0">{metric.label}</span>
+              <div className="flex-1 h-4 bg-muted/30 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ backgroundColor: metric.color }}
@@ -141,7 +141,7 @@ export function HealthScoreCard({ score, engagementRate, bounceRate, totalConver
                   transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
                 />
               </div>
-              <span className="text-sm font-semibold text-foreground w-14 text-right flex-shrink-0">{metric.value}</span>
+              <span className="text-base font-semibold text-foreground w-20 text-right flex-shrink-0">{metric.value}</span>
             </motion.div>
           );
         })}

@@ -65,7 +65,7 @@ export function ProjectRankingList({ data }: ProjectRankingListProps) {
                     #{project.overall_rank}
                   </span>
                   {project.recommended_position === 'featured' && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">
                       Featured
                     </span>
                   )}
@@ -82,21 +82,21 @@ export function ProjectRankingList({ data }: ProjectRankingListProps) {
                     <span className="block text-sm font-semibold text-black dark:text-white">
                       {formatNumber(project.total_views)}
                     </span>
-                    <span className="text-[10px] text-muted-foreground">Views</span>
+                    <span className="text-xs text-muted-foreground">Views</span>
                   </div>
                   <div className="text-center p-2 rounded-lg bg-white/5">
                     <MousePointerClick size={14} className="mx-auto text-tech-accent mb-1" />
                     <span className="block text-sm font-semibold text-black dark:text-white">
                       {formatNumber(project.total_clicks)}
                     </span>
-                    <span className="text-[10px] text-muted-foreground">Clicks</span>
+                    <span className="text-xs text-muted-foreground">Clicks</span>
                   </div>
                   <div className="text-center p-2 rounded-lg bg-white/5">
                     <TrendingUp size={14} className="mx-auto text-green-400 mb-1" />
                     <span className="block text-sm font-semibold text-black dark:text-white">
                       {ctr}%
                     </span>
-                    <span className="text-[10px] text-muted-foreground">CTR</span>
+                    <span className="text-xs text-muted-foreground">CTR</span>
                   </div>
                 </div>
 

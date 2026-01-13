@@ -90,10 +90,10 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
   };
 
   return (
-    <div className="flex flex-col lg:flex-row items-center gap-3">
-      {/* Pie Chart */}
-      <div className="w-full lg:w-2/5">
-        <ResponsiveContainer width="100%" height={height}>
+    <div className="flex items-center gap-3">
+      {/* Pie Chart - Larger */}
+      <div className="flex-shrink-0 w-[200px] h-[200px]">
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={chartData}
@@ -101,8 +101,8 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
               cy="50%"
               labelLine={false}
               label={renderCustomLabel}
-              outerRadius={60}
-              innerRadius={35}
+              outerRadius={95}
+              innerRadius={55}
               dataKey="value"
               strokeWidth={0}
             >
@@ -128,8 +128,8 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
         </ResponsiveContainer>
       </div>
 
-      {/* Legend */}
-      <div className="w-full lg:w-3/5 space-y-1.5">
+      {/* Legend - Compact */}
+      <div className="flex-1 space-y-1">
         {chartData.map((segment) => {
           const Icon = segment.icon;
           const percentage = ((segment.value / total) * 100).toFixed(1);
@@ -139,10 +139,10 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
               className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
             >
               <div
-                className="w-6 h-6 rounded flex items-center justify-center"
+                className="w-5 h-5 rounded flex items-center justify-center"
                 style={{ backgroundColor: `${segment.color}20` }}
               >
-                <Icon size={12} style={{ color: segment.color }} />
+                <Icon size={11} style={{ color: segment.color }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
@@ -153,7 +153,7 @@ export function VisitorSegmentChart({ data, height = 280 }: VisitorSegmentChartP
                     {segment.value}
                   </span>
                 </div>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {segment.description} • {percentage}%
                 </span>
               </div>

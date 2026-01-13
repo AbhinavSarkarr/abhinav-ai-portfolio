@@ -210,28 +210,28 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xl sm:text-2xl font-bold text-emerald-400">{groupedInsights.success.length}</span>
           </div>
-          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Wins</span>
+          <span className="text-xs text-gray-400 uppercase tracking-wider">Wins</span>
         </div>
         <div className="flex-1 p-3 sm:p-4 text-center border-r border-white/10 group">
           <div className="flex items-center justify-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
             <span className="text-xl sm:text-2xl font-bold text-amber-400">{groupedInsights.warning.length}</span>
           </div>
-          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Risks</span>
+          <span className="text-xs text-gray-400 uppercase tracking-wider">Risks</span>
         </div>
         <div className="flex-1 p-3 sm:p-4 text-center border-r border-white/10 group">
           <div className="flex items-center justify-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-tech-neon animate-pulse" />
             <span className="text-xl sm:text-2xl font-bold text-tech-neon">{groupedInsights.opportunity.length}</span>
           </div>
-          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Opportunities</span>
+          <span className="text-xs text-gray-400 uppercase tracking-wider">Opportunities</span>
         </div>
         <div className="flex-1 p-3 sm:p-4 text-center group">
           <div className="flex items-center justify-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-tech-accent animate-pulse" />
             <span className="text-xl sm:text-2xl font-bold text-tech-accent">{groupedInsights.info.length}</span>
           </div>
-          <span className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">Insights</span>
+          <span className="text-xs text-gray-400 uppercase tracking-wider">Insights</span>
         </div>
       </div>
 
@@ -271,7 +271,7 @@ export function KeyInsightsPanel({ data }: KeyInsightsPanelProps) {
               </div>
 
               {/* Type badge */}
-              <div className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.bg} ${config.text} border ${config.border}`}>
+              <div className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${config.bg} ${config.text} border ${config.border}`}>
                 {config.icon}
                 <span>{config.label}</span>
               </div>
