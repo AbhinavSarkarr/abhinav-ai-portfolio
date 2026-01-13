@@ -26,3 +26,14 @@ export { DomainInterestChart } from './DomainInterestChart';
 export { ExperienceInterestChart } from './ExperienceInterestChart';
 export { KeyInsightsPanel } from './KeyInsightsPanel';
 export { EnhancedOverview } from './EnhancedOverview';
+
+// Stakeholder-Friendly Components (v3)
+export { InsightCard, SectionConclusion } from './InsightCard';
+export { InfoTooltip, MetricWithInfo, analyticsDictionary } from './InfoTooltip';
+export {
+  HeroKPI,
+  StatRow,
+  ProgressMetric,
+  ConversionSummary,
+  ComparisonBar,
+} from './ExecutiveMetrics';
