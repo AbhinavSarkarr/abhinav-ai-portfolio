@@ -1,16 +1,24 @@
 import { motion } from 'framer-motion';
-import { ChevronDown, AlertTriangle, CheckCircle, TrendingDown, Eye, LogOut } from 'lucide-react';
+import { ChevronDown, AlertTriangle, CheckCircle, TrendingDown, Eye, LogOut, RefreshCw, Sparkles } from 'lucide-react';
 
 interface SectionData {
   section_id: string;
-  total_views: number;
+  // Unique metrics (for funnel analysis - each session counts once)
+  total_unique_views: number;
+  total_unique_exits: number;
   total_unique_viewers: number;
+  avg_exit_rate: number;  // Based on unique, always <=100%
+  // Total metrics (for engagement analysis - includes revisits)
+  total_views: number;
+  total_exits: number;
+  avg_total_exit_rate: number;
+  avg_revisits_per_session: number;
+  // Engagement metrics
   total_engaged_views: number;
   avg_engagement_rate: number;
   avg_time_spent_seconds: number;
   avg_scroll_depth_percent: number;
-  total_exits: number;
-  avg_exit_rate: number;
+  // Scores and rankings
   health_score: number;
   engagement_rank: number;
   health_tier: string;
@@ -62,6 +70,19 @@ function getDropoffConfig(indicator: string) {
   }
 }
 
+// Get stickiness indicator based on revisit rate
+function getStickinessConfig(revisits: number) {
+  if (revisits >= 2.0) {
+    return { color: '#8B5CF6', label: 'Very Sticky', bgColor: 'bg-purple-500/10', isSticky: true };
+  } else if (revisits >= 1.5) {
+    return { color: '#3B82F6', label: 'Sticky', bgColor: 'bg-blue-500/10', isSticky: true };
+  } else if (revisits >= 1.2) {
+    return { color: '#6B7280', label: 'Normal', bgColor: 'bg-gray-500/10', isSticky: false };
+  } else {
+    return { color: '#6B7280', label: 'Linear', bgColor: 'bg-gray-500/10', isSticky: false };
+  }
+}
+
 export function SectionFunnel({ data }: SectionFunnelProps) {
   if (!data || data.length === 0) {
     return (
@@ -71,17 +92,18 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
     );
   }
 
-  // Sort by views descending (natural funnel order)
-  const sortedSections = [...data].sort((a, b) => b.total_views - a.total_views);
-  const maxViews = sortedSections[0]?.total_views || 1;
+  // Sort by unique views descending (natural funnel order - each session counts once)
+  const sortedSections = [...data].sort((a, b) => b.total_unique_views - a.total_unique_views);
+  const maxViews = sortedSections[0]?.total_unique_views || 1;
 
   return (
     <div className="space-y-2">
       {sortedSections.map((section, index) => {
-        const widthPercent = (section.total_views / maxViews) * 100;
+        const widthPercent = (section.total_unique_views / maxViews) * 100;
         const dropoffConfig = getDropoffConfig(section.dropoff_indicator);
         const DropoffIcon = dropoffConfig.icon;
         const healthColor = getHealthColor(section.health_tier);
+        const stickinessConfig = getStickinessConfig(section.avg_revisits_per_session);
 
         return (
           <motion.div
@@ -107,10 +129,22 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
                     <span className="text-xs md:text-sm font-medium text-foreground truncate">
                       {formatSectionName(section.section_id)}
                     </span>
-                    <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
                       <span className="text-xs md:text-sm font-semibold text-foreground">
-                        {section.total_views}
+                        {section.total_unique_views}
                       </span>
+                      {/* Stickiness Badge - only show if sticky */}
+                      {stickinessConfig.isSticky && (
+                        <span
+                          className={`hidden md:flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium ${stickinessConfig.bgColor}`}
+                          style={{ color: stickinessConfig.color }}
+                          title={`${section.avg_revisits_per_session.toFixed(1)}x revisits per session`}
+                        >
+                          <RefreshCw size={10} />
+                          {section.avg_revisits_per_session.toFixed(1)}x
+                        </span>
+                      )}
+                      {/* Exit Rate Badge */}
                       <span
                         className={`flex items-center gap-0.5 md:gap-1 px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium ${dropoffConfig.bgColor}`}
                         style={{ color: dropoffConfig.color }}
@@ -145,12 +179,12 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
               </div>
 
               {/* Drop-off Indicator Arrow - Hidden on mobile */}
-              {index < sortedSections.length - 1 && section.total_exits > 0 && (
+              {index < sortedSections.length - 1 && section.total_unique_exits > 0 && (
                 <div className="hidden md:flex ml-11 items-center gap-2 py-1">
                   <ChevronDown size={14} className="text-muted-foreground" />
                   <span className="text-sm text-red-400 flex items-center gap-1">
                     <LogOut size={12} />
-                    {section.total_exits} visitors left here
+                    {section.total_unique_exits} sessions ended here
                   </span>
                 </div>
               )}
@@ -194,6 +228,52 @@ export function SectionDropoffSummary({ data }: SectionDropoffSummaryProps) {
           <span className="text-sm font-bold text-red-400">{section.avg_exit_rate.toFixed(0)}% exit</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+// Stickiness Summary - shows sections users revisit most
+interface SectionStickinessSummaryProps {
+  data: SectionData[];
+}
+
+export function SectionStickinessSummary({ data }: SectionStickinessSummaryProps) {
+  if (!data || data.length === 0) return null;
+
+  // Find sections with highest stickiness (revisits >= 1.5)
+  const stickySections = data
+    .filter(s => s.avg_revisits_per_session >= 1.5)
+    .sort((a, b) => b.avg_revisits_per_session - a.avg_revisits_per_session)
+    .slice(0, 3);
+
+  if (stickySections.length === 0) return null;
+
+  return (
+    <div className="space-y-2">
+      <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+        <Sparkles size={14} className="text-purple-400" />
+        Most Engaging Sections
+      </h4>
+      <p className="text-xs text-muted-foreground mb-2">
+        Sections users revisit multiple times per session
+      </p>
+      {stickySections.map((section) => {
+        const config = getStickinessConfig(section.avg_revisits_per_session);
+        return (
+          <div
+            key={section.section_id}
+            className={`flex items-center justify-between p-2 rounded-lg ${config.bgColor} border border-purple-500/20`}
+          >
+            <span className="text-sm text-foreground">{formatSectionName(section.section_id)}</span>
+            <div className="flex items-center gap-2">
+              <RefreshCw size={12} style={{ color: config.color }} />
+              <span className="text-sm font-bold" style={{ color: config.color }}>
+                {section.avg_revisits_per_session.toFixed(1)}x revisits
+              </span>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

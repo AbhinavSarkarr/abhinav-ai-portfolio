@@ -108,7 +108,7 @@ export function SectionHealthCards({ data }: SectionHealthCardsProps) {
               <div className="grid grid-cols-3 gap-2 mb-4">
                 <div className="text-center p-2 rounded-lg bg-white/5">
                   <span className="block text-sm font-semibold text-black dark:text-white">
-                    {section.total_views}
+                    {section.total_unique_views}
                   </span>
                   <span className="text-xs text-muted-foreground">Views</span>
                 </div>

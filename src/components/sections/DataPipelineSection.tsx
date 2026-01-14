@@ -289,7 +289,7 @@ export function DataPipelineSection() {
           transition={{ duration: 0.5, delay: 0.8 }}
         >
           <motion.a
-            href="https://analytics.abhinavbuilds.in"
+            href="http://localhost:8080"
             target="_blank"
             rel="noopener noreferrer"
             className="gradient-cta"
@@ -302,7 +302,7 @@ export function DataPipelineSection() {
             <ExternalLink size={16} />
           </motion.a>
           <p className="text-xs text-tech-accent/70 mt-2 font-mono">
-            analytics.abhinavbuilds.in
+            localhost:8080
           </p>
           <p className="text-sm text-muted-foreground mt-2 text-center">
             Explore real-time metrics, engagement data, and content performance

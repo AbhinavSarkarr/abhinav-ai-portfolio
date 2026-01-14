@@ -39,7 +39,7 @@ import {
 } from '@/components/dashboard';
 import { HealthScoreGauge, HealthScoreCard } from '@/components/dashboard3/HealthScoreGauge';
 import { AlertBanner, type Alert } from '@/components/dashboard3/AlertBanner';
-import { SectionFunnel, SectionDropoffSummary } from '@/components/dashboard3/SectionFunnel';
+import { SectionFunnel, SectionDropoffSummary, SectionStickinessSummary } from '@/components/dashboard3/SectionFunnel';
 import { TopVisitors, TopVisitorsSummary } from '@/components/dashboard3/TopVisitors';
 import { DomainInterest, DomainInterestBars } from '@/components/dashboard3/DomainInterest';
 import { TechStackedBar } from '@/components/dashboard3/TechBreakdown';
@@ -502,11 +502,25 @@ export default function Dashboard3() {
     .slice(0, 5);
 
   // Prepare traffic source pie chart data with formatted names
-  const trafficSourcePieData = data.trafficSources.slice(0, 6).map((source, index) => ({
-    name: formatTrafficSource(source.traffic_source),
-    value: source.sessions,
-    color: [chartColors.primary, chartColors.accent, chartColors.highlight, chartColors.success, chartColors.warning, chartColors.muted][index],
-  }));
+  // Aggregate sources that map to the same formatted name (e.g., "instagram", "l.instagram.com" -> "Instagram")
+  const aggregatedTrafficSources = data.trafficSources.reduce((acc, source) => {
+    const formattedName = formatTrafficSource(source.traffic_source);
+    if (acc[formattedName]) {
+      acc[formattedName] += source.sessions;
+    } else {
+      acc[formattedName] = source.sessions;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  const trafficSourcePieData = Object.entries(aggregatedTrafficSources)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([name, value], index) => ({
+      name,
+      value,
+      color: [chartColors.primary, chartColors.accent, chartColors.highlight, chartColors.success, chartColors.warning, chartColors.muted][index],
+    }));
 
   // Prepare device pie chart data
   const devicePieData = data.devices.categories.map((device, index) => ({
@@ -865,6 +879,19 @@ export default function Dashboard3() {
                     )}
                   </div>
                 </GlassCard>
+
+                {/* Stickiness Insights */}
+                <GlassCard title="Stickiness" subtitle="Sections users revisit">
+                  <div className="mt-2">
+                    <SectionStickinessSummary data={data.sectionRankings} />
+                    {data.sectionRankings.filter(s => s.avg_revisits_per_session >= 1.5).length === 0 && (
+                      <div className="p-3 rounded-lg bg-gray-500/10 border border-gray-500/20">
+                        <div className="text-sm font-medium text-muted-foreground">No sticky sections yet</div>
+                        <p className="text-xs text-muted-foreground">Users viewing sections once and moving on</p>
+                      </div>
+                    )}
+                  </div>
+                </GlassCard>
               </div>
             </div>
 
@@ -875,8 +902,13 @@ export default function Dashboard3() {
                   text: `${data.sectionRankings.filter(s => s.dropoff_indicator === 'high_dropoff').length} sections with high drop-off, ${data.sectionRankings.filter(s => s.dropoff_indicator === 'low_dropoff').length} with good retention.`
                 },
                 {
-                  type: 'neutral' as const,
-                  text: `Highest exit: ${data.sectionRankings.sort((a, b) => b.avg_exit_rate - a.avg_exit_rate)[0]?.section_id || 'N/A'} (${data.sectionRankings.sort((a, b) => b.avg_exit_rate - a.avg_exit_rate)[0]?.avg_exit_rate.toFixed(0) || 0}% exit rate).`
+                  type: data.sectionRankings.some(s => s.avg_revisits_per_session >= 1.5) ? 'positive' as const : 'neutral' as const,
+                  text: (() => {
+                    const stickiest = [...data.sectionRankings].sort((a, b) => b.avg_revisits_per_session - a.avg_revisits_per_session)[0];
+                    return stickiest?.avg_revisits_per_session >= 1.5
+                      ? `Most engaging: ${stickiest.section_id} (${stickiest.avg_revisits_per_session.toFixed(1)}x revisits per session).`
+                      : 'No sticky sections detected - users viewing content linearly.';
+                  })()
                 },
                 {
                   type: 'neutral' as const,

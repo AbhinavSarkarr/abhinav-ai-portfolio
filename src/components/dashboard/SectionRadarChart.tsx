@@ -19,13 +19,14 @@ type SectionRadarChartProps = {
 };
 
 export function SectionRadarChart({ data, height = 350 }: SectionRadarChartProps) {
-  // Transform data for radar chart
+  // Transform data for radar chart (using unique views for funnel analysis)
+  const maxUniqueViews = Math.max(...data.map(d => d.total_unique_views));
   const radarData = data.map((section) => ({
     section: section.section_id.charAt(0).toUpperCase() + section.section_id.slice(1),
     health: section.health_score,
     engagement: section.avg_engagement_rate,
-    retention: 100 - section.avg_exit_rate, // Inverse of exit rate
-    views: Math.min(100, (section.total_views / Math.max(...data.map(d => d.total_views))) * 100),
+    retention: 100 - section.avg_exit_rate, // Inverse of exit rate (unique-based)
+    views: Math.min(100, (section.total_unique_views / maxUniqueViews) * 100),
   }));
 
   // Calculate overall metrics
@@ -56,8 +57,8 @@ export function SectionRadarChart({ data, height = 350 }: SectionRadarChartProps
       color: avgExitRate > 30 ? chartTheme.colors.danger : chartTheme.colors.warning,
     },
     {
-      label: 'Total Views',
-      value: data.reduce((sum, d) => sum + d.total_views, 0),
+      label: 'Unique Sessions',
+      value: data.reduce((sum, d) => sum + d.total_unique_views, 0),
       suffix: '',
       icon: Eye,
       color: chartTheme.colors.info,
@@ -229,7 +230,7 @@ export function SectionRadarChart({ data, height = 350 }: SectionRadarChartProps
                     </div>
                     <div>
                       <p className="text-muted-foreground">Views</p>
-                      <p className="font-semibold text-black dark:text-white">{section.total_views}</p>
+                      <p className="font-semibold text-black dark:text-white">{section.total_unique_views}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Engage</p>

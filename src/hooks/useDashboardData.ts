@@ -97,14 +97,22 @@ export type ProjectRanking = {
 
 export type SectionRanking = {
   section_id: string;
-  total_views: number;
+  // Unique metrics (for funnel analysis - each session counts once)
+  total_unique_views: number;
+  total_unique_exits: number;
   total_unique_viewers: number;
+  avg_exit_rate: number;  // Based on unique, always <=100%
+  // Total metrics (for engagement analysis - includes revisits)
+  total_views: number;
+  total_exits: number;
+  avg_total_exit_rate: number;
+  avg_revisits_per_session: number;
+  // Engagement metrics
   total_engaged_views: number;
   avg_engagement_rate: number;
   avg_time_spent_seconds: number;
   avg_scroll_depth_percent: number;
-  total_exits: number;
-  avg_exit_rate: number;
+  // Scores and rankings
   health_score: number;
   engagement_rank: number;
   health_tier: string;
@@ -330,14 +338,22 @@ function normalizeDashboardData(raw: Record<string, unknown>): DashboardData {
   // Normalize sectionRankings
   const sectionRankings = ((data.sectionRankings || []) as Record<string, unknown>[]).map(d => ({
     section_id: String(d.section_id || ''),
-    total_views: toNumber(d.total_views),
+    // Unique metrics (for funnel analysis)
+    total_unique_views: toNumber(d.total_unique_views),
+    total_unique_exits: toNumber(d.total_unique_exits),
     total_unique_viewers: toNumber(d.total_unique_viewers),
+    avg_exit_rate: toNumber(d.avg_exit_rate),  // Based on unique, always <=100%
+    // Total metrics (for engagement analysis)
+    total_views: toNumber(d.total_views),
+    total_exits: toNumber(d.total_exits),
+    avg_total_exit_rate: toNumber(d.avg_total_exit_rate),
+    avg_revisits_per_session: toNumber(d.avg_revisits_per_session),
+    // Engagement metrics
     total_engaged_views: toNumber(d.total_engaged_views),
     avg_engagement_rate: toNumber(d.avg_engagement_rate),
     avg_time_spent_seconds: toNumber(d.avg_time_spent_seconds),
     avg_scroll_depth_percent: toNumber(d.avg_scroll_depth_percent),
-    total_exits: toNumber(d.total_exits),
-    avg_exit_rate: toNumber(d.avg_exit_rate),
+    // Scores and rankings
     health_score: toNumber(d.health_score),
     engagement_rank: toNumber(d.engagement_rank),
     health_tier: String(d.health_tier || ''),

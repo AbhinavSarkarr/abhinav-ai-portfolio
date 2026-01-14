@@ -495,15 +495,23 @@ export interface SkillRanking {
 
 export interface SectionRanking {
   section_id: string;
-  total_views: number;
+  // Unique metrics (for funnel analysis - each session counts once)
+  total_unique_views: number;
+  total_unique_exits: number;
   total_unique_viewers: number;
+  avg_exit_rate: number;  // Based on unique, always <=100%
+  // Total metrics (for engagement analysis - includes revisits)
+  total_views: number;
+  total_exits: number;
+  avg_total_exit_rate: number;
+  avg_revisits_per_session: number;
+  // Engagement metrics
   total_engaged_views: number;
   avg_engagement_rate: number;
   avg_time_spent_seconds: number;
   avg_scroll_depth_percent: number;
   max_scroll_milestone: number;
-  total_exits: number;
-  avg_exit_rate: number;
+  // Scores and rankings
   health_score: number;
   engagement_rank: number;
   view_rank: number;

@@ -16,7 +16,7 @@ type ConversionFunnelProps = {
 };
 
 export function ConversionFunnel({ data }: ConversionFunnelProps) {
-  const funnelSteps = [
+  const allFunnelSteps = [
     {
       label: 'CTA Views',
       value: data.cta_views,
@@ -43,9 +43,16 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
     },
   ];
 
-  const maxValue = Math.max(...funnelSteps.map((s) => s.value));
+  // Filter out leading zero-value steps (steps with 0 that precede non-zero steps)
+  // This handles cases where CTA tracking isn't implemented but form tracking is
+  let firstNonZeroIndex = allFunnelSteps.findIndex(step => step.value > 0);
+  // If all are zero, show from Form Starts onwards (index 2) to maintain context
+  if (firstNonZeroIndex === -1) firstNonZeroIndex = 2;
+  const funnelSteps = allFunnelSteps.slice(firstNonZeroIndex);
 
-  // Calculate conversion rates
+  const maxValue = Math.max(...funnelSteps.map((s) => s.value), 1);
+
+  // Calculate conversion rates based on available data
   const ctaClickRate = data.cta_views > 0 ? (data.cta_clicks / data.cta_views) * 100 : 0;
   const formStartRate = data.cta_clicks > 0 ? (data.form_starts / data.cta_clicks) * 100 : 0;
   const formCompletionRate = data.form_starts > 0 ? (data.form_submissions / data.form_starts) * 100 : 0;
@@ -118,23 +125,27 @@ export function ConversionFunnel({ data }: ConversionFunnelProps) {
         })}
       </div>
 
-      {/* Conversion Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
-        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
-          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">CTA Click Rate</p>
-          <p className="text-sm sm:text-lg font-bold text-tech-neon">{ctaClickRate.toFixed(1)}%</p>
-        </div>
-        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
-          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Start Rate</p>
-          <p className="text-sm sm:text-lg font-bold text-tech-accent">{formStartRate.toFixed(1)}%</p>
-        </div>
+      {/* Conversion Metrics - only show metrics that have meaningful data */}
+      <div className={`grid gap-2 sm:gap-3 ${data.cta_views > 0 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2'}`}>
+        {data.cta_views > 0 && (
+          <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
+            <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">CTA Click Rate</p>
+            <p className="text-sm sm:text-lg font-bold text-tech-neon">{ctaClickRate.toFixed(1)}%</p>
+          </div>
+        )}
+        {data.cta_clicks > 0 && (
+          <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
+            <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Start Rate</p>
+            <p className="text-sm sm:text-lg font-bold text-tech-accent">{formStartRate.toFixed(1)}%</p>
+          </div>
+        )}
         <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
           <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Completion</p>
           <p className="text-sm sm:text-lg font-bold text-tech-highlight">{formCompletionRate.toFixed(1)}%</p>
         </div>
         <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/5 text-center">
-          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Overall Conversion</p>
-          <p className="text-sm sm:text-lg font-bold text-green-400">{overallConversionRate.toFixed(2)}%</p>
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Form Abandonment</p>
+          <p className="text-sm sm:text-lg font-bold text-red-400">{data.form_starts > 0 ? (100 - formCompletionRate).toFixed(1) : '0.0'}%</p>
         </div>
       </div>
 
