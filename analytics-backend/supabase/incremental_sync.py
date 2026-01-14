@@ -375,13 +375,14 @@ def main():
     results.append(sync_rankings_full_refresh(
         bq_client, pg_conn,
         "section_rankings",
-        f"""SELECT section_id, total_views, total_unique_viewers, total_engaged_views,
-                   avg_engagement_rate, avg_time_spent_seconds, avg_scroll_depth_percent,
-                   max_scroll_milestone, total_exits, avg_exit_rate, health_score,
-                   engagement_rank, view_rank, retention_rank, health_tier,
-                   dropoff_indicator, optimization_hint, ranked_at, materialized_at
+        f"""SELECT section_id, total_unique_views, total_unique_exits, total_unique_viewers,
+                   avg_exit_rate, total_views, total_exits, avg_total_exit_rate,
+                   avg_revisits_per_session, total_engaged_views, avg_engagement_rate,
+                   avg_time_spent_seconds, avg_scroll_depth_percent, max_scroll_milestone,
+                   health_score, engagement_rank, view_rank, retention_rank,
+                   health_tier, dropoff_indicator, optimization_hint, ranked_at, materialized_at
             FROM `{PROJECT_ID}.{BQ_DATASET}.section_rankings`""",
-        "section_id,total_views,total_unique_viewers,total_engaged_views,avg_engagement_rate,avg_time_spent_seconds,avg_scroll_depth_percent,max_scroll_milestone,total_exits,avg_exit_rate,health_score,engagement_rank,view_rank,retention_rank,health_tier,dropoff_indicator,optimization_hint,ranked_at,materialized_at"
+        "section_id,total_unique_views,total_unique_exits,total_unique_viewers,avg_exit_rate,total_views,total_exits,avg_total_exit_rate,avg_revisits_per_session,total_engaged_views,avg_engagement_rate,avg_time_spent_seconds,avg_scroll_depth_percent,max_scroll_milestone,health_score,engagement_rank,view_rank,retention_rank,health_tier,dropoff_indicator,optimization_hint,ranked_at,materialized_at"
     ))
 
     results.append(sync_rankings_full_refresh(
