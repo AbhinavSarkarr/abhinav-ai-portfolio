@@ -1,5 +1,6 @@
 -- Layer 1: Base View - Section Events
--- Extracts section visibility and engagement events
+-- Extracts section visibility and engagement events (raw, no deduplication)
+-- Downstream views calculate both unique and total metrics
 -- Dataset: portfolio-483605.analytics_PROPERTY_ID
 
 CREATE OR REPLACE VIEW `portfolio-483605.analytics_processed.v_section_events` AS
@@ -21,13 +22,13 @@ SELECT
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'scroll_milestone') AS scroll_milestone,
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_threshold') AS time_threshold_sec,
 
-  -- Section flow context (NEW)
+  -- Section flow context
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'entry_direction') AS entry_direction,
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'previous_section') AS previous_section,
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'section_position') AS section_position,
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'exit_direction') AS exit_direction,
 
-  -- Scroll behavior analysis (NEW)
+  -- Scroll behavior analysis
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'scroll_velocity') AS scroll_velocity,
   (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'time_to_reach_depth') AS time_to_reach_depth_sec,
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'is_bouncing') AS is_bouncing,

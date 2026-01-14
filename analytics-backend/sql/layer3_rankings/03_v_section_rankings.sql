@@ -1,5 +1,6 @@
 -- Layer 3: Rankings View - Section Rankings
 -- 7-day rolling section engagement rankings
+-- Uses UNIQUE metrics for funnel analysis (exit rate should be <=100%)
 -- Dataset: portfolio-483605.analytics_processed
 
 CREATE OR REPLACE VIEW `portfolio-483605.analytics_processed.v_section_rankings` AS
@@ -7,16 +8,24 @@ WITH section_7day AS (
   SELECT
     section_id,
 
-    -- Aggregate 7-day metrics
-    SUM(views) AS total_views,
+    -- Unique metrics (for funnel analysis - each session counts once)
+    SUM(unique_views) AS total_unique_views,
+    SUM(unique_exits) AS total_unique_exits,
+    AVG(unique_exit_rate) AS avg_exit_rate,  -- This is the meaningful exit rate
+
+    -- Total metrics (for engagement analysis - includes revisits)
+    SUM(total_views) AS total_views,
+    SUM(total_exits) AS total_exits,
+    AVG(total_exit_rate) AS avg_total_exit_rate,
+    AVG(avg_revisits_per_session) AS avg_revisits,
+
+    -- Other aggregated metrics
     SUM(unique_viewers) AS total_unique_viewers,
     SUM(engaged_views) AS total_engaged_views,
     AVG(engagement_rate) AS avg_engagement_rate,
     AVG(avg_time_spent_seconds) AS avg_time_spent_seconds,
     AVG(avg_scroll_depth_percent) AS avg_scroll_depth_percent,
-    MAX(max_scroll_milestone) AS max_scroll_milestone,
-    SUM(exits) AS total_exits,
-    AVG(exit_rate) AS avg_exit_rate
+    MAX(max_scroll_milestone) AS max_scroll_milestone
 
   FROM `portfolio-483605.analytics_processed.v_section_daily_stats`
   WHERE event_date >= FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
@@ -39,16 +48,24 @@ scored AS (
 SELECT
   section_id,
 
-  -- Metrics
-  total_views,
+  -- Unique metrics (for funnel analysis)
+  total_unique_views,
+  total_unique_exits,
   total_unique_viewers,
+  ROUND(avg_exit_rate, 2) AS avg_exit_rate,  -- This is based on unique, always <=100%
+
+  -- Total metrics (for engagement/stickiness analysis)
+  total_views,
+  total_exits,
+  ROUND(avg_total_exit_rate, 2) AS avg_total_exit_rate,
+  ROUND(avg_revisits, 2) AS avg_revisits_per_session,
+
+  -- Engagement metrics
   total_engaged_views,
   ROUND(avg_engagement_rate, 2) AS avg_engagement_rate,
   ROUND(avg_time_spent_seconds, 2) AS avg_time_spent_seconds,
   ROUND(avg_scroll_depth_percent, 2) AS avg_scroll_depth_percent,
   max_scroll_milestone,
-  total_exits,
-  ROUND(avg_exit_rate, 2) AS avg_exit_rate,
 
   -- Scores
   ROUND(health_score, 2) AS health_score,
