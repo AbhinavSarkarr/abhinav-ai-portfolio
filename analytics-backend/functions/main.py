@@ -286,9 +286,10 @@ async def get_dashboard3_data(
             "publication_clicks": int(conv.get("publication_clicks") or 0),
             "content_copies": int(conv.get("content_copies") or 0),
         }
+        # True conversions = form submissions + resume downloads
+        # (social_clicks are engagement signals, not conversions)
         total_conversions = (conversion_summary["form_submissions"] +
-                           conversion_summary["resume_downloads"] +
-                           conversion_summary["social_clicks"])
+                           conversion_summary["resume_downloads"])
 
         return {
             "overview": {

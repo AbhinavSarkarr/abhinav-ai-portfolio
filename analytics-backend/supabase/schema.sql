@@ -168,19 +168,28 @@ CREATE INDEX IF NOT EXISTS idx_project_rank ON project_rankings(overall_rank);
 
 -- ============================================================================
 -- LAYER 3: Section Rankings
+-- Now includes BOTH unique (funnel) and total (engagement) metrics
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS section_rankings (
     id SERIAL PRIMARY KEY,
     section_id TEXT,
-    total_views INT,
+    -- Unique metrics (for funnel analysis - each session counts once)
+    total_unique_views INT,
+    total_unique_exits INT,
     total_unique_viewers INT,
+    avg_exit_rate FLOAT,  -- Based on unique, always <=100%
+    -- Total metrics (for engagement analysis - includes revisits)
+    total_views INT,
+    total_exits INT,
+    avg_total_exit_rate FLOAT,
+    avg_revisits_per_session FLOAT,
+    -- Engagement metrics
     total_engaged_views INT,
     avg_engagement_rate FLOAT,
     avg_time_spent_seconds FLOAT,
     avg_scroll_depth_percent FLOAT,
     max_scroll_milestone INT,
-    total_exits INT,
-    avg_exit_rate FLOAT,
+    -- Scores and rankings
     health_score FLOAT,
     engagement_rank INT,
     view_rank INT,

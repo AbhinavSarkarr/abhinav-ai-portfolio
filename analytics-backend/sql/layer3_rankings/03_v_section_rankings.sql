@@ -35,7 +35,7 @@ WITH section_7day AS (
 scored AS (
   SELECT
     *,
-    -- Section health score
+    -- Section health score (re-duplication fix ensures exit_rate <= 100%)
     (
       (avg_engagement_rate * 2) +  -- High engagement is good
       (avg_scroll_depth_percent * 0.5) +   -- Scroll depth matters
@@ -52,7 +52,8 @@ SELECT
   total_unique_views,
   total_unique_exits,
   total_unique_viewers,
-  ROUND(avg_exit_rate, 2) AS avg_exit_rate,  -- This is based on unique, always <=100%
+  -- Re-duplication fix ensures this is always <= 100%
+  ROUND(avg_exit_rate, 2) AS avg_exit_rate,
 
   -- Total metrics (for engagement/stickiness analysis)
   total_views,
