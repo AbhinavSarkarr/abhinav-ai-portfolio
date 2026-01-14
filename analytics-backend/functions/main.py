@@ -149,9 +149,11 @@ async def get_dashboard3_data(
             FROM project_rankings ORDER BY overall_rank LIMIT 10
         """, None),
         "section_rankings": ("""
-            SELECT section_id, total_views, total_unique_viewers, total_engaged_views,
-                   avg_engagement_rate, avg_time_spent_seconds, avg_scroll_depth_percent,
-                   total_exits, avg_exit_rate, health_score, engagement_rank,
+            SELECT section_id, total_unique_views, total_unique_exits, total_unique_viewers,
+                   avg_exit_rate, total_views, total_exits, avg_total_exit_rate,
+                   avg_revisits_per_session, total_engaged_views, avg_engagement_rate,
+                   avg_time_spent_seconds, avg_scroll_depth_percent, max_scroll_milestone,
+                   health_score, engagement_rank, view_rank, retention_rank,
                    health_tier, dropoff_indicator, optimization_hint
             FROM section_rankings ORDER BY health_score DESC
         """, None),
