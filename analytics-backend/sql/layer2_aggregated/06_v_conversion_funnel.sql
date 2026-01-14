@@ -14,9 +14,12 @@ WITH session_conversions AS (
     COUNTIF(event_name = 'cta_click') AS cta_clicks,
 
     -- Contact form funnel
+    -- Stage 1: Started form (showed intent)
     MAX(CASE WHEN event_name = 'contact_form_start' THEN 1 ELSE 0 END) AS started_contact_form,
+    -- Stage 2: Engaged with form fields
     MAX(CASE WHEN event_name = 'contact_form_field_focus' THEN 1 ELSE 0 END) AS focused_form_field,
-    MAX(CASE WHEN event_name = 'contact_form_submit' AND submission_status = 'success' THEN 1 ELSE 0 END) AS submitted_contact_form,
+    -- Stage 3: Submitted form (if event fired, it's a submission - NULL status means success)
+    MAX(CASE WHEN event_name = 'contact_form_submit' THEN 1 ELSE 0 END) AS submitted_contact_form,
 
     -- Social clicks
     MAX(CASE WHEN event_name = 'social_click' THEN 1 ELSE 0 END) AS clicked_social,

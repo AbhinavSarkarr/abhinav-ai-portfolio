@@ -842,6 +842,11 @@ export function trackContactFormSubmit(formData: {
   hasMessage: boolean;
   messageLength?: number;
 }) {
+  // Ensure form_start is tracked before form_submit (handles page refresh edge case)
+  if (!contactFormStartTime) {
+    trackContactFormStart({ triggerAction: 'direct' });
+  }
+
   // Calculate time to submit
   const timeToSubmit = contactFormStartTime
     ? Math.round((Date.now() - contactFormStartTime) / 1000)
