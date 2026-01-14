@@ -112,9 +112,10 @@ SELECT
   ) AS visitor_value_score,
 
   -- Visitor segment
+  -- A "converter" is anyone who performed a conversion action (form submission OR resume download)
   CASE
-    WHEN COALESCE(vc.form_submissions, 0) > 0 THEN 'converter'
-    WHEN COALESCE(vc.resume_downloads, 0) > 0 THEN 'high_intent'
+    WHEN COALESCE(vc.form_submissions, 0) > 0
+      OR COALESCE(vc.resume_downloads, 0) > 0 THEN 'converter'
     WHEN vs.engaged_sessions >= 2 AND COALESCE(vp.projects_viewed, 0) >= 3 THEN 'engaged_explorer'
     WHEN vs.total_sessions >= 2 THEN 'returning_visitor'
     WHEN vs.engaged_sessions = 1 THEN 'engaged_new'
