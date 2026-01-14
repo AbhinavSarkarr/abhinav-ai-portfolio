@@ -262,6 +262,19 @@ async def get_dashboard3_data(
         # Convert to dict
         data = {name: result for name, result in results}
 
+        # Ensure all 7 days are present in temporal_dow, even with zero values
+        all_days = [
+            (1, 'Sunday'), (2, 'Monday'), (3, 'Tuesday'), (4, 'Wednesday'),
+            (5, 'Thursday'), (6, 'Friday'), (7, 'Saturday')
+        ]
+        dow_raw = {row['day_number']: row for row in data.get("temporal_dow", [])}
+        data["temporal_dow"] = [
+            dow_raw.get(num, {
+                'day_name': name, 'day_number': num, 'sessions': 0,
+                'unique_visitors': 0, 'avg_engagement': 0, 'engagement_rate': 0
+            }) for num, name in all_days
+        ]
+
         # Extract overview
         overview = data["overview"][0] if data["overview"] else {}
 

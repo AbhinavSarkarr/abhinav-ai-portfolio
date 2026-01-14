@@ -39,6 +39,7 @@ import {
 } from '@/components/dashboard';
 import { HealthScoreGauge, HealthScoreCard } from '@/components/dashboard3/HealthScoreGauge';
 import { AlertBanner, type Alert } from '@/components/dashboard3/AlertBanner';
+import { ExecutiveSummaryCard } from '@/components/dashboard3/ExecutiveSummaryCard';
 import { SectionFunnel, SectionDropoffSummary, SectionStickinessSummary } from '@/components/dashboard3/SectionFunnel';
 import { TopVisitors, TopVisitorsSummary } from '@/components/dashboard3/TopVisitors';
 import { DomainInterest, DomainInterestBars } from '@/components/dashboard3/DomainInterest';
@@ -609,75 +610,19 @@ export default function Dashboard3() {
           id="executive"
           title="Executive Summary"
           subtitle="Overall portfolio performance at a glance"
-          description="This is your portfolio's overall health report. It shows how many people visited, how engaged they were, and whether they took meaningful actions like downloading your resume or contacting you."
+          description="Your portfolio's health report showing visitors, engagement, and key actions."
           icon={Gauge}
           priority="high"
         >
-          {/* Hero KPIs - 4 main metrics with sparklines */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-            <HeroKPI
-              title="Total Visitors"
-              value={formatNumber(data.overview.uniqueVisitors)}
-              subtitle={`${data.overview.totalSessions} total sessions`}
-              icon={Users}
-              color="purple"
-              tooltip="The number of individual people who visited your portfolio. One person visiting multiple times still counts as one visitor."
-              sparklineData={data.dailyMetrics?.map(d => d.visitors) || []}
-              trend={data.dailyMetrics && data.dailyMetrics.length > 1 ? {
-                value: Math.round(((data.dailyMetrics[data.dailyMetrics.length - 1].visitors - data.dailyMetrics[0].visitors) / Math.max(data.dailyMetrics[0].visitors, 1)) * 100),
-                label: 'vs start'
-              } : undefined}
-            />
-            <HeroKPI
-              title="Engagement Rate"
-              value={`${data.overview.engagementRate.toFixed(1)}%`}
-              subtitle={`${(100 - data.overview.bounceRate).toFixed(0)}% stayed to explore`}
-              icon={Heart}
-              color="cyan"
-              tooltip="Percentage of visitors who actively interacted with your portfolio - scrolled, clicked, or spent meaningful time reading."
-              sparklineData={data.dailyMetrics?.map(d => d.sessions) || []}
-              trend={{ value: data.overview.engagementRate > 50 ? 12 : -5, label: 'vs avg' }}
-            />
-            <HeroKPI
-              title="Avg. Time on Site"
-              value={formatDuration(data.overview.avgSessionDuration)}
-              subtitle={`${data.overview.avgPagesPerSession.toFixed(1)} pages viewed per visit`}
-              icon={Clock}
-              color="green"
-              tooltip="Average time visitors spend exploring your portfolio. Longer times indicate more engaging content."
-              sparklineData={data.dailyMetrics?.map(d => d.visitors * 1.5 + Math.random() * 10) || []}
-            />
-            <HeroKPI
-              title="Key Conversions"
-              value={data.overview.totalConversions}
-              subtitle={`${data.conversionSummary.resume_downloads} resumes + ${data.conversionSummary.form_submissions} contacts`}
-              icon={Target}
-              color="amber"
-              tooltip="Important actions visitors took: downloading your resume, contacting you, or clicking on social profiles."
-              sparklineData={data.dailyMetrics?.map((d, i) => Math.max(0, Math.floor(d.visitors / 3) + (i % 2))) || []}
-              trend={data.overview.totalConversions > 0 ? { value: 8, label: 'active' } : undefined}
-            />
-          </div>
-
-          {/* Health Score with metrics and Alerts - side by side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
-            <GlassCard title="Portfolio Health" subtitle="Score with key metrics">
-              <HealthScoreCard
-                score={healthScore}
-                engagementRate={data.overview.engagementRate}
-                bounceRate={data.overview.bounceRate}
-                totalConversions={data.overview.totalConversions}
-                avgSessionDuration={data.overview.avgSessionDuration}
-              />
-            </GlassCard>
-
-            <GlassCard title="Smart Insights" subtitle="Automated analysis">
-              <AlertBanner alerts={generateAlerts(data)} />
-            </GlassCard>
-          </div>
-
-          {/* Section Conclusion */}
-          <SectionConclusion insights={generateExecutiveInsights(data)} />
+          <ExecutiveSummaryCard
+            uniqueVisitors={data.overview.uniqueVisitors}
+            totalSessions={data.overview.totalSessions}
+            engagementRate={data.overview.engagementRate}
+            bounceRate={data.overview.bounceRate}
+            avgSessionDuration={data.overview.avgSessionDuration}
+            avgPagesPerSession={data.overview.avgPagesPerSession}
+            totalConversions={data.overview.totalConversions}
+          />
         </DashboardSection>
 
         {/* ============================================ */}

@@ -204,7 +204,18 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
         FROM sessions WHERE session_date BETWEEN %s AND %s
         GROUP BY session_day_of_week ORDER BY session_day_of_week
     """, (start_date, end_date))
-    day_of_week_distribution = [dict(row) for row in cursor.fetchall()]
+    day_of_week_raw = {row['day_number']: dict(row) for row in cursor.fetchall()}
+    # Ensure all 7 days are present, even with zero values
+    all_days = [
+        (1, 'Sunday'), (2, 'Monday'), (3, 'Tuesday'), (4, 'Wednesday'),
+        (5, 'Thursday'), (6, 'Friday'), (7, 'Saturday')
+    ]
+    day_of_week_distribution = [
+        day_of_week_raw.get(num, {
+            'day_name': name, 'day_number': num, 'sessions': 0,
+            'unique_visitors': 0, 'avg_engagement': 0, 'engagement_rate': 0
+        }) for num, name in all_days
+    ]
 
     # Devices
     cursor.execute("""
