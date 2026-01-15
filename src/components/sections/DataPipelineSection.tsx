@@ -286,44 +286,50 @@ export function DataPipelineSection() {
 
           {/* Mobile/Tablet Flowchart */}
           <div className="lg:hidden">
-            <div className="space-y-3">
-              {pipelineSteps.map((step, index) => (
-                <motion.div
-                  key={step.id}
-                  className="relative"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                  transition={{ duration: 0.4, delay: 0.06 * index }}
-                >
-                  {/* Vertical Connector */}
-                  {index < pipelineSteps.length - 1 && (
-                    <div className="absolute left-6 sm:left-7 top-full w-0.5 h-3 bg-gradient-to-b from-tech-accent/50 to-transparent" />
-                  )}
+            <div className="relative">
+              {/* Vertical flow line */}
+              <div className="absolute left-[23px] sm:left-[27px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-tech-accent/30 via-tech-neon/20 to-tech-accent/30 rounded-full" />
 
+              <div className="space-y-2">
+                {pipelineSteps.map((step, index) => (
                   <motion.div
-                    className="glass-card flex items-start gap-3 p-3 group"
-                    whileHover={{ scale: 1.01, x: 4 }}
+                    key={step.id}
+                    className="relative"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                    transition={{ duration: 0.4, delay: 0.05 * index }}
                   >
                     <motion.div
-                      className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg`}
-                      whileHover={{ rotate: 10 }}
+                      className="glass-card flex items-center gap-3 p-2.5 sm:p-3 group relative"
+                      whileHover={{ scale: 1.01, x: 4 }}
                     >
-                      <step.icon size={20} className="text-white" />
-                    </motion.div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[10px] font-bold text-tech-accent">Step {step.id}</span>
-                        <h4 className="font-semibold text-xs sm:text-sm group-hover:text-tech-accent transition-colors">
-                          {step.title}
-                        </h4>
+                      {/* Icon with glow effect */}
+                      <motion.div
+                        className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg relative z-10`}
+                        whileHover={{ rotate: 10 }}
+                      >
+                        <step.icon size={20} className="text-white" />
+                        {/* Subtle glow */}
+                        <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${step.color} opacity-40 blur-md -z-10`} />
+                      </motion.div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-tech-accent/80 bg-tech-accent/10 px-1.5 py-0.5 rounded">
+                            {step.id}
+                          </span>
+                          <h4 className="font-semibold text-sm group-hover:text-tech-accent transition-colors">
+                            {step.title}
+                          </h4>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                          {step.description}
+                        </p>
                       </div>
-                      <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
+                    </motion.div>
                   </motion.div>
-                </motion.div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </motion.div>
