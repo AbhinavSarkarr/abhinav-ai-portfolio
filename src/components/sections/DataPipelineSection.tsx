@@ -6,16 +6,19 @@ import {
   BarChart3,
   Sparkles,
   ArrowRight,
+  ArrowDown,
   ExternalLink,
   Layers,
   RefreshCw,
   Zap,
-  Brain,
+  TrendingUp,
+  Server,
+  FileJson,
+  CloudCog,
 } from 'lucide-react';
 import {
   staggerContainer,
   sectionHeading,
-  sectionSubheading,
 } from '@/lib/animations';
 import { trackAnalyticsDashboardClick } from '@/hooks/useAnalytics';
 
@@ -23,51 +26,82 @@ const pipelineSteps = [
   {
     id: 1,
     title: 'Event Capture',
-    description: 'Google Analytics 4 tracks user interactions, clicks, scroll depth, and engagement patterns in real-time',
+    description: 'GA4 tracks 50+ event types with real-time engagement scoring',
     icon: Zap,
     color: 'from-blue-500 to-cyan-500',
+    phase: 'collection',
   },
   {
     id: 2,
-    title: 'Data Lake',
-    description: 'Raw events flow into Google BigQuery for storage and SQL-based analysis',
+    title: 'Raw Data Lake',
+    description: 'Events stream into BigQuery for durable, queryable storage',
     icon: Database,
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-cyan-500 to-teal-500',
+    phase: 'collection',
   },
   {
     id: 3,
-    title: 'SQL Views',
-    description: '27+ layered views transform raw data into sessions, rankings, and insights',
+    title: 'Base Views',
+    description: 'Transforms raw events into sessions, pages & interactions',
     icon: Layers,
-    color: 'from-orange-500 to-red-500',
+    color: 'from-purple-500 to-violet-500',
+    phase: 'processing',
   },
   {
     id: 4,
-    title: 'Materialization',
-    description: 'GitHub Actions runs daily to materialize views and compute fresh rankings',
-    icon: GitBranch,
-    color: 'from-green-500 to-emerald-500',
+    title: 'Aggregations',
+    description: 'Daily metrics, traffic stats & conversion funnels aggregated',
+    icon: BarChart3,
+    color: 'from-orange-500 to-amber-500',
+    phase: 'processing',
   },
   {
     id: 5,
-    title: 'Data Export',
-    description: 'Processed data exports to multiple GitHub Gists as JSON for frontend consumption',
-    icon: RefreshCw,
-    color: 'from-yellow-500 to-orange-500',
+    title: 'Rankings Layer',
+    description: 'Derives project rankings, visitor insights & tech demand',
+    icon: TrendingUp,
+    color: 'from-red-500 to-pink-500',
+    phase: 'processing',
   },
   {
     id: 6,
-    title: 'Recommendation Engine',
-    description: 'Combines data  with feature engineering to suggest relevant projects and case studies',
-    icon: Brain,
-    color: 'from-pink-500 to-rose-500',
+    title: 'Materialization',
+    description: 'GitHub Actions materializes 31 tables daily via scheduled workflows',
+    icon: GitBranch,
+    color: 'from-green-500 to-emerald-500',
+    phase: 'distribution',
   },
   {
     id: 7,
-    title: 'Dynamic UI',
-    description: 'Portfolio fetches rankings to reorder content and show personalized recommendations',
+    title: 'Supabase Sync',
+    description: 'Incremental sync with materialized tables',
+    icon: CloudCog,
+    color: 'from-emerald-500 to-teal-500',
+    phase: 'distribution',
+  },
+  {
+    id: 8,
+    title: 'FastAPI Backend',
+    description: '15 parallel workers serve dashboard data with low latency',
+    icon: Server,
+    color: 'from-indigo-500 to-purple-500',
+    phase: 'serving',
+  },
+  {
+    id: 9,
+    title: 'Gist Caching',
+    description: 'Pre-computed data for multiple common time spans',
+    icon: FileJson,
+    color: 'from-yellow-500 to-orange-500',
+    phase: 'serving',
+  },
+  {
+    id: 10,
+    title: 'Live Dashboard',
+    description: 'Frontend with in-memory caching for instant access',
     icon: Sparkles,
     color: 'from-tech-neon to-tech-accent',
+    phase: 'serving',
   },
 ];
 
@@ -134,50 +168,50 @@ export function DataPipelineSection() {
             </span>
           </h3>
 
-          {/* Desktop Flowchart */}
+          {/* Desktop Flowchart - 5+5 Grid Layout */}
           <div className="hidden lg:block">
-            <div className="relative space-y-3">
-              {/* First Row - Steps 1-4 */}
-              <div className="grid grid-cols-4 gap-4">
-                {pipelineSteps.slice(0, 4).map((step, index) => (
+            <div className="relative space-y-4">
+              {/* First Row - Steps 1-5 (Collection & Processing) */}
+              <div className="grid grid-cols-5 gap-3">
+                {pipelineSteps.slice(0, 5).map((step, index) => (
                   <motion.div
                     key={step.id}
                     className="relative"
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.5, delay: 0.1 * index }}
+                    transition={{ duration: 0.5, delay: 0.08 * index }}
                   >
                     {/* Connector Arrow */}
-                    {index < 3 && (
+                    {index < 4 && (
                       <motion.div
-                        className="absolute top-1/2 -right-2 transform -translate-y-1/2 z-10"
+                        className="absolute top-1/2 -right-1.5 transform -translate-y-1/2 z-10"
                         initial={{ opacity: 0, x: -10 }}
                         animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
-                        transition={{ duration: 0.3, delay: 0.2 + 0.1 * index }}
+                        transition={{ duration: 0.3, delay: 0.15 + 0.08 * index }}
                       >
-                        <ArrowRight size={16} className="text-tech-accent/50" />
+                        <ArrowRight size={14} className="text-tech-accent/60" />
                       </motion.div>
                     )}
 
                     {/* Step Card */}
                     <motion.div
-                      className="glass-card h-full flex flex-col items-center text-center p-4 group"
+                      className="glass-card h-full flex flex-col items-center text-center p-3 group"
                       whileHover={{ scale: 1.03, y: -4 }}
                       transition={{ duration: 0.2 }}
                     >
                       <motion.div
-                        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-3 shadow-lg`}
+                        className={`w-10 h-10 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-2 shadow-lg`}
                         whileHover={{ rotate: 10, scale: 1.1 }}
                       >
-                        <step.icon size={24} className="text-white" />
+                        <step.icon size={20} className="text-white" />
                       </motion.div>
-                      <div className="text-xs font-bold text-tech-accent mb-1">
+                      <div className="text-[10px] font-bold text-tech-accent mb-0.5">
                         Step {step.id}
                       </div>
-                      <h4 className="font-semibold text-sm mb-2 group-hover:text-tech-accent transition-colors">
+                      <h4 className="font-semibold text-xs mb-1.5 group-hover:text-tech-accent transition-colors leading-tight">
                         {step.title}
                       </h4>
-                      <p className="text-xs text-muted-foreground leading-relaxed text-center">
+                      <p className="text-[10px] text-muted-foreground leading-relaxed text-center">
                         {step.description}
                       </p>
                     </motion.div>
@@ -185,92 +219,105 @@ export function DataPipelineSection() {
                 ))}
               </div>
 
-              {/* Second Row - Steps 5-7 (centered) */}
-              <div className="flex justify-center">
-                <div className="grid grid-cols-3 gap-4 w-3/4">
-                  {pipelineSteps.slice(4).map((step, index) => (
+              {/* Row Connector - Arrow from Step 5 down to Step 6 */}
+              <div className="flex justify-end pr-[9%]">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                  className="flex items-center gap-1"
+                >
+                  <ArrowDown size={16} className="text-tech-accent/60" />
+                </motion.div>
+              </div>
+
+              {/* Second Row - Steps 6-10 (Distribution & Serving) - Reversed for right-to-left flow */}
+              <div className="grid grid-cols-5 gap-3">
+                {pipelineSteps.slice(5).reverse().map((step, index) => {
+                  const originalIndex = 4 - index; // Map back to original order for animation timing
+                  return (
                     <motion.div
                       key={step.id}
                       className="relative"
                       initial={{ opacity: 0, y: 20 }}
                       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                      transition={{ duration: 0.5, delay: 0.1 * (index + 4) }}
+                      transition={{ duration: 0.5, delay: 0.08 * (originalIndex + 5) }}
                     >
-                      {/* Connector Arrow */}
-                      {index < 2 && (
+                      {/* Connector Arrow - Points left (except for step 6 which is rightmost) */}
+                      {index > 0 && (
                         <motion.div
-                          className="absolute top-1/2 -right-2 transform -translate-y-1/2 z-10"
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
-                          transition={{ duration: 0.3, delay: 0.2 + 0.1 * (index + 4) }}
+                          className="absolute top-1/2 -right-1.5 transform -translate-y-1/2 z-10 rotate-180"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
+                          transition={{ duration: 0.3, delay: 0.15 + 0.08 * (originalIndex + 5) }}
                         >
-                          <ArrowRight size={16} className="text-tech-accent/50" />
+                          <ArrowRight size={14} className="text-tech-accent/60" />
                         </motion.div>
                       )}
 
                       {/* Step Card */}
                       <motion.div
-                        className="glass-card h-full flex flex-col items-center text-center p-4 group"
+                        className="glass-card h-full flex flex-col items-center text-center p-3 group"
                         whileHover={{ scale: 1.03, y: -4 }}
                         transition={{ duration: 0.2 }}
                       >
                         <motion.div
-                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-3 shadow-lg`}
+                          className={`w-10 h-10 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-2 shadow-lg`}
                           whileHover={{ rotate: 10, scale: 1.1 }}
                         >
-                          <step.icon size={24} className="text-white" />
+                          <step.icon size={20} className="text-white" />
                         </motion.div>
-                        <div className="text-xs font-bold text-tech-accent mb-1">
+                        <div className="text-[10px] font-bold text-tech-accent mb-0.5">
                           Step {step.id}
                         </div>
-                        <h4 className="font-semibold text-sm mb-2 group-hover:text-tech-accent transition-colors">
+                        <h4 className="font-semibold text-xs mb-1.5 group-hover:text-tech-accent transition-colors leading-tight">
                           {step.title}
                         </h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-[10px] text-muted-foreground leading-relaxed">
                           {step.description}
                         </p>
                       </motion.div>
                     </motion.div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
           </div>
 
           {/* Mobile/Tablet Flowchart */}
           <div className="lg:hidden">
-            <div className="space-y-4">
+            <div className="space-y-3">
               {pipelineSteps.map((step, index) => (
                 <motion.div
                   key={step.id}
                   className="relative"
                   initial={{ opacity: 0, x: -20 }}
                   animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                  transition={{ duration: 0.5, delay: 0.1 * index }}
+                  transition={{ duration: 0.4, delay: 0.06 * index }}
                 >
                   {/* Vertical Connector */}
                   {index < pipelineSteps.length - 1 && (
-                    <div className="absolute left-10 sm:left-12 top-full w-0.5 h-4 bg-gradient-to-b from-tech-accent/50 to-transparent" />
+                    <div className="absolute left-6 sm:left-7 top-full w-0.5 h-3 bg-gradient-to-b from-tech-accent/50 to-transparent" />
                   )}
 
                   <motion.div
-                    className="glass-card flex items-start gap-4 group"
+                    className="glass-card flex items-start gap-3 p-3 group"
                     whileHover={{ scale: 1.01, x: 4 }}
                   >
                     <motion.div
-                      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg`}
+                      className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg`}
                       whileHover={{ rotate: 10 }}
                     >
-                      <step.icon size={24} className="text-white" />
+                      <step.icon size={20} className="text-white" />
                     </motion.div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-tech-accent">Step {step.id}</span>
-                        <h4 className="font-semibold text-sm group-hover:text-tech-accent transition-colors">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] font-bold text-tech-accent">Step {step.id}</span>
+                        <h4 className="font-semibold text-xs sm:text-sm group-hover:text-tech-accent transition-colors">
                           {step.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
                         {step.description}
                       </p>
                     </div>
@@ -283,10 +330,10 @@ export function DataPipelineSection() {
 
         {/* Analytics Dashboard CTA */}
         <motion.div
-          className="mt-6 flex flex-col items-center"
+          className="mt-8 flex flex-col items-center"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
+          transition={{ duration: 0.5, delay: 1.0 }}
         >
           <motion.a
             href="https://analytics.abhinavbuilds.in"
@@ -304,7 +351,7 @@ export function DataPipelineSection() {
           <p className="text-xs text-tech-accent/70 mt-2 font-mono">
             analytics.abhinavbuilds.in
           </p>
-          <p className="text-sm text-muted-foreground mt-2 text-center">
+          <p className="text-sm text-muted-foreground mt-2 text-center max-w-md">
             Explore real-time metrics, engagement data, and content performance
           </p>
         </motion.div>
