@@ -186,34 +186,37 @@ function DateRangeSelector({
         variant="outline"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="gap-2 text-xs sm:text-sm border-tech-accent/20 hover:border-tech-accent/40"
+        className="gap-1 sm:gap-2 text-[10px] sm:text-xs md:text-sm border-tech-accent/20 hover:border-tech-accent/40 px-2 sm:px-3 h-8 sm:h-9 min-w-0"
       >
-        <Calendar size={14} />
-        <span className="hidden sm:inline">{currentLabel}</span>
-        <span className="sm:hidden">{currentLabel.length > 15 ? currentLabel.slice(0, 12) + '...' : currentLabel}</span>
-        <ChevronDown size={14} />
+        <Calendar size={12} className="sm:hidden flex-shrink-0" />
+        <Calendar size={14} className="hidden sm:block flex-shrink-0" />
+        <span className="hidden md:inline truncate max-w-[120px]">{currentLabel}</span>
+        <span className="hidden sm:inline md:hidden truncate max-w-[80px]">{currentLabel.length > 10 ? currentLabel.slice(0, 8) + '...' : currentLabel}</span>
+        <span className="sm:hidden truncate max-w-[50px]">{currentLabel.length > 7 ? currentLabel.slice(0, 5) + '..' : currentLabel}</span>
+        <ChevronDown size={12} className="sm:hidden flex-shrink-0" />
+        <ChevronDown size={14} className="hidden sm:block flex-shrink-0" />
       </Button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setShowCustomPicker(false); }} />
-          <div className="absolute right-0 top-full mt-2 z-50 bg-background/95 backdrop-blur-xl border border-tech-accent/20 rounded-lg shadow-lg p-2 min-w-[220px]">
+          <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 bottom-2 sm:bottom-auto sm:top-full sm:mt-2 z-50 bg-background/95 backdrop-blur-xl border border-tech-accent/20 rounded-lg shadow-lg p-2 sm:p-2 sm:min-w-[220px] max-h-[70vh] overflow-y-auto">
             {!showCustomPicker ? (
-              <>
+              <div className="grid grid-cols-2 sm:grid-cols-1 gap-1 sm:gap-0">
                 {DATE_PRESET_OPTIONS.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handlePresetSelect(option.value)}
-                    className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors border border-transparent ${
+                    className={`w-full text-left px-3 py-2.5 sm:py-2 text-sm rounded-md transition-colors border border-transparent min-h-[44px] sm:min-h-0 ${
                       currentPreset === option.value
                         ? 'bg-tech-accent/20 border-tech-accent/40 text-tech-neon'
-                        : 'hover:bg-tech-accent/10 hover:border-tech-accent/20'
+                        : 'hover:bg-tech-accent/10 hover:border-tech-accent/20 active:bg-tech-accent/20'
                     }`}
                   >
                     {option.label}
                   </button>
                 ))}
-              </>
+              </div>
             ) : (
               <div className="p-2 space-y-3">
                 <h4 className="text-sm font-medium text-center">Custom Date Range</h4>
@@ -226,7 +229,7 @@ function DateRangeSelector({
                       min={minDate}
                       max={tempEnd || maxDate}
                       onChange={(e) => setTempStart(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded border border-tech-accent/20 bg-background focus:border-tech-accent/40 outline-none"
+                      className="w-full px-3 py-2.5 sm:py-2 text-sm rounded border border-tech-accent/20 bg-background focus:border-tech-accent/40 outline-none min-h-[44px] sm:min-h-0"
                     />
                   </div>
                   <div>
@@ -237,15 +240,15 @@ function DateRangeSelector({
                       min={tempStart || minDate}
                       max={maxDate}
                       onChange={(e) => setTempEnd(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded border border-tech-accent/20 bg-background focus:border-tech-accent/40 outline-none"
+                      className="w-full px-3 py-2.5 sm:py-2 text-sm rounded border border-tech-accent/20 bg-background focus:border-tech-accent/40 outline-none min-h-[44px] sm:min-h-0"
                     />
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => setShowCustomPicker(false)} className="flex-1 text-xs">
+                  <Button size="sm" variant="outline" onClick={() => setShowCustomPicker(false)} className="flex-1 text-xs min-h-[44px] sm:min-h-0">
                     Back
                   </Button>
-                  <Button size="sm" onClick={handleCustomApply} className="flex-1 text-xs bg-tech-neon hover:bg-tech-neon/80" disabled={!tempStart || !tempEnd}>
+                  <Button size="sm" onClick={handleCustomApply} className="flex-1 text-xs bg-tech-neon hover:bg-tech-neon/80 min-h-[44px] sm:min-h-0" disabled={!tempStart || !tempEnd}>
                     Apply
                   </Button>
                 </div>
@@ -378,30 +381,34 @@ export default function Dashboard3() {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="container py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-4">
+        <div className="container px-3 sm:px-4 py-2 sm:py-3 md:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs sm:text-sm">
-                <ArrowLeft size={14} />
-                <span className="hidden xs:inline">Portfolio</span>
+              <Button variant="ghost" size="sm" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9">
+                <ArrowLeft size={12} className="sm:hidden" />
+                <ArrowLeft size={14} className="hidden sm:block" />
+                <span className="hidden sm:inline">Portfolio</span>
               </Button>
             </Link>
-            <div className="h-6 w-px bg-black/10 dark:bg-white/10 hidden sm:block" />
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center">
-                <LayoutDashboard size={24} className="text-white" />
+            <div className="h-6 w-px bg-black/10 dark:bg-white/10 hidden md:block" />
+            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-tech-neon to-tech-accent flex items-center justify-center flex-shrink-0">
+                <LayoutDashboard size={16} className="text-white sm:hidden" />
+                <LayoutDashboard size={20} className="text-white hidden sm:block md:hidden" />
+                <LayoutDashboard size={24} className="text-white hidden md:block" />
               </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent">
-                  Analytics Dashboard
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-tech-neon via-tech-accent to-tech-highlight bg-clip-text text-transparent truncate">
+                  Analytics
+                  <span className="hidden sm:inline"> Dashboard</span>
                 </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+                <p className="text-xs sm:text-sm text-muted-foreground hidden md:block">
                   Portfolio Performance Insights
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
             <DateRangeSelector
               currentPreset={currentPreset}
               onPresetChange={handlePresetChange}
@@ -410,15 +417,16 @@ export default function Dashboard3() {
               onCustomDateChange={handleCustomDateChange}
               metadata={metadata}
             />
-            <Button variant="ghost" size="sm" onClick={refetch} className="gap-1.5">
-              <RefreshCw size={14} />
+            <Button variant="ghost" size="sm" onClick={refetch} className="gap-1.5 px-2 sm:px-3 h-8 sm:h-9">
+              <RefreshCw size={12} className="sm:hidden" />
+              <RefreshCw size={14} className="hidden sm:block" />
             </Button>
           </div>
         </div>
       </motion.header>
 
       {/* Main Content */}
-      <main className="pt-16 sm:pt-20 md:pt-24 relative z-10">
+      <main className="pt-14 sm:pt-16 md:pt-20 lg:pt-24 relative z-10 px-2 sm:px-0">
 
         {/* ============================================ */}
         {/* SECTION 1: EXECUTIVE SUMMARY */}
@@ -610,19 +618,19 @@ export default function Dashboard3() {
           icon={Globe}
           priority="medium"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             {/* Traffic Sources Pie */}
             <GlassCard title="Traffic Sources" subtitle="Discovery channels">
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex-shrink-0 w-[160px] h-[160px]">
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mt-2">
+                <div className="flex-shrink-0 w-[120px] h-[120px] sm:w-[160px] sm:h-[160px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={trafficSourcePieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={45}
-                        outerRadius={75}
+                        innerRadius={35}
+                        outerRadius={55}
                         dataKey="value"
                         labelLine={false}
                       >
@@ -634,14 +642,14 @@ export default function Dashboard3() {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex-1 space-y-1.5">
+                <div className="flex-1 w-full space-y-1 sm:space-y-1.5">
                   {trafficSourcePieData.map((source) => (
-                    <div key={source.name} className="flex items-center justify-between p-2 rounded-lg bg-white/5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: source.color }} />
-                        <span className="text-xs text-foreground">{source.name}</span>
+                    <div key={source.name} className="flex items-center justify-between p-1.5 sm:p-2 rounded-lg bg-white/5">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style={{ backgroundColor: source.color }} />
+                        <span className="text-[11px] sm:text-xs text-foreground">{source.name}</span>
                       </div>
-                      <span className="text-xs font-semibold text-foreground">{source.value}</span>
+                      <span className="text-[11px] sm:text-xs font-semibold text-foreground">{source.value}</span>
                     </div>
                   ))}
                 </div>
@@ -700,13 +708,13 @@ export default function Dashboard3() {
           icon={FileText}
           priority="medium"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             <PortfolioEngagementCard
               projects={data.projectRankings}
               sections={data.sectionRankings || []}
             />
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 sm:gap-4">
               <MarketDemandCard
                 skills={data.techDemand || []}
                 experiences={data.experienceRankings || []}
@@ -722,14 +730,14 @@ export default function Dashboard3() {
           {data.projectRankings && data.projectRankings.length > 0 && (
             <>
               {/* Project Actions Summary */}
-              <GlassCard title="Project Actions Overview" subtitle="Total interactions breakdown" className="mt-4 mb-4">
+              <GlassCard title="Project Actions Overview" subtitle="Total interactions breakdown" className="mt-3 sm:mt-4 mb-3 sm:mb-4">
                 <div className="mt-2">
                   <ProjectActionsSummary data={data.projectRankings} />
                 </div>
               </GlassCard>
 
               {/* Advanced Project Analytics - Side by Side */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-3 sm:mb-4">
                 {/* Stacked Multi-Metric Chart */}
                 <GlassCard title="Project Metrics" subtitle="Views, clicks, GitHub, demo combined">
                   <div className="mt-2">
@@ -747,23 +755,23 @@ export default function Dashboard3() {
 
               {/* Project Rankings Table */}
               <GlassCard title="All Projects" subtitle="Ranked by engagement">
-                <div className="overflow-x-auto mt-2">
-                  <table className="w-full text-sm">
+                <div className="overflow-x-auto mt-2 -mx-2 sm:mx-0">
+                  <table className="w-full text-xs sm:text-sm min-w-[500px] sm:min-w-0">
                     <thead>
                       <tr className="border-b border-muted">
-                        <th className="text-left py-3 px-3 text-muted-foreground font-medium">Rank</th>
-                        <th className="text-left py-3 px-3 text-muted-foreground font-medium">Project</th>
-                        <th className="text-right py-3 px-3 text-muted-foreground font-medium">Views</th>
-                        <th className="text-right py-3 px-3 text-muted-foreground font-medium">Clicks</th>
-                        <th className="text-right py-3 px-3 text-muted-foreground font-medium">Score</th>
-                        <th className="text-left py-3 px-3 text-muted-foreground font-medium">Performance</th>
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-muted-foreground font-medium">Rank</th>
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-muted-foreground font-medium">Project</th>
+                        <th className="text-right py-2 sm:py-3 px-2 sm:px-3 text-muted-foreground font-medium">Views</th>
+                        <th className="text-right py-2 sm:py-3 px-2 sm:px-3 text-muted-foreground font-medium">Clicks</th>
+                        <th className="text-right py-2 sm:py-3 px-2 sm:px-3 text-muted-foreground font-medium hidden sm:table-cell">Score</th>
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-muted-foreground font-medium hidden md:table-cell">Performance</th>
                       </tr>
                     </thead>
                     <tbody>
                       {data.projectRankings.map((project) => (
                         <tr key={project.project_id} className="border-b border-muted/50 hover:bg-muted/10 transition-colors">
-                          <td className="py-3 px-3">
-                            <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${
+                          <td className="py-2 sm:py-3 px-2 sm:px-3">
+                            <span className={`inline-flex items-center justify-center w-5 h-5 sm:w-7 sm:h-7 rounded-full text-[10px] sm:text-sm font-bold ${
                               project.overall_rank === 1 ? 'bg-amber-500/20 text-amber-400' :
                               project.overall_rank === 2 ? 'bg-gray-400/20 text-gray-400' :
                               project.overall_rank === 3 ? 'bg-orange-500/20 text-orange-400' :
@@ -772,12 +780,12 @@ export default function Dashboard3() {
                               {project.overall_rank}
                             </span>
                           </td>
-                          <td className="py-3 px-3 font-medium text-foreground">{project.project_title}</td>
-                          <td className="py-3 px-3 text-right text-foreground">{project.total_unique_viewers}</td>
-                          <td className="py-3 px-3 text-right font-bold text-tech-neon">{project.total_clicks}</td>
-                          <td className="py-3 px-3 text-right font-bold text-tech-accent">{project.engagement_score}</td>
-                          <td className="py-3 px-3">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          <td className="py-2 sm:py-3 px-2 sm:px-3 font-medium text-foreground max-w-[120px] sm:max-w-none truncate">{project.project_title}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-3 text-right text-foreground">{project.total_unique_viewers}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-3 text-right font-bold text-tech-neon">{project.total_clicks}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-3 text-right font-bold text-tech-accent hidden sm:table-cell">{project.engagement_score}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-3 hidden md:table-cell">
+                            <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${
                               project.performance_tier === 'above_average' ? 'bg-emerald-500/20 text-emerald-400' :
                               project.performance_tier === 'average' ? 'bg-blue-500/20 text-blue-400' :
                               'bg-amber-500/20 text-amber-400'
@@ -813,21 +821,23 @@ export default function Dashboard3() {
         {/* ============================================ */}
         {/* FOOTER */}
         {/* ============================================ */}
-        <footer className="py-6 border-t border-black/5 dark:border-white/5 mt-4">
-          <div className="container text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <LayoutDashboard size={16} className="text-tech-accent" />
-              <span className="text-sm font-bold bg-gradient-to-r from-tech-neon to-tech-accent bg-clip-text text-transparent">
+        <footer className="py-4 sm:py-6 border-t border-black/5 dark:border-white/5 mt-3 sm:mt-4">
+          <div className="container text-center px-4">
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-2">
+              <LayoutDashboard size={14} className="text-tech-accent sm:hidden" />
+              <LayoutDashboard size={16} className="text-tech-accent hidden sm:block" />
+              <span className="text-xs sm:text-sm font-bold bg-gradient-to-r from-tech-neon to-tech-accent bg-clip-text text-transparent">
                 Portfolio Analytics
               </span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-500">
-              Data: {data.dateRange.start} to {data.dateRange.end}
-              {metadata?.updatedAt && ` • Updated: ${new Date(metadata.updatedAt).toLocaleDateString()}`}
+            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500">
+              <span className="block sm:inline">Data: {data.dateRange.start} to {data.dateRange.end}</span>
+              {metadata?.updatedAt && <span className="block sm:inline sm:before:content-['_•_']">Updated: {new Date(metadata.updatedAt).toLocaleDateString()}</span>}
             </p>
             <Link to="/">
-              <Button className="tech-btn gap-2 mt-4" size="sm">
-                <ArrowLeft size={14} />
+              <Button className="tech-btn gap-1.5 sm:gap-2 mt-3 sm:mt-4 min-h-[44px] sm:min-h-0" size="sm">
+                <ArrowLeft size={12} className="sm:hidden" />
+                <ArrowLeft size={14} className="hidden sm:block" />
                 Back to Portfolio
               </Button>
             </Link>

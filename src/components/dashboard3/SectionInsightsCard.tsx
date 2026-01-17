@@ -67,21 +67,22 @@ export function SectionInsightsCard({ sections }: SectionInsightsCardProps) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-colors min-h-[40px] sm:min-h-0 ${
                 isActive
                   ? 'text-tech-neon border-b-2 border-tech-neon bg-white/50 dark:bg-white/5'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5 active:bg-white/50'
               }`}
             >
-              <Icon size={16} />
-              {tab.label}
+              <Icon size={12} className="sm:hidden" />
+              <Icon size={16} className="hidden sm:block" />
+              <span className="hidden xs:inline">{tab.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* Tab Content */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {activeTab === 'health' && <HealthView sections={sections} />}
         {activeTab === 'engaging' && <EngagingView sections={sections} />}
       </div>
@@ -99,24 +100,24 @@ function HealthView({ sections }: { sections: SectionData[] }) {
   const avgHealth = Math.round(sections.reduce((sum, s) => sum + s.health_score, 0) / sections.length);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Health List */}
-      <div className="space-y-2">
+      <div className="space-y-1.5 sm:space-y-2">
         {sortedByHealth.slice(0, 8).map((section, index) => {
           const healthColor = getHealthColor(section.health_tier);
           return (
             <motion.div
               key={section.section_id}
-              className="flex items-center justify-between p-2.5 rounded-lg bg-white/5"
+              className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg bg-white/5"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.03 }}
             >
-              <span className="text-sm text-foreground capitalize">
+              <span className="text-xs sm:text-sm text-foreground capitalize">
                 {formatSectionName(section.section_id)}
               </span>
-              <div className="flex items-center gap-3">
-                <div className="w-24 h-2 bg-muted/30 rounded-full overflow-hidden">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-16 sm:w-24 h-1.5 sm:h-2 bg-muted/30 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ backgroundColor: healthColor }}
@@ -125,7 +126,7 @@ function HealthView({ sections }: { sections: SectionData[] }) {
                     transition={{ duration: 0.5, delay: index * 0.05 }}
                   />
                 </div>
-                <span className="text-sm font-bold w-12 text-right" style={{ color: healthColor }}>
+                <span className="text-xs sm:text-sm font-bold w-8 sm:w-12 text-right" style={{ color: healthColor }}>
                   {section.health_score.toFixed(section.health_score % 1 === 0 ? 0 : 2)}
                 </span>
               </div>
@@ -135,18 +136,18 @@ function HealthView({ sections }: { sections: SectionData[] }) {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-muted/20">
-        <div className="p-2 rounded-lg bg-emerald-500/10 text-center">
-          <div className="text-lg font-bold text-emerald-400">{excellentCount}</div>
-          <div className="text-[10px] text-muted-foreground">Excellent</div>
+      <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-2 sm:pt-3 border-t border-muted/20">
+        <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-500/10 text-center">
+          <div className="text-sm sm:text-lg font-bold text-emerald-400">{excellentCount}</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Excellent</div>
         </div>
-        <div className="p-2 rounded-lg bg-blue-500/10 text-center">
-          <div className="text-lg font-bold text-blue-400">{goodCount}</div>
-          <div className="text-[10px] text-muted-foreground">Good</div>
+        <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10 text-center">
+          <div className="text-sm sm:text-lg font-bold text-blue-400">{goodCount}</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Good</div>
         </div>
-        <div className="p-2 rounded-lg bg-tech-accent/10 text-center">
-          <div className="text-lg font-bold text-tech-accent">{avgHealth}</div>
-          <div className="text-[10px] text-muted-foreground">Avg Score</div>
+        <div className="p-1.5 sm:p-2 rounded-lg bg-tech-accent/10 text-center">
+          <div className="text-sm sm:text-lg font-bold text-tech-accent">{avgHealth}</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Avg Score</div>
         </div>
       </div>
     </div>
@@ -166,31 +167,32 @@ function EngagingView({ sections }: { sections: SectionData[] }) {
     : '0';
 
   return (
-    <div className="space-y-4">
-      <p className="text-xs text-muted-foreground">
+    <div className="space-y-3 sm:space-y-4">
+      <p className="text-[10px] sm:text-xs text-muted-foreground">
         Sections users revisit multiple times
       </p>
 
       {/* Engaging Sections List */}
       {stickySections.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           {stickySections.slice(0, 8).map((section, index) => {
             const color = section.avg_revisits_per_session >= 2.0 ? '#8B5CF6' :
                          section.avg_revisits_per_session >= 1.0 ? '#3B82F6' : '#6B7280';
             return (
               <motion.div
                 key={section.section_id}
-                className="flex items-center justify-between p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20"
+                className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20"
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.03 }}
               >
-                <span className="text-sm text-foreground">
+                <span className="text-xs sm:text-sm text-foreground">
                   {formatSectionName(section.section_id)}
                 </span>
-                <div className="flex items-center gap-2">
-                  <RefreshCw size={14} style={{ color }} />
-                  <span className="text-sm font-bold" style={{ color }}>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <RefreshCw size={12} className="sm:hidden" style={{ color }} />
+                  <RefreshCw size={14} className="hidden sm:block" style={{ color }} />
+                  <span className="text-xs sm:text-sm font-bold" style={{ color }}>
                     {section.avg_revisits_per_session.toFixed(1)}x
                   </span>
                 </div>
@@ -199,25 +201,25 @@ function EngagingView({ sections }: { sections: SectionData[] }) {
           })}
         </div>
       ) : (
-        <div className="p-4 rounded-lg bg-gray-500/10 border border-gray-500/20 text-center">
-          <div className="text-sm font-medium text-muted-foreground">No sticky sections yet</div>
-          <p className="text-xs text-muted-foreground mt-1">Users viewing sections once and moving on</p>
+        <div className="p-3 sm:p-4 rounded-lg bg-gray-500/10 border border-gray-500/20 text-center">
+          <div className="text-xs sm:text-sm font-medium text-muted-foreground">No sticky sections yet</div>
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Users viewing sections once and moving on</p>
         </div>
       )}
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-muted/20">
-        <div className="p-2 rounded-lg bg-purple-500/10 text-center">
-          <div className="text-lg font-bold text-purple-400">{highlyEngaging.length}</div>
-          <div className="text-[10px] text-muted-foreground">Highly Engaging</div>
+      <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-2 sm:pt-3 border-t border-muted/20">
+        <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10 text-center">
+          <div className="text-sm sm:text-lg font-bold text-purple-400">{highlyEngaging.length}</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Highly Engaging</div>
         </div>
-        <div className="p-2 rounded-lg bg-blue-500/10 text-center">
-          <div className="text-lg font-bold text-blue-400">{moderatelyEngaging.length}</div>
-          <div className="text-[10px] text-muted-foreground">Moderate</div>
+        <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10 text-center">
+          <div className="text-sm sm:text-lg font-bold text-blue-400">{moderatelyEngaging.length}</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Moderate</div>
         </div>
-        <div className="p-2 rounded-lg bg-tech-accent/10 text-center">
-          <div className="text-lg font-bold text-tech-accent">{avgRevisits}x</div>
-          <div className="text-[10px] text-muted-foreground">Avg Revisits</div>
+        <div className="p-1.5 sm:p-2 rounded-lg bg-tech-accent/10 text-center">
+          <div className="text-sm sm:text-lg font-bold text-tech-accent">{avgRevisits}x</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Avg Revisits</div>
         </div>
       </div>
     </div>

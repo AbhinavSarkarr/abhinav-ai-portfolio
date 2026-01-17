@@ -55,12 +55,17 @@ export function ExecutiveSummaryCard({
     return { label: 'Needs Work', color: '#ef4444', gradient: ['#ef4444', '#f87171'] };
   }, [healthScore]);
 
-  // Gauge dimensions
-  const gaugeSize = 140;
-  const stroke = 10;
-  const radius = (gaugeSize - stroke) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (healthScore / 100) * circumference;
+  // Gauge dimensions - responsive
+  const gaugeSizeMobile = 100;
+  const gaugeSizeDesktop = 140;
+  const strokeMobile = 8;
+  const strokeDesktop = 10;
+  const radiusMobile = (gaugeSizeMobile - strokeMobile) / 2;
+  const radiusDesktop = (gaugeSizeDesktop - strokeDesktop) / 2;
+  const circumferenceMobile = radiusMobile * 2 * Math.PI;
+  const circumferenceDesktop = radiusDesktop * 2 * Math.PI;
+  const offsetMobile = circumferenceMobile - (healthScore / 100) * circumferenceMobile;
+  const offsetDesktop = circumferenceDesktop - (healthScore / 100) * circumferenceDesktop;
 
   // Metrics data
   const metrics = [
@@ -133,11 +138,65 @@ export function ExecutiveSummaryCard({
         }}
       />
 
-      <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
+      <div className="relative z-10 flex flex-col lg:flex-row items-center gap-4 sm:gap-6 lg:gap-10">
         {/* Health Score Gauge - Left/Top */}
         <div className="flex-shrink-0 flex flex-col items-center">
-          <div className="relative" style={{ width: gaugeSize, height: gaugeSize }}>
-            <svg className="transform -rotate-90" width={gaugeSize} height={gaugeSize}>
+          {/* Mobile Gauge */}
+          <div className="relative sm:hidden" style={{ width: gaugeSizeMobile, height: gaugeSizeMobile }}>
+            <svg className="transform -rotate-90" width={gaugeSizeMobile} height={gaugeSizeMobile}>
+              <defs>
+                <linearGradient id="exec-gauge-gradient-mobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor={healthTier.gradient[0]} />
+                  <stop offset="100%" stopColor={healthTier.gradient[1]} />
+                </linearGradient>
+                <filter id="glow-mobile">
+                  <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <circle
+                cx={gaugeSizeMobile / 2}
+                cy={gaugeSizeMobile / 2}
+                r={radiusMobile}
+                stroke="currentColor"
+                strokeWidth={strokeMobile}
+                fill="none"
+                className="text-gray-200 dark:text-white/10"
+              />
+              <motion.circle
+                cx={gaugeSizeMobile / 2}
+                cy={gaugeSizeMobile / 2}
+                r={radiusMobile}
+                stroke="url(#exec-gauge-gradient-mobile)"
+                strokeWidth={strokeMobile}
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray={circumferenceMobile}
+                initial={{ strokeDashoffset: circumferenceMobile }}
+                animate={{ strokeDashoffset: offsetMobile }}
+                transition={{ duration: 1.5, ease: 'easeOut' }}
+                filter="url(#glow-mobile)"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <motion.div
+                className="text-2xl font-bold"
+                style={{ color: healthTier.color }}
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                {healthScore}
+              </motion.div>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">Health</span>
+            </div>
+          </div>
+          {/* Desktop Gauge */}
+          <div className="relative hidden sm:block" style={{ width: gaugeSizeDesktop, height: gaugeSizeDesktop }}>
+            <svg className="transform -rotate-90" width={gaugeSizeDesktop} height={gaugeSizeDesktop}>
               <defs>
                 <linearGradient id="exec-gauge-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor={healthTier.gradient[0]} />
@@ -151,33 +210,30 @@ export function ExecutiveSummaryCard({
                   </feMerge>
                 </filter>
               </defs>
-              {/* Background circle */}
               <circle
-                cx={gaugeSize / 2}
-                cy={gaugeSize / 2}
-                r={radius}
+                cx={gaugeSizeDesktop / 2}
+                cy={gaugeSizeDesktop / 2}
+                r={radiusDesktop}
                 stroke="currentColor"
-                strokeWidth={stroke}
+                strokeWidth={strokeDesktop}
                 fill="none"
                 className="text-gray-200 dark:text-white/10"
               />
-              {/* Animated progress circle */}
               <motion.circle
-                cx={gaugeSize / 2}
-                cy={gaugeSize / 2}
-                r={radius}
+                cx={gaugeSizeDesktop / 2}
+                cy={gaugeSizeDesktop / 2}
+                r={radiusDesktop}
                 stroke="url(#exec-gauge-gradient)"
-                strokeWidth={stroke}
+                strokeWidth={strokeDesktop}
                 fill="none"
                 strokeLinecap="round"
-                strokeDasharray={circumference}
-                initial={{ strokeDashoffset: circumference }}
-                animate={{ strokeDashoffset: offset }}
+                strokeDasharray={circumferenceDesktop}
+                initial={{ strokeDashoffset: circumferenceDesktop }}
+                animate={{ strokeDashoffset: offsetDesktop }}
                 transition={{ duration: 1.5, ease: 'easeOut' }}
                 filter="url(#glow)"
               />
             </svg>
-            {/* Center content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <motion.div
                 className="text-4xl font-bold text-gray-900 dark:text-white"
@@ -193,7 +249,7 @@ export function ExecutiveSummaryCard({
           </div>
           {/* Health tier badge */}
           <motion.div
-            className="text-xs font-semibold px-3 py-1 rounded-full mt-2"
+            className="text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mt-1.5 sm:mt-2"
             style={{
               backgroundColor: `${healthTier.color}20`,
               color: healthTier.color,
@@ -208,14 +264,14 @@ export function ExecutiveSummaryCard({
 
         {/* Metrics Grid - Right/Bottom */}
         <div className="flex-1 w-full">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
             {metrics.map((metric, index) => {
               const Icon = metric.icon;
               return (
                 <motion.div
                   key={metric.label}
                   className="
-                    relative p-3 md:p-4 rounded-xl
+                    relative p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl
                     bg-gray-50/50 dark:bg-white/5
                     border border-gray-100 dark:border-white/10
                     hover:bg-gray-100/50 dark:hover:bg-white/10
@@ -229,21 +285,22 @@ export function ExecutiveSummaryCard({
                 >
                   {/* Icon */}
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center mb-2"
+                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg flex items-center justify-center mb-1 sm:mb-2"
                     style={{ backgroundColor: `${metric.color}15` }}
                   >
-                    <Icon size={16} style={{ color: metric.color }} />
+                    <Icon size={12} className="sm:hidden" style={{ color: metric.color }} />
+                    <Icon size={16} className="hidden sm:block" style={{ color: metric.color }} />
                   </div>
                   {/* Value */}
-                  <div className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                     {metric.value}
                   </div>
                   {/* Label */}
-                  <div className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <div className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300">
                     {metric.label}
                   </div>
                   {/* Subtitle */}
-                  <div className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                  <div className="text-[8px] sm:text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mt-0.5 line-clamp-1">
                     {metric.subtitle}
                   </div>
                 </motion.div>

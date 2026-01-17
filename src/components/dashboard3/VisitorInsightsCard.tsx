@@ -174,7 +174,7 @@ export function VisitorInsightsCard({
       animate={{ opacity: 1, y: 0 }}
     >
       {/* Tab Navigation */}
-      <div className="flex overflow-x-auto border-b border-black/5 dark:border-white/10 bg-gray-50/50 dark:bg-white/5">
+      <div className="flex overflow-x-auto border-b border-black/5 dark:border-white/10 bg-gray-50/50 dark:bg-white/5 scrollbar-hide">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -182,21 +182,22 @@ export function VisitorInsightsCard({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 text-[10px] sm:text-xs font-medium whitespace-nowrap transition-colors min-h-[40px] sm:min-h-0 ${
                 isActive
                   ? 'text-tech-neon border-b-2 border-tech-neon bg-white/50 dark:bg-white/5'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5 active:bg-white/50'
               }`}
             >
-              <Icon size={14} />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <Icon size={12} className="sm:hidden flex-shrink-0" />
+              <Icon size={14} className="hidden sm:block flex-shrink-0" />
+              <span className="hidden xs:inline sm:inline">{tab.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* Tab Content */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {activeTab === 'segments' && (
           <SegmentsView segments={segments} />
         )}
@@ -242,9 +243,9 @@ function SegmentsView({ segments }: { segments: VisitorSegments }) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row items-center gap-4">
+    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
       {/* Pie Chart */}
-      <div className="flex-shrink-0 w-[160px] h-[160px]">
+      <div className="flex-shrink-0 w-[120px] h-[120px] sm:w-[160px] sm:h-[160px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -266,25 +267,26 @@ function SegmentsView({ segments }: { segments: VisitorSegments }) {
       </div>
 
       {/* Legend */}
-      <div className="flex-1 w-full space-y-1.5">
+      <div className="flex-1 w-full space-y-1 sm:space-y-1.5">
         {chartData.map((segment) => {
           const Icon = segment.icon;
           const percentage = ((segment.value / total) * 100).toFixed(0);
           return (
             <div
               key={segment.name}
-              className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-white/5"
+              className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5"
             >
               <div
-                className="w-6 h-6 rounded flex items-center justify-center"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: `${segment.color}20` }}
               >
-                <Icon size={12} style={{ color: segment.color }} />
+                <Icon size={10} className="sm:hidden" style={{ color: segment.color }} />
+                <Icon size={12} className="hidden sm:block" style={{ color: segment.color }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-foreground">{segment.label}</span>
-                  <span className="text-xs font-bold" style={{ color: segment.color }}>
+                  <span className="text-[11px] sm:text-xs font-medium text-foreground">{segment.label}</span>
+                  <span className="text-[11px] sm:text-xs font-bold" style={{ color: segment.color }}>
                     {segment.value} ({percentage}%)
                   </span>
                 </div>
@@ -313,7 +315,7 @@ function TopVisitorsView({ visitors }: { visitors: TopVisitor[] }) {
   const maxScore = Math.max(...topVisitors.map(v => v.visitor_value_score));
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 sm:space-y-2">
       {topVisitors.map((visitor, index) => {
         const segmentConfig = getSegmentConfig(visitor.visitor_segment);
         const scoreWidth = (visitor.visitor_value_score / maxScore) * 100;
@@ -321,32 +323,32 @@ function TopVisitorsView({ visitors }: { visitors: TopVisitor[] }) {
         return (
           <motion.div
             key={visitor.user_pseudo_id}
-            className="p-2 rounded-lg bg-gray-50 dark:bg-white/5"
+            className="p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <div
-                className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold flex-shrink-0"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center text-[10px] sm:text-xs font-bold flex-shrink-0"
                 style={{ backgroundColor: `${segmentConfig.color}20`, color: segmentConfig.color }}
               >
                 {index + 1}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-foreground">
+                  <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+                    <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate">
                       {anonymizeId(visitor.user_pseudo_id)}
                     </span>
                     <span
-                      className="px-1.5 py-0.5 rounded text-[10px] font-medium"
+                      className="px-1 sm:px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium flex-shrink-0"
                       style={{ backgroundColor: `${segmentConfig.color}20`, color: segmentConfig.color }}
                     >
                       {segmentConfig.label}
                     </span>
                   </div>
-                  <span className="text-xs font-bold text-tech-accent">
+                  <span className="text-[11px] sm:text-xs font-bold text-tech-accent flex-shrink-0 ml-1">
                     {visitor.visitor_value_score}
                   </span>
                 </div>
@@ -358,21 +360,29 @@ function TopVisitorsView({ visitors }: { visitors: TopVisitor[] }) {
                     animate={{ width: `${scoreWidth}%` }}
                   />
                 </div>
-                <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground">
+                <div className="flex items-center gap-2 sm:gap-3 mt-1 text-[9px] sm:text-[10px] text-muted-foreground flex-wrap">
                   <span className="flex items-center gap-0.5">
-                    <Eye size={10} /> {visitor.total_page_views}
+                    <Eye size={8} className="sm:hidden" />
+                    <Eye size={10} className="hidden sm:block" />
+                    {visitor.total_page_views}
                   </span>
                   <span className="flex items-center gap-0.5">
-                    <Clock size={10} /> {formatDuration(visitor.avg_session_duration_sec)}
+                    <Clock size={8} className="sm:hidden" />
+                    <Clock size={10} className="hidden sm:block" />
+                    {formatDuration(visitor.avg_session_duration_sec)}
                   </span>
                   {visitor.resume_downloads > 0 && (
                     <span className="flex items-center gap-0.5 text-emerald-400">
-                      <Download size={10} /> {visitor.resume_downloads}
+                      <Download size={8} className="sm:hidden" />
+                      <Download size={10} className="hidden sm:block" />
+                      {visitor.resume_downloads}
                     </span>
                   )}
                   {visitor.form_submissions > 0 && (
                     <span className="flex items-center gap-0.5 text-blue-400">
-                      <MessageSquare size={10} /> {visitor.form_submissions}
+                      <MessageSquare size={8} className="sm:hidden" />
+                      <MessageSquare size={10} className="hidden sm:block" />
+                      {visitor.form_submissions}
                     </span>
                   )}
                 </div>
@@ -383,24 +393,24 @@ function TopVisitorsView({ visitors }: { visitors: TopVisitor[] }) {
       })}
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-muted/20">
-        <div className="text-center p-2 rounded-lg bg-emerald-500/10">
-          <div className="text-lg font-bold text-emerald-400">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-muted/20">
+        <div className="text-center p-1.5 sm:p-2 rounded-lg bg-emerald-500/10">
+          <div className="text-sm sm:text-lg font-bold text-emerald-400">
             {visitors.filter(v => v.visitor_segment === 'converter').length}
           </div>
-          <div className="text-[10px] text-muted-foreground">Converters</div>
+          <div className="text-[9px] sm:text-[10px] text-muted-foreground">Converters</div>
         </div>
-        <div className="text-center p-2 rounded-lg bg-amber-500/10">
-          <div className="text-lg font-bold text-amber-400">
+        <div className="text-center p-1.5 sm:p-2 rounded-lg bg-amber-500/10">
+          <div className="text-sm sm:text-lg font-bold text-amber-400">
             {visitors.filter(v => v.visitor_segment === 'high_intent').length}
           </div>
-          <div className="text-[10px] text-muted-foreground">High Intent</div>
+          <div className="text-[9px] sm:text-[10px] text-muted-foreground">High Intent</div>
         </div>
-        <div className="text-center p-2 rounded-lg bg-tech-accent/10">
-          <div className="text-lg font-bold text-tech-accent">
+        <div className="text-center p-1.5 sm:p-2 rounded-lg bg-tech-accent/10">
+          <div className="text-sm sm:text-lg font-bold text-tech-accent">
             {Math.round(visitors.reduce((s, v) => s + v.visitor_value_score, 0) / visitors.length)}
           </div>
-          <div className="text-[10px] text-muted-foreground">Avg Score</div>
+          <div className="text-[9px] sm:text-[10px] text-muted-foreground">Avg Score</div>
         </div>
       </div>
     </div>
@@ -486,13 +496,13 @@ function DomainsView({ domains }: { domains: DomainRanking[] }) {
   const maxInterest = Math.max(...domains.map(d => d.total_interest_score));
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       {/* Radar Chart */}
-      <div className="h-[180px]">
+      <div className="h-[140px] sm:h-[180px]">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={radarData} margin={{ top: 5, right: 20, bottom: 5, left: 20 }}>
+          <RadarChart data={radarData} margin={{ top: 5, right: 15, bottom: 5, left: 15 }}>
             <PolarGrid stroke="rgba(255,255,255,0.1)" />
-            <PolarAngleAxis dataKey="domain" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }} />
+            <PolarAngleAxis dataKey="domain" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 9 }} />
             <Radar
               name="Interest"
               dataKey="interest"
@@ -507,7 +517,7 @@ function DomainsView({ domains }: { domains: DomainRanking[] }) {
       </div>
 
       {/* Domain List */}
-      <div className="space-y-1.5">
+      <div className="space-y-1 sm:space-y-1.5">
         {domains.slice(0, 4).map((domain, index) => {
           const tierColor = domain.demand_tier === 'high_demand' ? '#10B981' :
                            domain.demand_tier === 'moderate_demand' ? '#3B82F6' : '#6B7280';
@@ -516,22 +526,22 @@ function DomainsView({ domains }: { domains: DomainRanking[] }) {
           return (
             <motion.div
               key={domain.domain}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5 sm:gap-2"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <span className="text-xs text-muted-foreground w-4">{index + 1}</span>
-              <div className="flex-1">
+              <span className="text-[10px] sm:text-xs text-muted-foreground w-3 sm:w-4">{index + 1}</span>
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-xs font-medium text-foreground truncate">
+                  <span className="text-[11px] sm:text-xs font-medium text-foreground truncate">
                     {formatDomain(domain.domain)}
                   </span>
-                  <span className="text-xs font-bold" style={{ color: tierColor }}>
+                  <span className="text-[11px] sm:text-xs font-bold flex-shrink-0 ml-1" style={{ color: tierColor }}>
                     {domain.total_interest_score}
                   </span>
                 </div>
-                <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden">
+                <div className="h-1 sm:h-1.5 bg-muted/20 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ backgroundColor: tierColor }}
@@ -568,25 +578,25 @@ function DevicesView({ devices }: { devices: DeviceCategory[] }) {
   const maxSessions = Math.max(...devices.map(d => d.sessions));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Stacked bar showing distribution */}
-      <div className="h-8 rounded-xl overflow-hidden flex">
+      <div className="h-6 sm:h-8 rounded-lg sm:rounded-xl overflow-hidden flex">
         {devicePieData.map((device, index) => {
           const width = (device.value / total) * 100;
           return (
             <div
               key={index}
-              className="h-full flex items-center justify-center text-xs font-bold text-white"
+              className="h-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-white"
               style={{ width: `${width}%`, backgroundColor: device.color }}
             >
-              {width > 15 && `${width.toFixed(0)}%`}
+              {width > 20 && `${width.toFixed(0)}%`}
             </div>
           );
         })}
       </div>
 
       {/* Device breakdown with progress bars */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {devices.map((device) => {
           const barWidth = (device.sessions / maxSessions) * 100;
           const color = device.device_category === 'mobile' ? '#00E0FF' :
@@ -597,20 +607,21 @@ function DevicesView({ devices }: { devices: DeviceCategory[] }) {
           return (
             <div key={device.device_category} className="space-y-1">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Icon size={16} style={{ color }} />
-                  <span className="text-sm font-medium text-foreground capitalize">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Icon size={14} className="sm:hidden" style={{ color }} />
+                  <Icon size={16} className="hidden sm:block" style={{ color }} />
+                  <span className="text-xs sm:text-sm font-medium text-foreground capitalize">
                     {device.device_category}
                   </span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">
                     {device.engagement_rate?.toFixed(0) || 0}% engaged
                   </span>
-                  <span className="text-sm font-bold text-foreground">{device.sessions}</span>
+                  <span className="text-xs sm:text-sm font-bold text-foreground">{device.sessions}</span>
                 </div>
               </div>
-              <div className="h-2 bg-muted/20 rounded-full overflow-hidden">
+              <div className="h-1.5 sm:h-2 bg-muted/20 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ backgroundColor: color }}

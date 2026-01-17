@@ -97,7 +97,7 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
   const maxViews = sortedSections[0]?.total_unique_views || 1;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 sm:space-y-2">
       {sortedSections.map((section, index) => {
         const widthPercent = (section.total_unique_views / maxViews) * 100;
         const dropoffConfig = getDropoffConfig(section.dropoff_indicator);
@@ -114,10 +114,10 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
           >
             {/* Section Row */}
             <div className="relative">
-              <div className="flex items-center gap-2 md:gap-3 mb-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 mb-0.5 sm:mb-1">
                 {/* Rank Badge */}
                 <div
-                  className="w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold flex-shrink-0"
+                  className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-md sm:rounded-lg flex items-center justify-center text-[10px] sm:text-xs md:text-sm font-bold flex-shrink-0"
                   style={{ backgroundColor: `${healthColor}20`, color: healthColor }}
                 >
                   {index + 1}
@@ -125,12 +125,12 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
 
                 {/* Section Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs md:text-sm font-medium text-foreground truncate">
+                  <div className="flex items-center justify-between mb-0.5 sm:mb-1">
+                    <span className="text-[10px] sm:text-xs md:text-sm font-medium text-foreground truncate">
                       {formatSectionName(section.section_id)}
                     </span>
-                    <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
-                      <span className="text-xs md:text-sm font-semibold text-foreground">
+                    <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0">
+                      <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-foreground">
                         {section.total_unique_views}
                       </span>
                       {/* Stickiness Badge - only show if sticky */}
@@ -146,10 +146,11 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
                       )}
                       {/* Exit Rate Badge */}
                       <span
-                        className={`flex items-center gap-0.5 md:gap-1 px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium ${dropoffConfig.bgColor}`}
+                        className={`flex items-center gap-0.5 px-1 sm:px-1.5 md:px-2 py-0.5 rounded text-[9px] sm:text-[10px] md:text-xs font-medium ${dropoffConfig.bgColor}`}
                         style={{ color: dropoffConfig.color }}
                       >
-                        <DropoffIcon size={10} className="md:hidden" />
+                        <DropoffIcon size={8} className="sm:hidden" />
+                        <DropoffIcon size={10} className="hidden sm:block md:hidden" />
                         <DropoffIcon size={12} className="hidden md:block" />
                         {section.avg_exit_rate.toFixed(0)}%
                       </span>
@@ -157,19 +158,19 @@ export function SectionFunnel({ data }: SectionFunnelProps) {
                   </div>
 
                   {/* Progress Bar (funnel shape) */}
-                  <div className="h-4 md:h-6 bg-muted/20 rounded-lg overflow-hidden relative">
+                  <div className="h-3 sm:h-4 md:h-6 bg-muted/20 rounded-md sm:rounded-lg overflow-hidden relative">
                     <motion.div
-                      className="h-full rounded-lg flex items-center justify-end pr-2 md:pr-3"
+                      className="h-full rounded-md sm:rounded-lg flex items-center justify-end pr-1.5 sm:pr-2 md:pr-3"
                       style={{
                         background: `linear-gradient(90deg, ${healthColor}40, ${healthColor}20)`,
-                        borderLeft: `3px solid ${healthColor}`,
+                        borderLeft: `2px solid ${healthColor}`,
                       }}
                       initial={{ width: 0 }}
                       animate={{ width: `${widthPercent}%` }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
-                      {widthPercent > 40 && (
-                        <span className="text-[10px] md:text-xs font-medium text-foreground/80">
+                      {widthPercent > 50 && (
+                        <span className="text-[8px] sm:text-[10px] md:text-xs font-medium text-foreground/80">
                           {section.avg_time_spent_seconds.toFixed(0)}s
                         </span>
                       )}
@@ -214,18 +215,19 @@ export function SectionDropoffSummary({ data }: SectionDropoffSummaryProps) {
   if (highDropoff.length === 0) return null;
 
   return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-        <AlertTriangle size={14} className="text-amber-400" />
+    <div className="space-y-1.5 sm:space-y-2">
+      <h4 className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5 sm:gap-2">
+        <AlertTriangle size={12} className="text-amber-400 sm:hidden" />
+        <AlertTriangle size={14} className="text-amber-400 hidden sm:block" />
         Sections with High Drop-off
       </h4>
       {highDropoff.map((section) => (
         <div
           key={section.section_id}
-          className="flex items-center justify-between p-2 rounded-lg bg-red-500/10 border border-red-500/20"
+          className="flex items-center justify-between p-1.5 sm:p-2 rounded-lg bg-red-500/10 border border-red-500/20"
         >
-          <span className="text-sm text-foreground">{formatSectionName(section.section_id)}</span>
-          <span className="text-sm font-bold text-red-400">{section.avg_exit_rate.toFixed(0)}% exit</span>
+          <span className="text-xs sm:text-sm text-foreground">{formatSectionName(section.section_id)}</span>
+          <span className="text-xs sm:text-sm font-bold text-red-400">{section.avg_exit_rate.toFixed(0)}% exit</span>
         </div>
       ))}
     </div>
@@ -249,12 +251,13 @@ export function SectionStickinessSummary({ data }: SectionStickinessSummaryProps
   if (stickySections.length === 0) return null;
 
   return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-        <Sparkles size={14} className="text-purple-400" />
+    <div className="space-y-1.5 sm:space-y-2">
+      <h4 className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5 sm:gap-2">
+        <Sparkles size={12} className="text-purple-400 sm:hidden" />
+        <Sparkles size={14} className="text-purple-400 hidden sm:block" />
         Most Engaging Sections
       </h4>
-      <p className="text-xs text-muted-foreground mb-2">
+      <p className="text-[10px] sm:text-xs text-muted-foreground mb-1.5 sm:mb-2">
         Sections users revisit multiple times per session
       </p>
       {stickySections.map((section) => {
@@ -262,13 +265,14 @@ export function SectionStickinessSummary({ data }: SectionStickinessSummaryProps
         return (
           <div
             key={section.section_id}
-            className={`flex items-center justify-between p-2 rounded-lg ${config.bgColor} border border-purple-500/20`}
+            className={`flex items-center justify-between p-1.5 sm:p-2 rounded-lg ${config.bgColor} border border-purple-500/20`}
           >
-            <span className="text-sm text-foreground">{formatSectionName(section.section_id)}</span>
-            <div className="flex items-center gap-2">
-              <RefreshCw size={12} style={{ color: config.color }} />
-              <span className="text-sm font-bold" style={{ color: config.color }}>
-                {section.avg_revisits_per_session.toFixed(1)}x revisits
+            <span className="text-xs sm:text-sm text-foreground">{formatSectionName(section.section_id)}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <RefreshCw size={10} className="sm:hidden" style={{ color: config.color }} />
+              <RefreshCw size={12} className="hidden sm:block" style={{ color: config.color }} />
+              <span className="text-xs sm:text-sm font-bold" style={{ color: config.color }}>
+                {section.avg_revisits_per_session.toFixed(1)}x
               </span>
             </div>
           </div>

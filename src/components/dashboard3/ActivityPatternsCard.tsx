@@ -115,55 +115,60 @@ export function ActivityPatternsCard({ temporal }: ActivityPatternsCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="p-4 space-y-4">
+      <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
         {/* Peak Insights */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-2">
           {insights.peakDay && (
-            <div className="p-3 rounded-lg bg-gradient-to-br from-tech-neon/10 to-tech-neon/5 border border-tech-neon/20">
-              <div className="flex items-center gap-1.5 mb-1">
-                <Calendar size={12} className="text-tech-neon" />
-                <span className="text-[10px] text-muted-foreground">Peak Day</span>
+            <div className="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-tech-neon/10 to-tech-neon/5 border border-tech-neon/20">
+              <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                <Calendar size={10} className="text-tech-neon sm:hidden" />
+                <Calendar size={12} className="text-tech-neon hidden sm:block" />
+                <span className="text-[9px] sm:text-[10px] text-muted-foreground">Peak Day</span>
               </div>
-              <div className="text-sm font-bold text-foreground">{insights.peakDay.day_name}</div>
-              <div className="text-xs text-tech-neon">{insights.peakDay.sessions} sessions</div>
+              <div className="text-xs sm:text-sm font-bold text-foreground">{insights.peakDay.day_name}</div>
+              <div className="text-[10px] sm:text-xs text-tech-neon">{insights.peakDay.sessions} sessions</div>
             </div>
           )}
           {insights.peakHour && (
-            <div className="p-3 rounded-lg bg-gradient-to-br from-tech-accent/10 to-tech-accent/5 border border-tech-accent/20">
-              <div className="flex items-center gap-1.5 mb-1">
-                <Clock size={12} className="text-tech-accent" />
-                <span className="text-[10px] text-muted-foreground">Peak Hour</span>
+            <div className="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-tech-accent/10 to-tech-accent/5 border border-tech-accent/20">
+              <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+                <Clock size={10} className="text-tech-accent sm:hidden" />
+                <Clock size={12} className="text-tech-accent hidden sm:block" />
+                <span className="text-[9px] sm:text-[10px] text-muted-foreground">Peak Hour</span>
               </div>
-              <div className="text-sm font-bold text-foreground">{insights.peakHour.hour}:00</div>
-              <div className="text-xs text-tech-accent">{insights.peakHour.sessions} sessions</div>
+              <div className="text-xs sm:text-sm font-bold text-foreground">{insights.peakHour.hour}:00</div>
+              <div className="text-[10px] sm:text-xs text-tech-accent">{insights.peakHour.sessions} sessions</div>
             </div>
           )}
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-white/5">
-            <div className="flex items-center gap-1.5 mb-1">
-              <TrendingUp size={12} className="text-emerald-400" />
-              <span className="text-[10px] text-muted-foreground">Weekdays</span>
+          <div className="p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-white/5">
+            <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+              <TrendingUp size={10} className="text-emerald-400 sm:hidden" />
+              <TrendingUp size={12} className="text-emerald-400 hidden sm:block" />
+              <span className="text-[9px] sm:text-[10px] text-muted-foreground">Weekdays</span>
             </div>
-            <div className="text-sm font-bold text-foreground">{insights.weekdaySessions}</div>
-            <div className="text-xs text-emerald-400">sessions</div>
+            <div className="text-xs sm:text-sm font-bold text-foreground">{insights.weekdaySessions}</div>
+            <div className="text-[10px] sm:text-xs text-emerald-400">sessions</div>
           </div>
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-white/5">
-            <div className="flex items-center gap-1.5 mb-1">
-              <Zap size={12} className="text-amber-400" />
-              <span className="text-[10px] text-muted-foreground">Weekend</span>
+          <div className="p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-white/5">
+            <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
+              <Zap size={10} className="text-amber-400 sm:hidden" />
+              <Zap size={12} className="text-amber-400 hidden sm:block" />
+              <span className="text-[9px] sm:text-[10px] text-muted-foreground">Weekend</span>
             </div>
-            <div className="text-sm font-bold text-foreground">{insights.weekendSessions}</div>
-            <div className="text-xs text-amber-400">sessions</div>
+            <div className="text-xs sm:text-sm font-bold text-foreground">{insights.weekendSessions}</div>
+            <div className="text-[10px] sm:text-xs text-amber-400">sessions</div>
           </div>
         </div>
 
         {/* Daily Distribution */}
         {hasDayData && (
           <div>
-            <h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
-              <Calendar size={12} className="text-tech-neon" />
+            <h4 className="text-[11px] sm:text-xs font-semibold text-foreground mb-1.5 sm:mb-2 flex items-center gap-1 sm:gap-1.5">
+              <Calendar size={10} className="text-tech-neon sm:hidden" />
+              <Calendar size={12} className="text-tech-neon hidden sm:block" />
               Daily Traffic
             </h4>
-            <div className="space-y-1.5">
+            <div className="space-y-1 sm:space-y-1.5">
               {dayOfWeekDistribution.map((day, index) => {
                 const maxSessions = Math.max(...dayOfWeekDistribution.map(d => d.sessions));
                 const width = maxSessions > 0 ? (day.sessions / maxSessions) * 100 : 0;
@@ -172,15 +177,15 @@ export function ActivityPatternsCard({ temporal }: ActivityPatternsCardProps) {
                 return (
                   <motion.div
                     key={index}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1.5 sm:gap-2"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <span className={`text-xs w-14 ${isPeak ? 'font-bold text-tech-neon' : 'text-muted-foreground'}`}>
-                      {day.day_name || `Day ${day.day_number}`}
+                    <span className={`text-[10px] sm:text-xs w-10 sm:w-14 ${isPeak ? 'font-bold text-tech-neon' : 'text-muted-foreground'}`}>
+                      {day.day_name?.slice(0, 3) || `D${day.day_number}`}
                     </span>
-                    <div className="flex-1 h-4 bg-muted/20 rounded overflow-hidden relative">
+                    <div className="flex-1 h-3 sm:h-4 bg-muted/20 rounded overflow-hidden relative">
                       <motion.div
                         className={`h-full rounded ${isPeak ? 'bg-gradient-to-r from-tech-neon to-tech-accent' : 'bg-tech-neon/60'}`}
                         initial={{ width: 0 }}
@@ -188,7 +193,7 @@ export function ActivityPatternsCard({ temporal }: ActivityPatternsCardProps) {
                         transition={{ duration: 0.5, delay: index * 0.05 }}
                       />
                     </div>
-                    <span className={`text-xs w-8 text-right ${isPeak ? 'font-bold text-tech-neon' : 'text-foreground'}`}>
+                    <span className={`text-[10px] sm:text-xs w-6 sm:w-8 text-right ${isPeak ? 'font-bold text-tech-neon' : 'text-foreground'}`}>
                       {day.sessions}
                     </span>
                   </motion.div>
@@ -201,11 +206,12 @@ export function ActivityPatternsCard({ temporal }: ActivityPatternsCardProps) {
         {/* Hourly Distribution */}
         {hasHourData && (
           <div>
-            <h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
-              <Clock size={12} className="text-tech-accent" />
+            <h4 className="text-[11px] sm:text-xs font-semibold text-foreground mb-1.5 sm:mb-2 flex items-center gap-1 sm:gap-1.5">
+              <Clock size={10} className="text-tech-accent sm:hidden" />
+              <Clock size={12} className="text-tech-accent hidden sm:block" />
               Hourly Traffic
             </h4>
-            <div className="h-[140px]">
+            <div className="h-[110px] sm:h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={hourlyDistribution.filter((_, i) => i % 2 === 0).map(h => ({
@@ -216,15 +222,15 @@ export function ActivityPatternsCard({ temporal }: ActivityPatternsCardProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis
                     dataKey="hour"
-                    tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
+                    tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 9 }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
-                    tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
+                    tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 9 }}
                     axisLine={false}
                     tickLine={false}
-                    width={25}
+                    width={20}
                   />
                   <Tooltip {...tooltipStyle} />
                   <Bar dataKey="Sessions" fill="#00E0FF" radius={[3, 3, 0, 0]} />
@@ -236,18 +242,18 @@ export function ActivityPatternsCard({ temporal }: ActivityPatternsCardProps) {
 
         {/* Time of Day Summary */}
         {hasHourData && (
-          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-muted/20">
-            <div className="p-2 rounded-lg bg-amber-500/10 text-center">
-              <div className="text-sm font-bold text-amber-400">{insights.morningHours}</div>
-              <div className="text-[10px] text-muted-foreground">Morning (6-12)</div>
+          <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-2 sm:pt-3 border-t border-muted/20">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-amber-500/10 text-center">
+              <div className="text-xs sm:text-sm font-bold text-amber-400">{insights.morningHours}</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">Morning (6-12)</div>
             </div>
-            <div className="p-2 rounded-lg bg-tech-neon/10 text-center">
-              <div className="text-sm font-bold text-tech-neon">{insights.afternoonHours}</div>
-              <div className="text-[10px] text-muted-foreground">Afternoon (12-18)</div>
+            <div className="p-1.5 sm:p-2 rounded-lg bg-tech-neon/10 text-center">
+              <div className="text-xs sm:text-sm font-bold text-tech-neon">{insights.afternoonHours}</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">Afternoon (12-18)</div>
             </div>
-            <div className="p-2 rounded-lg bg-tech-accent/10 text-center">
-              <div className="text-sm font-bold text-tech-accent">{insights.eveningHours}</div>
-              <div className="text-[10px] text-muted-foreground">Evening (18-24)</div>
+            <div className="p-1.5 sm:p-2 rounded-lg bg-tech-accent/10 text-center">
+              <div className="text-xs sm:text-sm font-bold text-tech-accent">{insights.eveningHours}</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">Evening (18-24)</div>
             </div>
           </div>
         )}

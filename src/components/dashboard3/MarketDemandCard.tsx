@@ -54,13 +54,14 @@ export function MarketDemandCard({ skills, experiences }: MarketDemandCardProps)
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors min-h-[40px] sm:min-h-0 ${
                 isActive
                   ? 'text-tech-neon border-b-2 border-tech-neon bg-white/50 dark:bg-white/5'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5 active:bg-white/50'
               }`}
             >
-              <Icon size={16} />
+              <Icon size={14} className="sm:hidden" />
+              <Icon size={16} className="hidden sm:block" />
               {tab.label}
             </button>
           );
@@ -68,7 +69,7 @@ export function MarketDemandCard({ skills, experiences }: MarketDemandCardProps)
       </div>
 
       {/* Tab Content */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {activeTab === 'skills' && <SkillsView skills={skills} />}
         {activeTab === 'experience' && <ExperienceView experiences={experiences} />}
       </div>
@@ -90,9 +91,9 @@ function SkillsView({ skills }: { skills: TechDemand[] }) {
   const highDemand = skills.filter(s => s.demand_tier === 'high_demand');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Skill Rankings */}
-      <div className="space-y-1.5">
+      <div className="space-y-1 sm:space-y-1.5">
         {skills.slice(0, 6).map((skill, index) => {
           const tierColor = skill.demand_tier === 'high_demand' ? '#10B981' :
                            skill.demand_tier === 'moderate_demand' ? '#3B82F6' : '#6B7280';
@@ -101,14 +102,14 @@ function SkillsView({ skills }: { skills: TechDemand[] }) {
           return (
             <motion.div
               key={skill.skill_name}
-              className="p-2 rounded-lg bg-gray-50 dark:bg-white/5"
+              className="p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <span
-                  className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center text-[10px] sm:text-xs font-bold flex-shrink-0 ${
                     skill.demand_rank <= 3 ? 'bg-tech-neon/20 text-tech-neon' : 'bg-gray-500/20 text-muted-foreground'
                   }`}
                 >
@@ -116,17 +117,17 @@ function SkillsView({ skills }: { skills: TechDemand[] }) {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-xs font-medium text-foreground truncate">
+                    <span className="text-[11px] sm:text-xs font-medium text-foreground truncate">
                       {skill.skill_name}
                     </span>
                     <span
-                      className="text-xs font-bold"
+                      className="text-[11px] sm:text-xs font-bold flex-shrink-0 ml-1"
                       style={{ color: tierColor }}
                     >
                       {skill.total_interactions}
                     </span>
                   </div>
-                  <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden">
+                  <div className="h-1 sm:h-1.5 bg-muted/20 rounded-full overflow-hidden">
                     <motion.div
                       className="h-full rounded-full"
                       style={{ backgroundColor: tierColor }}
@@ -143,20 +144,20 @@ function SkillsView({ skills }: { skills: TechDemand[] }) {
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
-          <div className="text-lg font-bold text-tech-neon">{skills.length}</div>
-          <div className="text-[10px] text-muted-foreground">Skills Tracked</div>
+      <div className="grid grid-cols-3 gap-1 sm:gap-2">
+        <div className="p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
+          <div className="text-sm sm:text-lg font-bold text-tech-neon">{skills.length}</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Skills Tracked</div>
         </div>
-        <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
-          <div className="text-lg font-bold text-emerald-400">{highDemand.length}</div>
-          <div className="text-[10px] text-muted-foreground">High Demand</div>
+        <div className="p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
+          <div className="text-sm sm:text-lg font-bold text-emerald-400">{highDemand.length}</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">High Demand</div>
         </div>
-        <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
-          <div className="text-lg font-bold text-tech-accent">
+        <div className="p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
+          <div className="text-sm sm:text-lg font-bold text-tech-accent">
             {skills.reduce((s, t) => s + t.total_interactions, 0)}
           </div>
-          <div className="text-[10px] text-muted-foreground">Interactions</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Interactions</div>
         </div>
       </div>
     </div>
@@ -176,7 +177,7 @@ function ExperienceView({ experiences }: { experiences: ExperienceRanking[] }) {
   const maxInteractions = Math.max(...experiences.map(e => e.total_interactions));
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 sm:space-y-2">
       {experiences.map((exp, index) => {
         const attractivenessColor = exp.role_attractiveness === 'high' ? '#10B981' :
                                     exp.role_attractiveness === 'medium' ? '#3B82F6' : '#6B7280';
@@ -185,14 +186,14 @@ function ExperienceView({ experiences }: { experiences: ExperienceRanking[] }) {
         return (
           <motion.div
             key={exp.experience_id}
-            className="p-3 rounded-lg bg-gray-50 dark:bg-white/5"
+            className="p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-white/5"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
           >
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-1.5 sm:gap-2">
               <span
-                className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                className={`w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center text-[10px] sm:text-xs font-bold flex-shrink-0 ${
                   exp.interest_rank === 1 ? 'bg-amber-500/20 text-amber-400' :
                   exp.interest_rank === 2 ? 'bg-gray-400/20 text-gray-400' :
                   exp.interest_rank === 3 ? 'bg-orange-500/20 text-orange-400' :
@@ -202,28 +203,28 @@ function ExperienceView({ experiences }: { experiences: ExperienceRanking[] }) {
                 {exp.interest_rank}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h4 className="text-xs font-semibold text-foreground truncate">
+                <div className="flex items-start justify-between gap-1 sm:gap-2">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-[11px] sm:text-xs font-semibold text-foreground truncate">
                       {exp.experience_title}
                     </h4>
-                    <p className="text-[10px] text-muted-foreground truncate">{exp.company}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{exp.company}</p>
                   </div>
                   <div className="flex flex-col items-end flex-shrink-0">
                     <span
-                      className="px-1.5 py-0.5 rounded text-[10px] font-medium"
+                      className="px-1 sm:px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium"
                       style={{ backgroundColor: `${attractivenessColor}20`, color: attractivenessColor }}
                     >
                       {exp.role_attractiveness || 'N/A'}
                     </span>
-                    <span className="text-xs text-muted-foreground mt-0.5">
+                    <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
                       {exp.total_interactions} views
                     </span>
                   </div>
                 </div>
 
                 {/* Progress bar */}
-                <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden mt-2">
+                <div className="h-1 sm:h-1.5 bg-muted/20 rounded-full overflow-hidden mt-1.5 sm:mt-2">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ backgroundColor: attractivenessColor }}
@@ -235,9 +236,10 @@ function ExperienceView({ experiences }: { experiences: ExperienceRanking[] }) {
 
                 {/* Positioning suggestion */}
                 {exp.positioning_suggestion && (
-                  <p className="text-[10px] text-muted-foreground mt-1.5 flex items-start gap-1">
-                    <TrendingUp size={10} className="flex-shrink-0 mt-0.5 text-tech-accent" />
-                    {exp.positioning_suggestion}
+                  <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1 sm:mt-1.5 flex items-start gap-0.5 sm:gap-1">
+                    <TrendingUp size={8} className="flex-shrink-0 mt-0.5 text-tech-accent sm:hidden" />
+                    <TrendingUp size={10} className="flex-shrink-0 mt-0.5 text-tech-accent hidden sm:block" />
+                    <span className="line-clamp-2">{exp.positioning_suggestion}</span>
                   </p>
                 )}
               </div>
@@ -247,18 +249,18 @@ function ExperienceView({ experiences }: { experiences: ExperienceRanking[] }) {
       })}
 
       {/* Summary */}
-      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-muted/20">
-        <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
-          <div className="text-lg font-bold text-tech-neon">
+      <div className="grid grid-cols-2 gap-1 sm:gap-2 pt-2 sm:pt-3 border-t border-muted/20">
+        <div className="p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
+          <div className="text-sm sm:text-lg font-bold text-tech-neon">
             {experiences.reduce((s, e) => s + e.total_interactions, 0)}
           </div>
-          <div className="text-[10px] text-muted-foreground">Total Views</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">Total Views</div>
         </div>
-        <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
-          <div className="text-lg font-bold text-emerald-400">
+        <div className="p-1.5 sm:p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-center">
+          <div className="text-sm sm:text-lg font-bold text-emerald-400">
             {experiences.filter(e => e.role_attractiveness === 'high').length}
           </div>
-          <div className="text-[10px] text-muted-foreground">High Attractiveness</div>
+          <div className="text-[8px] sm:text-[10px] text-muted-foreground">High Attractiveness</div>
         </div>
       </div>
     </div>
