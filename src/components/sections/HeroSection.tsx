@@ -365,7 +365,7 @@ export function HeroSection() {
                 />
               </motion.div>
 
-              {/* Resume badge - compact on mobile */}
+              {/* Resume badge temporarily commented out
               <motion.div
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -383,6 +383,7 @@ export function HeroSection() {
                   <ExternalLink size={12} className="text-muted-foreground group-hover:text-tech-accent transition-colors sm:w-[14px] sm:h-[14px]" />
                 </div>
               </motion.div>
+              */}
             </div>
           </motion.div>
         </div>

@@ -153,6 +153,7 @@ export function Navbar() {
               )}
             </motion.a>
           ))}
+          {/* Resume button temporarily commented out
           <motion.a
             href={portfolioData.hero.resumeLink}
             target="_blank"
@@ -166,6 +167,7 @@ export function Navbar() {
           >
             <Button className="tech-btn">Resume</Button>
           </motion.a>
+          */}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -246,6 +248,7 @@ export function Navbar() {
                   </a>
                 </motion.div>
               ))}
+              {/* Resume button temporarily commented out
               <motion.a
                 href={portfolioData.hero.resumeLink}
                 target="_blank"
@@ -257,6 +260,7 @@ export function Navbar() {
               >
                 <Button className="mt-2 tech-btn w-full">Resume</Button>
               </motion.a>
+              */}
             </motion.div>
           </motion.div>
         )}
