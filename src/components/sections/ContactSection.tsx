@@ -301,7 +301,7 @@ export function ContactSection() {
               </motion.a>
             </motion.div>
 
-            {/* Resume Card */}
+            {/* Resume Card temporarily commented out
             <motion.div
               className="p-4 sm:p-6 glass rounded-xl sm:rounded-2xl relative overflow-hidden group cursor-pointer"
               initial={{ opacity: 0, y: 20 }}
@@ -334,6 +334,7 @@ export function ContactSection() {
                 </motion.div>
               </div>
             </motion.div>
+            */}
           </motion.div>
 
           {/* Right Column - Contact Form */}
