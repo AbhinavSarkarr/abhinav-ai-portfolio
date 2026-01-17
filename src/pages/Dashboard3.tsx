@@ -9,96 +9,54 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
-  RadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
 } from 'recharts';
 import {
   DashboardSection,
   GlassCard,
-  TrafficTrendChart,
-  VisitorSegmentChart,
   ConversionFunnel as ConversionFunnelViz,
-  InsightCard,
-  SectionConclusion,
-  HeroKPI,
-  StatRow,
-  ProgressMetric,
-  ConversionSummary,
-  ComparisonBar,
 } from '@/components/dashboard';
-import { HealthScoreGauge, HealthScoreCard } from '@/components/dashboard3/HealthScoreGauge';
-import { AlertBanner, type Alert } from '@/components/dashboard3/AlertBanner';
 import { ExecutiveSummaryCard } from '@/components/dashboard3/ExecutiveSummaryCard';
-import { SectionFunnel, SectionDropoffSummary, SectionStickinessSummary } from '@/components/dashboard3/SectionFunnel';
-import { TopVisitors, TopVisitorsSummary } from '@/components/dashboard3/TopVisitors';
-import { DomainInterest, DomainInterestBars } from '@/components/dashboard3/DomainInterest';
-import { TechStackedBar } from '@/components/dashboard3/TechBreakdown';
+import { VisitorInsightsCard } from '@/components/dashboard3/VisitorInsightsCard';
+import { PortfolioEngagementCard } from '@/components/dashboard3/PortfolioEngagementCard';
+import { MarketDemandCard } from '@/components/dashboard3/MarketDemandCard';
+import { ActivityPatternsCard } from '@/components/dashboard3/ActivityPatternsCard';
+import { SectionInsightsCard } from '@/components/dashboard3/SectionInsightsCard';
 import { ProjectMetricsChart, ProjectDetailedBreakdown, ProjectActionsSummary } from '@/components/dashboard3/ProjectAnalyticsAdvanced';
-import { InfoTooltip, analyticsDictionary } from '@/components/dashboard/InfoTooltip';
 import {
   useDashboardData,
   type DateRangePreset,
-  type DashboardData,
   getPresetLabel,
   warmUpBackendAPI,
 } from '@/hooks/useDashboardData';
 import {
   RefreshCw,
   AlertCircle,
-  BarChart3,
   ArrowLeft,
   Calendar,
   ChevronDown,
-  TrendingUp,
-  TrendingDown,
   Gauge,
   Globe,
   Users,
-  Activity,
   FileText,
-  Layers,
-  Code,
-  Briefcase,
   Target,
-  Sparkles,
   Clock,
   Download,
   ExternalLink,
-  Eye,
-  MousePointer,
-  Smartphone,
-  Monitor,
-  Tablet,
-  BookOpen,
-  Award,
-  MapPin,
-  Zap,
   MessageSquare,
   Share2,
-  Trophy,
-  PieChart as PieChartIcon,
+  BookOpen,
   LayoutDashboard,
-  Lightbulb,
-  CheckCircle2,
-  Star,
-  Heart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
 
-// Chart theme for consistent styling
+// Chart theme
 const chartColors = {
   primary: '#7B42F6',
   accent: '#00E0FF',
@@ -130,36 +88,19 @@ const DATE_PRESET_OPTIONS: { value: DateRangePreset; label: string }[] = [
   { value: 'custom', label: 'Custom Range' },
 ];
 
-// Get yesterday's date
+// Helper functions
 function getYesterdayDate(): string {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   return yesterday.toISOString().split('T')[0];
 }
 
-// Get date X days ago
 function getDaysAgoDate(days: number): string {
   const date = new Date();
   date.setDate(date.getDate() - days);
   return date.toISOString().split('T')[0];
 }
 
-// Format duration in human readable format
-function formatDuration(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.round(seconds % 60);
-  if (mins === 0) return `${secs}s`;
-  return `${mins}m ${secs}s`;
-}
-
-// Format large numbers
-function formatNumber(num: number): string {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
-}
-
-// Format traffic source names to readable labels
 function formatTrafficSource(source: string): string {
   const sourceMap: Record<string, string> = {
     '(direct)': 'Direct',
@@ -175,29 +116,13 @@ function formatTrafficSource(source: string): string {
     'lnkd.in': 'LinkedIn',
     'google': 'Google',
     'google.com': 'Google',
-    'tagassistant.google.com': 'Google Tag',
     'github': 'GitHub',
     'github.com': 'GitHub',
     'twitter': 'Twitter/X',
     'twitter.com': 'Twitter/X',
     't.co': 'Twitter/X',
     'x.com': 'Twitter/X',
-    'facebook': 'Facebook',
-    'facebook.com': 'Facebook',
-    'fb.com': 'Facebook',
-    'l.facebook.com': 'Facebook',
-    'whatsapp': 'WhatsApp',
-    'web.whatsapp.com': 'WhatsApp',
-    'youtube': 'YouTube',
-    'youtube.com': 'YouTube',
-    'reddit': 'Reddit',
-    'reddit.com': 'Reddit',
-    'bing': 'Bing',
-    'bing.com': 'Bing',
-    'duckduckgo': 'DuckDuckGo',
-    'duckduckgo.com': 'DuckDuckGo',
   };
-
   const lower = source.toLowerCase().trim();
   return sourceMap[lower] || source.charAt(0).toUpperCase() + source.slice(1);
 }
@@ -333,84 +258,6 @@ function DateRangeSelector({
   );
 }
 
-// Calculate overall health score
-function calculateHealthScore(data: DashboardData): number {
-  if (!data) return 0;
-  const engagementScore = Math.min(100, data.overview.engagementRate * 1.2);
-  const bounceScore = Math.max(0, 100 - data.overview.bounceRate * 1.2);
-  const conversionScore = Math.min(100, data.overview.totalConversions * 15);
-  const sessionScore = Math.min(100, data.overview.totalSessions * 0.5);
-  return Math.round((engagementScore * 0.35 + bounceScore * 0.25 + conversionScore * 0.25 + sessionScore * 0.15));
-}
-
-// Generate smart alerts based on data
-function generateAlerts(data: DashboardData): Alert[] {
-  if (!data) return [];
-  const alerts: Alert[] = [];
-
-  if (data.overview.bounceRate > 60) {
-    alerts.push({
-      type: 'warning',
-      title: 'High Bounce Rate',
-      message: `${data.overview.bounceRate.toFixed(1)}% of visitors leave without engaging.`,
-      metric: 'Consider improving landing page content.',
-    });
-  }
-
-  if (data.overview.engagementRate > 70) {
-    alerts.push({
-      type: 'success',
-      title: 'Strong Engagement',
-      message: `${data.overview.engagementRate.toFixed(1)}% engagement rate is excellent!`,
-    });
-  }
-
-  if (data.conversionSummary.resume_downloads > 0) {
-    alerts.push({
-      type: 'success',
-      title: 'Resume Interest',
-      message: `${data.conversionSummary.resume_downloads} resume downloads - recruiters are interested!`,
-    });
-  }
-
-  const topProject = data.projectRankings[0];
-  if (topProject && topProject.total_clicks > 10) {
-    alerts.push({
-      type: 'info',
-      title: 'Top Project',
-      message: `"${topProject.project_title}" is your most clicked project with ${topProject.total_clicks} clicks.`,
-    });
-  }
-
-  return alerts;
-}
-
-// Generate executive insights - data facts only
-function generateExecutiveInsights(data: DashboardData) {
-  const insights: Array<{ type: 'positive' | 'negative' | 'neutral' | 'warning' | 'action'; text: string }> = [];
-
-  // Engagement
-  insights.push({
-    type: data.overview.engagementRate >= 50 ? 'positive' : 'neutral',
-    text: `${data.overview.engagementRate.toFixed(1)}% engagement rate across ${data.overview.totalSessions} sessions.`
-  });
-
-  // Retention
-  insights.push({
-    type: data.overview.bounceRate < 50 ? 'positive' : 'neutral',
-    text: `${(100 - data.overview.bounceRate).toFixed(1)}% of visitors stayed to explore the portfolio.`
-  });
-
-  // Conversions
-  const totalActions = data.conversionSummary.resume_downloads + data.conversionSummary.form_submissions + data.conversionSummary.social_clicks;
-  insights.push({
-    type: totalActions > 0 ? 'positive' : 'neutral',
-    text: `${totalActions} total actions: ${data.conversionSummary.resume_downloads} downloads, ${data.conversionSummary.form_submissions} contacts, ${data.conversionSummary.social_clicks} social clicks.`
-  });
-
-  return insights;
-}
-
 // Main Dashboard Component
 export default function Dashboard3() {
   const {
@@ -479,7 +326,7 @@ export default function Dashboard3() {
 
   if (!data) return null;
 
-  // Prepare chart data
+  // Prepare visitor segment data
   const visitorSegmentData = {
     converters: data.visitorSegments?.converter?.count || 0,
     high_intent: data.visitorSegments?.high_intent?.count || 0,
@@ -488,22 +335,7 @@ export default function Dashboard3() {
     casual_browsers: (data.visitorSegments?.casual_browser?.count || 0) + (data.visitorSegments?.engaged_new?.count || 0),
   };
 
-  // Group geographic data
-  const countryData = data.geographic.reduce((acc, item) => {
-    if (!acc[item.country]) {
-      acc[item.country] = { sessions: 0, visitors: 0 };
-    }
-    acc[item.country].sessions += item.sessions;
-    acc[item.country].visitors += item.unique_visitors;
-    return acc;
-  }, {} as Record<string, { sessions: number; visitors: number }>);
-
-  const topCountries = Object.entries(countryData)
-    .sort((a, b) => b[1].sessions - a[1].sessions)
-    .slice(0, 5);
-
-  // Prepare traffic source pie chart data with formatted names
-  // Aggregate sources that map to the same formatted name (e.g., "instagram", "l.instagram.com" -> "Instagram")
+  // Prepare traffic source pie chart data
   const aggregatedTrafficSources = data.trafficSources.reduce((acc, source) => {
     const formattedName = formatTrafficSource(source.traffic_source);
     if (acc[formattedName]) {
@@ -523,19 +355,9 @@ export default function Dashboard3() {
       color: [chartColors.primary, chartColors.accent, chartColors.highlight, chartColors.success, chartColors.warning, chartColors.muted][index],
     }));
 
-  // Prepare device pie chart data
-  const devicePieData = data.devices.categories.map((device, index) => ({
-    name: device.device_category.charAt(0).toUpperCase() + device.device_category.slice(1),
-    value: device.sessions,
-    color: [chartColors.primary, chartColors.accent, chartColors.success][index],
-  }));
-
-  // Calculate health score
-  const healthScore = calculateHealthScore(data);
-
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Animated Background - matching portfolio */}
+      {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <motion.div
           className="absolute top-1/4 -left-32 w-96 h-96 bg-tech-neon/10 dark:bg-tech-neon/5 rounded-full blur-[120px]"
@@ -547,14 +369,9 @@ export default function Dashboard3() {
           animate={{ x: [0, -60, 0], y: [0, -40, 0], scale: [1, 1.2, 1] }}
           transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
         />
-        <motion.div
-          className="absolute top-2/3 left-1/2 w-64 h-64 bg-tech-highlight/5 rounded-full blur-[100px]"
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
       </div>
 
-      {/* Header - matching portfolio navbar style */}
+      {/* Header */}
       <motion.header
         className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/80 border-b border-black/5 dark:border-white/5"
         initial={{ y: -100 }}
@@ -604,13 +421,12 @@ export default function Dashboard3() {
       <main className="pt-16 sm:pt-20 md:pt-24 relative z-10">
 
         {/* ============================================ */}
-        {/* SECTION 1: EXECUTIVE SUMMARY (MOST IMPORTANT) */}
+        {/* SECTION 1: EXECUTIVE SUMMARY */}
         {/* ============================================ */}
         <DashboardSection
           id="executive"
           title="Executive Summary"
           subtitle="Overall portfolio performance at a glance"
-          description="Your portfolio's health report showing visitors, engagement, and key actions."
           icon={Gauge}
           priority="high"
         >
@@ -623,20 +439,51 @@ export default function Dashboard3() {
             avgPagesPerSession={data.overview.avgPagesPerSession}
             totalConversions={data.overview.totalConversions}
           />
+
+          {/* Traffic Sparkline */}
+          {data.dailyMetrics && data.dailyMetrics.length > 0 && (
+            <GlassCard title="Traffic Trend" subtitle="Daily visitors" className="mt-4">
+              <div className="mt-2">
+                <ResponsiveContainer width="100%" height={120}>
+                  <AreaChart data={data.dailyMetrics
+                    .filter(d => d.date && d.date.trim() !== '' && d.date.includes('-'))
+                    .map(d => {
+                      try {
+                        const parsedDate = parseISO(d.date);
+                        if (isNaN(parsedDate.getTime())) return null;
+                        return { date: format(parsedDate, 'MMM d'), Visitors: d.visitors || 0 };
+                      } catch { return null; }
+                    })
+                    .filter(Boolean)}>
+                    <defs>
+                      <linearGradient id="visitorsGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={chartColors.primary} stopOpacity={0.4} />
+                        <stop offset="95%" stopColor={chartColors.primary} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }} axisLine={false} tickLine={false} width={30} />
+                    <Tooltip {...tooltipStyle} />
+                    <Area type="monotone" dataKey="Visitors" stroke={chartColors.primary} fill="url(#visitorsGrad)" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </GlassCard>
+          )}
         </DashboardSection>
 
         {/* ============================================ */}
-        {/* SECTION 2: CONVERSION PERFORMANCE */}
+        {/* SECTION 2: CONVERSIONS */}
         {/* ============================================ */}
         <DashboardSection
           id="conversions"
-          title="Visitor Actions"
-          subtitle="Downloads, contacts, and clicks"
-          description="These are the most important actions visitors took on the portfolio. Resume downloads and contact form submissions are strong signals of genuine interest from potential employers or clients."
+          title="Conversions"
+          subtitle="Key actions visitors took"
           icon={Target}
           priority="high"
         >
-          {/* Conversion Cards with inline progress bars */}
+          {/* Conversion Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3 mb-4">
             {[
               { label: 'Resume', sublabel: 'Downloads', value: data.conversionSummary.resume_downloads, icon: Download, color: 'emerald', max: 10 },
@@ -729,266 +576,53 @@ export default function Dashboard3() {
             </div>
           </GlassCard>
 
-          <SectionConclusion
-            insights={[
-              { type: data.conversionSummary.resume_downloads > 0 ? 'positive' as const : 'neutral' as const, text: `${data.conversionSummary.resume_downloads} resume downloads from ${data.overview.uniqueVisitors} visitors.` },
-              { type: data.conversionSummary.form_submissions > 0 ? 'positive' as const : 'neutral' as const, text: `${data.conversionSummary.form_submissions} contact form submissions received.` },
-              { type: 'neutral' as const, text: `${data.conversionSummary.social_clicks} social profile clicks, ${data.conversionSummary.publication_clicks} publication views.` },
-            ]}
-          />
         </DashboardSection>
 
         {/* ============================================ */}
-        {/* SECTION 3: SECTION DROP-OFF FUNNEL */}
-        {/* ============================================ */}
-        {data.sectionRankings && data.sectionRankings.length > 0 && (
-          <DashboardSection
-            id="section-funnel"
-            title="Section Drop-off Analysis"
-            subtitle="Where visitors leave on your portfolio"
-            description="This funnel shows how visitors flow through your portfolio sections and where they drop off. High exit rates on specific sections indicate areas that may need improvement."
-            icon={TrendingDown}
-            priority="high"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {/* Main Funnel Visualization - takes 2/3 */}
-              <div className="lg:col-span-2">
-                <GlassCard title="Portfolio Section Funnel" subtitle="Visitor flow through sections">
-                  <div className="mt-2">
-                    <SectionFunnel data={data.sectionRankings} />
-                  </div>
-                </GlassCard>
-              </div>
-
-              {/* Section Health Summary - takes 1/3 */}
-              <div className="space-y-4">
-                <GlassCard title="Section Health" subtitle="Performance by section">
-                  <div className="space-y-2 mt-2">
-                    {data.sectionRankings
-                      .sort((a, b) => b.health_score - a.health_score)
-                      .slice(0, 5)
-                      .map((section, index) => {
-                        const healthColor = section.health_tier === 'excellent' ? '#10B981' :
-                                          section.health_tier === 'good' ? '#3B82F6' :
-                                          section.health_tier === 'needs_attention' ? '#F59E0B' : '#EF4444';
-                        return (
-                          <motion.div
-                            key={section.section_id}
-                            className="flex items-center justify-between p-2 rounded-lg bg-white/5"
-                            initial={{ opacity: 0, x: 10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                          >
-                            <span className="text-sm text-foreground capitalize">{section.section_id}</span>
-                            <div className="flex items-center gap-2">
-                              <div className="w-16 h-1.5 bg-muted/30 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full rounded-full"
-                                  style={{ width: `${section.health_score}%`, backgroundColor: healthColor }}
-                                />
-                              </div>
-                              <span className="text-sm font-bold" style={{ color: healthColor }}>
-                                {section.health_score}
-                              </span>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                  </div>
-                </GlassCard>
-
-                {/* Optimization Hints */}
-                <GlassCard title="Insights" subtitle="From drop-off data">
-                  <div className="space-y-2 mt-2">
-                    {data.sectionRankings
-                      .filter(s => s.optimization_hint && s.dropoff_indicator === 'high_dropoff')
-                      .slice(0, 2)
-                      .map((section, index) => (
-                        <div
-                          key={section.section_id}
-                          className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20"
-                        >
-                          <div className="text-sm font-medium text-amber-400 mb-1 capitalize">
-                            {section.section_id}
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {section.optimization_hint || `${section.avg_exit_rate.toFixed(0)}% exit rate - consider enhancing content`}
-                          </p>
-                        </div>
-                      ))}
-                    {data.sectionRankings.filter(s => s.dropoff_indicator === 'high_dropoff').length === 0 && (
-                      <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                        <div className="text-sm font-medium text-emerald-400">All sections healthy</div>
-                        <p className="text-xs text-muted-foreground">No critical drop-off points detected</p>
-                      </div>
-                    )}
-                  </div>
-                </GlassCard>
-
-                {/* Stickiness Insights */}
-                <GlassCard title="Stickiness" subtitle="Sections users revisit">
-                  <div className="mt-2">
-                    <SectionStickinessSummary data={data.sectionRankings} />
-                    {data.sectionRankings.filter(s => s.avg_revisits_per_session >= 1.5).length === 0 && (
-                      <div className="p-3 rounded-lg bg-gray-500/10 border border-gray-500/20">
-                        <div className="text-sm font-medium text-muted-foreground">No sticky sections yet</div>
-                        <p className="text-xs text-muted-foreground">Users viewing sections once and moving on</p>
-                      </div>
-                    )}
-                  </div>
-                </GlassCard>
-              </div>
-            </div>
-
-            <SectionConclusion
-              insights={[
-                {
-                  type: data.sectionRankings.some(s => s.dropoff_indicator === 'high_dropoff') ? 'warning' as const : 'positive' as const,
-                  text: `${data.sectionRankings.filter(s => s.dropoff_indicator === 'high_dropoff').length} sections with high drop-off, ${data.sectionRankings.filter(s => s.dropoff_indicator === 'low_dropoff').length} with good retention.`
-                },
-                {
-                  type: data.sectionRankings.some(s => s.avg_revisits_per_session >= 1.5) ? 'positive' as const : 'neutral' as const,
-                  text: (() => {
-                    const stickiest = [...data.sectionRankings].sort((a, b) => b.avg_revisits_per_session - a.avg_revisits_per_session)[0];
-                    return stickiest?.avg_revisits_per_session >= 1.5
-                      ? `Most engaging: ${stickiest.section_id} (${stickiest.avg_revisits_per_session.toFixed(1)}x revisits per session).`
-                      : 'No sticky sections detected - users viewing content linearly.';
-                  })()
-                },
-                {
-                  type: 'neutral' as const,
-                  text: `Best performing: ${data.sectionRankings.sort((a, b) => b.health_score - a.health_score)[0]?.section_id || 'N/A'} with health score ${data.sectionRankings.sort((a, b) => b.health_score - a.health_score)[0]?.health_score || 0}.`
-                },
-              ]}
-            />
-          </DashboardSection>
-        )}
-
-        {/* ============================================ */}
-        {/* SECTION 4: AUDIENCE INSIGHTS (NEW - Combined View) */}
+        {/* SECTION 3: AUDIENCE */}
         {/* ============================================ */}
         <DashboardSection
           id="audience"
-          title="Audience Insights"
-          subtitle="Top visitors, interests, and technology"
-          description="Deep dive into your audience: who are your most valuable visitors, what domains interest them, and what technology they use."
+          title="Audience"
+          subtitle="Who visits your portfolio"
           icon={Users}
-          priority="medium"
+          priority="high"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            {/* Top Visitors */}
-            <GlassCard title="Top Visitors" subtitle="Most engaged audience">
-              <div className="mt-2">
-                <TopVisitors data={data.topVisitors || []} />
-              </div>
-            </GlassCard>
-
-            {/* Domain Interest */}
-            <GlassCard title="Domain Interest" subtitle="What industries are interested">
-              <div className="mt-2">
-                <DomainInterest data={data.domainRankings || []} />
-              </div>
-            </GlassCard>
-          </div>
-
-          {/* Browser/OS Stacked Bars - Full Width */}
-          <GlassCard title="Tech Distribution" subtitle="Combined browser and OS breakdown">
-            <div className="mt-2">
-              <TechStackedBar
-                browsers={data.devices.browsers || []}
-                operatingSystems={data.devices.operatingSystems || []}
-              />
-            </div>
-          </GlassCard>
-
-          <SectionConclusion
-            insights={[
-              {
-                type: (data.topVisitors?.filter(v => v.visitor_segment === 'converter').length || 0) > 0 ? 'positive' as const : 'neutral' as const,
-                text: `${data.topVisitors?.filter(v => v.visitor_segment === 'converter').length || 0} converters among ${data.topVisitors?.length || 0} tracked visitors.`
-              },
-              {
-                type: 'neutral' as const,
-                text: `Top domain interest: ${data.domainRankings?.[0]?.domain || 'N/A'} with score ${data.domainRankings?.[0]?.total_interest_score || 0}.`
-              },
-              {
-                type: 'neutral' as const,
-                text: `Primary browser: ${data.devices.browsers?.[0]?.browser || 'N/A'}, Primary OS: ${data.devices.operatingSystems?.[0]?.operating_system || 'N/A'}.`
-              },
-            ]}
+          <VisitorInsightsCard
+            segments={visitorSegmentData}
+            topVisitors={data.topVisitors || []}
+            geographic={data.geographic}
+            domainRankings={data.domainRankings || []}
+            devices={data.devices.categories}
+            browsers={data.devices.browsers || []}
+            operatingSystems={data.devices.operatingSystems || []}
           />
+
         </DashboardSection>
 
         {/* ============================================ */}
-        {/* SECTION 5: TRAFFIC SOURCES */}
+        {/* SECTION 4: ACQUISITION */}
         {/* ============================================ */}
         <DashboardSection
-          id="traffic"
-          title="Traffic Sources"
-          subtitle="Where visitors come from"
-          description="This shows how people discover the portfolio - through search engines, social media, direct links, or referrals. Understanding traffic sources helps focus promotion efforts."
+          id="acquisition"
+          title="Acquisition"
+          subtitle="How visitors find you"
           icon={Globe}
           priority="medium"
         >
-          {/* Traffic Trend Chart */}
-          {data.dailyMetrics && data.dailyMetrics.length > 0 && (
-            <GlassCard title="Daily Visitor Trends" subtitle="Traffic over time" className="mb-4">
-              <div className="mt-2">
-                <ResponsiveContainer width="100%" height={200}>
-                  <AreaChart data={data.dailyMetrics
-                    .filter(d => d.date && d.date.trim() !== '' && d.date.includes('-'))
-                    .map(d => {
-                      try {
-                        const parsedDate = parseISO(d.date);
-                        if (isNaN(parsedDate.getTime())) {
-                          return null;
-                        }
-                        return {
-                          date: format(parsedDate, 'MMM d'),
-                          Visitors: d.visitors || 0,
-                          Sessions: d.sessions || 0,
-                        };
-                      } catch {
-                        return null;
-                      }
-                    })
-                    .filter(Boolean)}>
-                    <defs>
-                      <linearGradient id="visitorsGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={chartColors.primary} stopOpacity={0.4} />
-                        <stop offset="95%" stopColor={chartColors.primary} stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="sessionsGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={chartColors.accent} stopOpacity={0.4} />
-                        <stop offset="95%" stopColor={chartColors.accent} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                    <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} axisLine={false} tickLine={false} width={40} />
-                    <Tooltip {...tooltipStyle} />
-                    <Legend wrapperStyle={{ paddingTop: 20 }} />
-                    <Area type="monotone" dataKey="Visitors" stroke={chartColors.primary} fill="url(#visitorsGrad)" strokeWidth={2} />
-                    <Area type="monotone" dataKey="Sessions" stroke={chartColors.accent} fill="url(#sessionsGrad)" strokeWidth={2} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </GlassCard>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Traffic Sources Pie */}
-            <GlassCard title="Traffic Breakdown" subtitle="Discovery channels">
+            <GlassCard title="Traffic Sources" subtitle="Discovery channels">
               <div className="flex items-center gap-4 mt-2">
-                <div className="flex-shrink-0 w-[180px] h-[180px]">
+                <div className="flex-shrink-0 w-[160px] h-[160px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={trafficSourcePieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={50}
-                        outerRadius={85}
+                        innerRadius={45}
+                        outerRadius={75}
                         dataKey="value"
                         labelLine={false}
                       >
@@ -1005,33 +639,41 @@ export default function Dashboard3() {
                     <div key={source.name} className="flex items-center justify-between p-2 rounded-lg bg-white/5">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: source.color }} />
-                        <span className="text-sm text-foreground">{source.name}</span>
+                        <span className="text-xs text-foreground">{source.name}</span>
                       </div>
-                      <span className="text-sm font-semibold text-foreground">{source.value}</span>
+                      <span className="text-xs font-semibold text-foreground">{source.value}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </GlassCard>
 
-            {/* Geographic Distribution */}
-            <GlassCard title="Geographic Distribution" subtitle="Top countries">
-              <div className="space-y-3 mt-2">
-                {topCountries.map(([country, stats], index) => {
-                  const maxSessions = topCountries[0][1].sessions;
-                  const width = (stats.sessions / maxSessions) * 100;
+            {/* Source Quality Comparison */}
+            <GlassCard title="Source Quality" subtitle="Engagement by source">
+              <div className="mt-3 space-y-3">
+                {data.trafficSources.slice(0, 5).map((source, index) => {
+                  const maxSessions = data.trafficSources[0]?.sessions || 1;
+                  const width = (source.sessions / maxSessions) * 100;
                   return (
-                    <div key={country} className="space-y-1.5">
+                    <motion.div
+                      key={source.traffic_source}
+                      className="space-y-1"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
                       <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-foreground">
+                          {formatTrafficSource(source.traffic_source)}
+                        </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-base">
-                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🌍'}
+                          <span className="text-[10px] text-muted-foreground">
+                            {source.engagement_rate?.toFixed(0) || 0}% engaged
                           </span>
-                          <span className="text-sm font-medium text-foreground">{country}</span>
+                          <span className="text-xs font-bold text-tech-accent">{source.sessions}</span>
                         </div>
-                        <span className="text-sm font-semibold text-tech-accent">{stats.visitors}</span>
                       </div>
-                      <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden">
+                      <div className="h-2 bg-muted/20 rounded-full overflow-hidden">
                         <motion.div
                           className="h-full rounded-full bg-gradient-to-r from-tech-neon to-tech-accent"
                           initial={{ width: 0 }}
@@ -1039,180 +681,48 @@ export default function Dashboard3() {
                           transition={{ duration: 0.5, delay: index * 0.1 }}
                         />
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
             </GlassCard>
           </div>
 
-          <SectionConclusion
-            insights={[
-              { type: 'neutral' as const, text: `Top traffic source: ${formatTrafficSource(data.trafficSources[0]?.traffic_source || 'direct')} with ${data.trafficSources[0]?.sessions || 0} sessions.` },
-              { type: 'neutral' as const, text: `${topCountries.length > 0 ? `Most visitors from ${topCountries[0][0]} (${topCountries[0][1].visitors})` : 'Geographic data being collected'}.` },
-              { type: 'neutral' as const, text: `${data.trafficSources.length} different traffic sources identified.` },
-            ]}
-          />
         </DashboardSection>
 
         {/* ============================================ */}
-        {/* SECTION 4: VISITOR QUALITY */}
+        {/* SECTION 5: CONTENT PERFORMANCE */}
         {/* ============================================ */}
         <DashboardSection
-          id="visitors"
-          title="Visitor Segments"
-          subtitle="Audience quality analysis"
-          description="Not all visitors are equal. This section shows visitor quality - from casual browsers to highly engaged potential employers. Understanding the audience helps tailor content."
-          icon={Users}
-          priority="medium"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <GlassCard title="Engagement Levels" subtitle="Visitor categorization">
-              <div className="mt-2">
-                <VisitorSegmentChart data={visitorSegmentData} height={180} />
-              </div>
-            </GlassCard>
-
-            <GlassCard title="Device Usage" subtitle="Access methods">
-              <div className="mt-3 md:mt-4 space-y-3 md:space-y-5">
-                {/* Stacked bar showing distribution */}
-                <div className="h-8 md:h-12 rounded-xl overflow-hidden flex">
-                  {devicePieData.map((device, index) => {
-                    const total = devicePieData.reduce((sum, d) => sum + d.value, 0);
-                    const width = (device.value / total) * 100;
-                    return (
-                      <div
-                        key={index}
-                        className="h-full flex items-center justify-center text-xs md:text-sm font-bold text-white"
-                        style={{ width: `${width}%`, backgroundColor: device.color }}
-                      >
-                        {width > 15 && `${width.toFixed(0)}%`}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Device breakdown with progress bars */}
-                <div className="space-y-3 md:space-y-5">
-                  {data.devices.categories.map((device) => {
-                    const maxSessions = Math.max(...data.devices.categories.map(d => d.sessions));
-                    const barWidth = (device.sessions / maxSessions) * 100;
-                    const color = device.device_category === 'mobile' ? '#00E0FF' : device.device_category === 'desktop' ? '#7B42F6' : '#F59E0B';
-                    return (
-                      <div key={device.device_category} className="space-y-1.5 md:space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 md:gap-3">
-                            {device.device_category === 'mobile' ? (
-                              <Smartphone size={16} className="md:hidden" style={{ color }} />
-                            ) : device.device_category === 'desktop' ? (
-                              <Monitor size={16} className="md:hidden" style={{ color }} />
-                            ) : (
-                              <Tablet size={16} className="md:hidden" style={{ color }} />
-                            )}
-                            {device.device_category === 'mobile' ? (
-                              <Smartphone size={20} className="hidden md:block" style={{ color }} />
-                            ) : device.device_category === 'desktop' ? (
-                              <Monitor size={20} className="hidden md:block" style={{ color }} />
-                            ) : (
-                              <Tablet size={20} className="hidden md:block" style={{ color }} />
-                            )}
-                            <span className="text-sm md:text-base font-medium text-foreground capitalize">{device.device_category}</span>
-                          </div>
-                          <div className="flex items-center gap-2 md:gap-4">
-                            <span className="text-xs md:text-sm text-muted-foreground">{device.engagement_rate?.toFixed(0) || 0}% engaged</span>
-                            <span className="text-sm md:text-base font-bold text-foreground">{device.sessions}</span>
-                          </div>
-                        </div>
-                        <div className="h-2.5 md:h-4 bg-muted/20 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{ width: `${barWidth}%`, backgroundColor: color }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-
-          <SectionConclusion
-            insights={[
-              { type: visitorSegmentData.converters > 0 ? 'positive' as const : 'neutral' as const, text: `${visitorSegmentData.converters} converters, ${visitorSegmentData.high_intent} high-intent visitors.` },
-              { type: 'neutral' as const, text: `${visitorSegmentData.engaged_explorers} engaged explorers, ${visitorSegmentData.casual_browsers} casual browsers.` },
-              { type: 'neutral' as const, text: `${data.devices.categories.find(d => d.device_category === 'mobile')?.sessions || 0} mobile, ${data.devices.categories.find(d => d.device_category === 'desktop')?.sessions || 0} desktop visitors.` },
-            ]}
-          />
-        </DashboardSection>
-
-        {/* ============================================ */}
-        {/* SECTION 5: PROJECT PERFORMANCE */}
-        {/* ============================================ */}
-        <DashboardSection
-          id="projects"
-          title="Project Performance"
-          subtitle="Projects ranked by engagement"
-          description="See which projects visitors are most interested in. High-performing projects should be featured prominently, while low-performing ones might need better descriptions or visuals."
+          id="content"
+          title="Content Performance"
+          subtitle="Projects, sections, skills, and experience"
           icon={FileText}
           priority="medium"
         >
-          {data.projectRankings && data.projectRankings.length > 0 ? (
-            <>
-              {/* Top Projects Visual */}
-              <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-3 md:gap-3 mb-4">
-                {data.projectRankings.slice(0, 3).map((project, index) => (
-                  <motion.div
-                    key={project.project_id}
-                    className={`p-2 md:p-3 rounded-xl border ${
-                      index === 0 ? 'bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/30' :
-                      index === 1 ? 'bg-gradient-to-br from-gray-400/10 to-gray-400/5 border-gray-400/30' :
-                      'bg-gradient-to-br from-orange-600/10 to-orange-600/5 border-orange-600/30'
-                    }`}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                  >
-                    {/* Mobile: Horizontal compact layout */}
-                    <div className="flex md:hidden items-center gap-3">
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <span className="text-base">{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
-                        <span className="text-[10px] text-muted-foreground">#{index + 1}</span>
-                      </div>
-                      <h4 className="text-xs font-bold text-foreground flex-1 truncate">{project.project_title}</h4>
-                      <div className="flex items-center gap-3 flex-shrink-0">
-                        <div className="text-center">
-                          <div className="text-sm font-bold text-tech-neon">{project.total_unique_viewers}</div>
-                          <div className="text-[10px] text-muted-foreground">Views</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-sm font-bold text-tech-accent">{project.total_clicks}</div>
-                          <div className="text-[10px] text-muted-foreground">Clicks</div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Desktop: Vertical card layout */}
-                    <div className="hidden md:block">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xl">{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">#{index + 1}</span>
-                      </div>
-                      <h4 className="text-base font-bold text-foreground mb-3 line-clamp-1">{project.project_title}</h4>
-                      <div className="grid grid-cols-2 gap-2 text-center">
-                        <div>
-                          <div className="text-xl font-bold text-tech-neon">{project.total_unique_viewers}</div>
-                          <div className="text-sm text-muted-foreground">Views</div>
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-tech-accent">{project.total_clicks}</div>
-                          <div className="text-sm text-muted-foreground">Clicks</div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <PortfolioEngagementCard
+              projects={data.projectRankings}
+              sections={data.sectionRankings || []}
+            />
 
+            <div className="flex flex-col gap-4">
+              <MarketDemandCard
+                skills={data.techDemand || []}
+                experiences={data.experienceRankings || []}
+              />
+
+              <SectionInsightsCard
+                sections={data.sectionRankings || []}
+              />
+            </div>
+          </div>
+
+          {/* Detailed Project Analytics */}
+          {data.projectRankings && data.projectRankings.length > 0 && (
+            <>
               {/* Project Actions Summary */}
-              <GlassCard title="Project Actions Overview" subtitle="Total interactions breakdown" className="mb-4">
+              <GlassCard title="Project Actions Overview" subtitle="Total interactions breakdown" className="mt-4 mb-4">
                 <div className="mt-2">
                   <ProjectActionsSummary data={data.projectRankings} />
                 </div>
@@ -1282,259 +792,23 @@ export default function Dashboard3() {
                 </div>
               </GlassCard>
             </>
-          ) : (
-            <GlassCard title="Project Data">
-              <p className="text-center text-muted-foreground py-8">No project ranking data available yet</p>
-            </GlassCard>
           )}
 
-          {data.projectRankings && data.projectRankings.length > 0 && (
-            <SectionConclusion
-              insights={[
-                { type: 'positive' as const, text: `Top project: "${data.projectRankings[0].project_title}" with ${data.projectRankings[0].total_clicks} clicks.` },
-                { type: 'neutral' as const, text: `${data.projectRankings.reduce((s, p) => s + p.total_github_clicks, 0)} GitHub clicks, ${data.projectRankings.reduce((s, p) => s + p.total_demo_clicks, 0)} demo clicks across all projects.` },
-                { type: 'neutral' as const, text: `${data.projectRankings.reduce((s, p) => s + p.total_expands, 0)} card expands, ${data.projectRankings.reduce((s, p) => s + p.total_link_clicks, 0)} link clicks total.` },
-              ]}
-            />
-          )}
         </DashboardSection>
 
         {/* ============================================ */}
-        {/* SECTION 6: SKILLS DEMAND */}
+        {/* SECTION 6: ACTIVITY PATTERNS */}
         {/* ============================================ */}
         <DashboardSection
-          id="skills"
-          title="Skills & Market Demand"
-          subtitle="Skill interest analysis"
-          description="This shows which skills visitors are most interested in. High-demand skills should be highlighted, while skills visitors search for but are missing might be worth learning."
-          icon={Code}
-          priority="low"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <GlassCard title="Skill Rankings" subtitle="By visitor interest">
-              {data.techDemand && data.techDemand.length > 0 ? (
-                <div className="space-y-2 mt-2">
-                  {data.techDemand.slice(0, 6).map((skill, index) => (
-                    <motion.div
-                      key={skill.skill_name}
-                      className="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className={`w-7 h-7 rounded flex items-center justify-center text-sm font-bold ${
-                            skill.demand_rank <= 3 ? 'bg-tech-neon/20 text-tech-neon' : 'bg-muted text-muted-foreground'
-                          }`}>
-                            {skill.demand_rank}
-                          </span>
-                          <span className="text-sm font-medium text-foreground">{skill.skill_name}</span>
-                        </div>
-                        <span className={`px-2 py-1 rounded text-sm font-medium ${
-                          skill.demand_tier === 'high_demand' ? 'bg-emerald-500/20 text-emerald-400' :
-                          skill.demand_tier === 'moderate_demand' ? 'bg-blue-500/20 text-blue-400' :
-                          'bg-gray-500/20 text-gray-400'
-                        }`}>
-                          {skill.total_interactions}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-4 text-sm">No skill data available</p>
-              )}
-            </GlassCard>
-
-            <GlassCard title="Skill Categories" subtitle="By demand level">
-              <div className="space-y-4 mt-2">
-                <div className="p-4 rounded-lg bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border border-emerald-500/30">
-                  <h4 className="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
-                    <Zap size={16} /> High Demand
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {data.techDemand?.filter(s => s.demand_tier === 'high_demand').slice(0, 4).map(s => (
-                      <span key={s.skill_name} className="px-3 py-1.5 bg-emerald-500/20 rounded text-sm font-medium text-emerald-400">
-                        {s.skill_name}
-                      </span>
-                    ))}
-                    {(!data.techDemand || data.techDemand.filter(s => s.demand_tier === 'high_demand').length === 0) && (
-                      <span className="text-sm text-muted-foreground">More data needed</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-500/5 border border-blue-500/30">
-                  <h4 className="text-sm font-bold text-blue-400 mb-3 flex items-center gap-2">
-                    <BookOpen size={16} /> Growing Interest
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {data.techDemand?.filter(s => s.demand_tier === 'moderate_demand').slice(0, 4).map(s => (
-                      <span key={s.skill_name} className="px-3 py-1.5 bg-blue-500/20 rounded text-sm font-medium text-blue-400">
-                        {s.skill_name}
-                      </span>
-                    ))}
-                    {(!data.techDemand || data.techDemand.filter(s => s.demand_tier === 'moderate_demand').length === 0) && (
-                      <span className="text-sm text-muted-foreground">More data needed</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-
-          {data.techDemand && data.techDemand.length > 0 && (
-            <SectionConclusion
-              insights={[
-                { type: 'positive' as const, text: `Top skill: "${data.techDemand[0].skill_name}" with ${data.techDemand[0].total_interactions} interactions.` },
-                { type: 'neutral' as const, text: `${data.techDemand.length} skills tracked, ${data.techDemand.filter(s => s.demand_tier === 'high_demand').length} in high demand.` },
-                { type: 'neutral' as const, text: `${data.techDemand.reduce((s, t) => s + t.total_interactions, 0)} total skill-related interactions.` },
-              ]}
-            />
-          )}
-        </DashboardSection>
-
-        {/* ============================================ */}
-        {/* SECTION 7: WHEN VISITORS COME */}
-        {/* ============================================ */}
-        <DashboardSection
-          id="temporal"
-          title="Temporal Patterns"
+          id="activity"
+          title="Activity Patterns"
           subtitle="When visitors are most active"
-          description="Understanding when visitors are most active helps time social media posts and portfolio updates for maximum visibility."
           icon={Clock}
           priority="low"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <GlassCard title="Daily Distribution" subtitle="Traffic by day">
-              {data.temporal.dayOfWeekDistribution && data.temporal.dayOfWeekDistribution.length > 0 ? (
-                <div className="space-y-3 mt-2">
-                  {data.temporal.dayOfWeekDistribution.map((day, index) => {
-                    const maxSessions = Math.max(...data.temporal.dayOfWeekDistribution.map(d => d.sessions));
-                    const width = maxSessions > 0 ? (day.sessions / maxSessions) * 100 : 0;
-                    return (
-                      <div key={index} className="flex items-center gap-3">
-                        <span className="text-sm text-muted-foreground w-20">{day.day_name || `Day ${day.day_number}`}</span>
-                        <div className="flex-1 h-5 bg-muted/30 rounded overflow-hidden relative">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-tech-neon to-tech-accent rounded"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${width}%` }}
-                            transition={{ duration: 0.5, delay: index * 0.05 }}
-                          />
-                        </div>
-                        <span className="text-sm font-bold text-foreground w-10 text-right">{day.sessions}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-4 text-sm">No daily data available</p>
-              )}
-            </GlassCard>
+          <ActivityPatternsCard temporal={data.temporal} />
 
-            <GlassCard title="Hourly Distribution" subtitle="Peak hours">
-              {data.temporal.hourlyDistribution && data.temporal.hourlyDistribution.length > 0 ? (
-                <div className="mt-2">
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={data.temporal.hourlyDistribution.filter((_, i) => i % 2 === 0).map(h => ({
-                      hour: `${h.hour}:00`,
-                      Sessions: h.sessions,
-                    }))}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                      <XAxis dataKey="hour" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} axisLine={false} tickLine={false} width={30} />
-                      <Tooltip {...tooltipStyle} />
-                      <Bar dataKey="Sessions" fill={chartColors.accent} radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-4 text-sm">No hourly data available</p>
-              )}
-            </GlassCard>
-          </div>
-
-          {data.temporal.dayOfWeekDistribution && data.temporal.dayOfWeekDistribution.length > 0 && (
-            <SectionConclusion
-              insights={[
-                { type: 'neutral' as const, text: `Busiest day: ${data.temporal.dayOfWeekDistribution.sort((a, b) => b.sessions - a.sessions)[0]?.day_name || 'N/A'} with ${data.temporal.dayOfWeekDistribution.sort((a, b) => b.sessions - a.sessions)[0]?.sessions || 0} sessions.` },
-                { type: 'neutral' as const, text: `Peak hour: ${data.temporal.hourlyDistribution?.sort((a, b) => b.sessions - a.sessions)[0]?.hour || 0}:00 with ${data.temporal.hourlyDistribution?.sort((a, b) => b.sessions - a.sessions)[0]?.sessions || 0} sessions.` },
-                { type: 'neutral' as const, text: `Traffic spread across ${data.temporal.dayOfWeekDistribution.filter(d => d.sessions > 0).length} days of the week.` },
-              ]}
-            />
-          )}
         </DashboardSection>
-
-        {/* ============================================ */}
-        {/* SECTION 8: EXPERIENCE INTEREST */}
-        {/* ============================================ */}
-        {data.experienceRankings && data.experienceRankings.length > 0 && (
-          <DashboardSection
-            id="experience"
-            title="Experience Interest"
-            subtitle="Work experience engagement"
-            description="Shows which job experiences visitors are most interested in. High-interest roles might be worth expanding or highlighting more prominently."
-            icon={Briefcase}
-            priority="low"
-          >
-            <GlassCard title="Experience Rankings" subtitle="By visitor interest">
-              <div className="space-y-2 md:space-y-3 mt-2">
-                {data.experienceRankings.map((exp, index) => {
-                  const attractivenessColor = exp.role_attractiveness === 'high' ? 'text-emerald-400 bg-emerald-500/20' :
-                                              exp.role_attractiveness === 'medium' ? 'text-blue-400 bg-blue-500/20' :
-                                              'text-gray-400 bg-gray-500/20';
-                  return (
-                    <motion.div
-                      key={exp.experience_id}
-                      className="p-2 md:p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
-                          <span className={`w-6 h-6 md:w-8 md:h-8 rounded flex items-center justify-center text-xs md:text-sm font-bold flex-shrink-0 ${
-                            exp.interest_rank === 1 ? 'bg-amber-500/20 text-amber-400' :
-                            exp.interest_rank === 2 ? 'bg-gray-400/20 text-gray-400' :
-                            exp.interest_rank === 3 ? 'bg-orange-500/20 text-orange-400' :
-                            'bg-muted text-muted-foreground'
-                          }`}>
-                            {exp.interest_rank}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-xs md:text-sm font-semibold text-foreground truncate">{exp.experience_title}</h4>
-                            <p className="text-[10px] md:text-sm text-muted-foreground truncate">{exp.company}</p>
-                            {exp.positioning_suggestion && (
-                              <p className="text-[10px] md:text-xs text-muted-foreground mt-1 hidden md:block">
-                                💡 {exp.positioning_suggestion}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex flex-col md:flex-row items-end md:items-center gap-1 md:gap-2 flex-shrink-0">
-                          <span className={`px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium ${attractivenessColor} hidden md:block`}>
-                            {exp.role_attractiveness || 'N/A'}
-                          </span>
-                          <span className="text-xs md:text-sm text-muted-foreground whitespace-nowrap">{exp.total_interactions} views</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </GlassCard>
-
-            <SectionConclusion
-              insights={[
-                { type: 'positive' as const, text: `Top experience: "${data.experienceRankings[0].experience_title}" at ${data.experienceRankings[0].company}.` },
-                { type: 'neutral' as const, text: `${data.experienceRankings.reduce((s, e) => s + e.total_interactions, 0)} total experience views across ${data.experienceRankings.length} roles.` },
-                { type: 'neutral' as const, text: `Most viewed role has ${data.experienceRankings[0].total_interactions} interactions.` },
-              ]}
-            />
-          </DashboardSection>
-        )}
 
         {/* ============================================ */}
         {/* FOOTER */}
