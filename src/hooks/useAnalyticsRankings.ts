@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { prefetchDashboardData } from './useDashboardData';
 
 // GitHub Gist URL for rankings data
 const GIST_URL = 'https://gist.githubusercontent.com/AbhinavSarkarr/7983bb85c69ec4cc45fe37b6a8d2d391/raw/skill-rankings.json';
@@ -106,6 +107,9 @@ export function useAnalyticsRankings(): AnalyticsRankingsData {
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
   useEffect(() => {
+    // Prefetch dashboard data in background (fire and forget)
+    prefetchDashboardData();
+
     async function loadRankings() {
       try {
         const data = await fetchRankingsData();

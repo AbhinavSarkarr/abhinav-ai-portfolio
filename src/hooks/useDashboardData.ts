@@ -511,6 +511,14 @@ function normalizeDashboardData(raw: Record<string, unknown>): DashboardData {
 let gistCache: GistData | null = null;
 let gistFetchPromise: Promise<GistData> | null = null;
 
+export async function prefetchDashboardData(): Promise<void> {
+  // Fire and forget - just populate the cache
+  console.log('[Prefetch] Starting dashboard data prefetch...');
+  fetchGistData()
+    .then(() => console.log('[Prefetch] Dashboard data cached successfully'))
+    .catch(() => console.log('[Prefetch] Dashboard data prefetch failed'));
+}
+
 async function fetchGistData(): Promise<GistData | null> {
   if (gistCache) return gistCache;
   if (gistFetchPromise) return gistFetchPromise;
