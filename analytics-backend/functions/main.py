@@ -142,51 +142,272 @@ async def get_dashboard3_data(
             FROM conversion_funnel WHERE event_date BETWEEN %s AND %s
         """, (start, end)),
         "project_rankings": ("""
+            WITH aggregated AS (
+                SELECT
+                    project_id,
+                    MAX(project_title) as project_title,
+                    MAX(project_category) as project_category,
+                    SUM(COALESCE(views, 0)) as total_views,
+                    SUM(COALESCE(unique_viewers, 0)) as total_unique_viewers,
+                    SUM(COALESCE(clicks, 0)) as total_clicks,
+                    SUM(COALESCE(expands, 0)) as total_expands,
+                    SUM(COALESCE(link_clicks, 0)) as total_link_clicks,
+                    SUM(COALESCE(github_clicks, 0)) as total_github_clicks,
+                    SUM(COALESCE(demo_clicks, 0)) as total_demo_clicks,
+                    -- Engagement score: clicks*5 + expands*3 + link_clicks*4 + views*1
+                    (SUM(COALESCE(clicks, 0)) * 5 + SUM(COALESCE(expands, 0)) * 3 +
+                     SUM(COALESCE(link_clicks, 0)) * 4 + SUM(COALESCE(views, 0)) * 1) as engagement_score
+                FROM project_daily_stats
+                WHERE event_date BETWEEN %s AND %s
+                GROUP BY project_id
+            ),
+            ranked AS (
+                SELECT *,
+                    ROW_NUMBER() OVER (ORDER BY engagement_score DESC) as overall_rank,
+                    CASE
+                        WHEN engagement_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY engagement_score) FROM aggregated) THEN 'top_performer'
+                        WHEN engagement_score >= (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY engagement_score) FROM aggregated) THEN 'above_average'
+                        ELSE 'below_average'
+                    END as performance_tier,
+                    ROUND(PERCENT_RANK() OVER (ORDER BY engagement_score) * 100, 1) as engagement_percentile
+                FROM aggregated
+            )
             SELECT project_id, project_title, project_category, total_views, total_unique_viewers,
                    total_clicks, total_expands, total_link_clicks, total_github_clicks, total_demo_clicks,
-                   engagement_score, overall_rank, performance_tier, recommended_position,
+                   engagement_score, overall_rank::int, performance_tier,
+                   CASE WHEN overall_rank <= 3 THEN 'featured' ELSE 'standard' END as recommended_position,
                    engagement_percentile
-            FROM project_rankings ORDER BY overall_rank LIMIT 10
-        """, None),
+            FROM ranked ORDER BY overall_rank LIMIT 10
+        """, (start, end)),
         "section_rankings": ("""
+            WITH aggregated AS (
+                SELECT
+                    section_id,
+                    SUM(COALESCE(unique_views, 0)) as total_unique_views,
+                    SUM(COALESCE(unique_exits, 0)) as total_unique_exits,
+                    SUM(COALESCE(unique_viewers, 0)) as total_unique_viewers,
+                    ROUND(AVG(unique_exit_rate)::numeric, 2) as avg_exit_rate,
+                    SUM(COALESCE(total_views, 0)) as total_views,
+                    SUM(COALESCE(total_exits, 0)) as total_exits,
+                    ROUND(AVG(total_exit_rate)::numeric, 2) as avg_total_exit_rate,
+                    ROUND(AVG(avg_revisits_per_session)::numeric, 2) as avg_revisits_per_session,
+                    SUM(COALESCE(engaged_sessions, 0)) as total_engaged_views,
+                    ROUND(AVG(engagement_rate)::numeric, 2) as avg_engagement_rate,
+                    ROUND(AVG(avg_time_spent_seconds)::numeric, 2) as avg_time_spent_seconds,
+                    ROUND(AVG(avg_scroll_depth_percent)::numeric, 2) as avg_scroll_depth_percent,
+                    MAX(max_scroll_milestone) as max_scroll_milestone,
+                    -- Health score: engagement_rate * 2 + (100 - exit_rate) + time_spent + scroll_depth
+                    (COALESCE(AVG(engagement_rate), 0) * 2 +
+                     (100 - COALESCE(AVG(unique_exit_rate), 100)) +
+                     LEAST(COALESCE(AVG(avg_time_spent_seconds), 0), 100) +
+                     COALESCE(AVG(avg_scroll_depth_percent), 0)) as health_score
+                FROM section_daily_stats
+                WHERE event_date BETWEEN %s AND %s
+                GROUP BY section_id
+            ),
+            ranked AS (
+                SELECT *,
+                    ROW_NUMBER() OVER (ORDER BY avg_engagement_rate DESC) as engagement_rank,
+                    ROW_NUMBER() OVER (ORDER BY total_views DESC) as view_rank,
+                    ROW_NUMBER() OVER (ORDER BY avg_exit_rate ASC) as retention_rank,
+                    CASE
+                        WHEN health_score >= 300 THEN 'excellent'
+                        WHEN health_score >= 150 THEN 'good'
+                        WHEN health_score >= 50 THEN 'needs_attention'
+                        ELSE 'critical'
+                    END as health_tier,
+                    CASE
+                        WHEN avg_exit_rate >= 90 THEN 'high_dropoff'
+                        WHEN avg_exit_rate >= 70 THEN 'moderate_dropoff'
+                        ELSE 'low_dropoff'
+                    END as dropoff_indicator,
+                    CASE
+                        WHEN avg_engagement_rate < 20 THEN 'improve_content'
+                        WHEN avg_exit_rate > 85 THEN 'add_cta_or_navigation'
+                        ELSE 'maintain'
+                    END as optimization_hint
+                FROM aggregated
+            )
             SELECT section_id, total_unique_views, total_unique_exits, total_unique_viewers,
                    avg_exit_rate, total_views, total_exits, avg_total_exit_rate,
                    avg_revisits_per_session, total_engaged_views, avg_engagement_rate,
                    avg_time_spent_seconds, avg_scroll_depth_percent, max_scroll_milestone,
-                   health_score, engagement_rank, view_rank, retention_rank,
+                   ROUND(health_score::numeric, 2) as health_score,
+                   engagement_rank::int, view_rank::int, retention_rank::int,
                    health_tier, dropoff_indicator, optimization_hint
-            FROM section_rankings ORDER BY health_score DESC
-        """, None),
+            FROM ranked ORDER BY health_score DESC
+        """, (start, end)),
         "visitor_segments": ("""
+            WITH visitor_stats AS (
+                SELECT
+                    user_pseudo_id,
+                    COUNT(*) as total_sessions,
+                    SUM(page_views) as total_page_views,
+                    ROUND(AVG(session_duration_seconds)::numeric, 2) as avg_duration,
+                    ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+                    SUM(conversions_count) as total_conversions,
+                    MAX(session_date) - MIN(session_date) as tenure_days,
+                    -- Value score: sessions*2 + page_views + conversions*20 + (engagement_rate/10)
+                    (COUNT(*) * 2 + SUM(page_views) + SUM(conversions_count) * 20) as value_score
+                FROM sessions
+                WHERE session_date BETWEEN %s AND %s
+                GROUP BY user_pseudo_id
+            ),
+            segmented AS (
+                SELECT *,
+                    CASE
+                        WHEN total_conversions > 0 THEN 'converter'
+                        WHEN total_sessions >= 3 AND engagement_rate >= 80 THEN 'engaged_explorer'
+                        WHEN total_sessions >= 2 THEN 'returning_visitor'
+                        WHEN engagement_rate >= 50 THEN 'engaged_new'
+                        ELSE 'casual_browser'
+                    END as visitor_segment
+                FROM visitor_stats
+            )
             SELECT visitor_segment, COUNT(*) as count,
-                   ROUND(AVG(visitor_value_score)::numeric, 2) as avg_value_score,
+                   ROUND(AVG(value_score)::numeric, 2) as avg_value_score,
                    ROUND(AVG(total_sessions)::numeric, 2) as avg_sessions,
                    ROUND(AVG(engagement_rate)::numeric, 2) as avg_engagement_rate
-            FROM visitor_insights GROUP BY visitor_segment ORDER BY count DESC
-        """, None),
+            FROM segmented GROUP BY visitor_segment ORDER BY count DESC
+        """, (start, end)),
         "top_visitors": ("""
+            WITH visitor_stats AS (
+                SELECT
+                    user_pseudo_id,
+                    COUNT(*) as total_sessions,
+                    MAX(session_date) - MIN(session_date) as visitor_tenure_days,
+                    SUM(page_views) as total_page_views,
+                    ROUND(AVG(session_duration_seconds)::numeric, 2) as avg_session_duration_sec,
+                    ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+                    MODE() WITHIN GROUP (ORDER BY device_category) as primary_device,
+                    MODE() WITHIN GROUP (ORDER BY country) as primary_country,
+                    MODE() WITHIN GROUP (ORDER BY traffic_source) as primary_traffic_source,
+                    SUM(projects_clicked_count) as projects_viewed,
+                    0 as cta_clicks,
+                    SUM(CASE WHEN has_conversion THEN 1 ELSE 0 END) as form_submissions,
+                    0 as social_clicks,
+                    0 as resume_downloads,
+                    -- Value score
+                    (COUNT(*) * 2 + SUM(page_views) + SUM(conversions_count) * 20) as visitor_value_score,
+                    CASE
+                        WHEN SUM(conversions_count) > 0 THEN 'converter'
+                        WHEN COUNT(*) >= 3 AND COUNT(*) FILTER (WHERE is_engaged) * 100.0 / COUNT(*) >= 80 THEN 'engaged_explorer'
+                        WHEN COUNT(*) >= 2 THEN 'returning_visitor'
+                        WHEN COUNT(*) FILTER (WHERE is_engaged) * 100.0 / COUNT(*) >= 50 THEN 'engaged_new'
+                        ELSE 'casual_browser'
+                    END as visitor_segment,
+                    'general_visitor' as interest_profile
+                FROM sessions
+                WHERE session_date BETWEEN %s AND %s
+                GROUP BY user_pseudo_id
+            )
             SELECT user_pseudo_id, total_sessions, visitor_tenure_days, total_page_views,
                    avg_session_duration_sec, engagement_rate, primary_device, primary_country,
                    primary_traffic_source, projects_viewed, cta_clicks, form_submissions,
                    social_clicks, resume_downloads, visitor_value_score, visitor_segment, interest_profile
-            FROM visitor_insights ORDER BY visitor_value_score DESC LIMIT 15
-        """, None),
+            FROM visitor_stats ORDER BY visitor_value_score DESC LIMIT 15
+        """, (start, end)),
         "tech_demand": ("""
-            SELECT technology as skill_name, total_interactions, total_unique_users,
-                   demand_rank, demand_percentile, demand_tier, learning_priority
-            FROM tech_demand_insights ORDER BY demand_rank
-        """, None),
+            WITH aggregated AS (
+                SELECT
+                    skill_name,
+                    SUM(COALESCE(clicks, 0) + COALESCE(hovers, 0)) as total_interactions,
+                    SUM(COALESCE(unique_users, 0)) as total_unique_users,
+                    SUM(COALESCE(weighted_interest_score, 0)) as weighted_score
+                FROM skill_daily_stats
+                WHERE event_date BETWEEN %s AND %s
+                GROUP BY skill_name
+            ),
+            ranked AS (
+                SELECT *,
+                    ROW_NUMBER() OVER (ORDER BY weighted_score DESC) as demand_rank,
+                    ROUND(PERCENT_RANK() OVER (ORDER BY weighted_score) * 100, 1) as demand_percentile,
+                    CASE
+                        WHEN weighted_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY weighted_score) FROM aggregated) THEN 'high_demand'
+                        WHEN weighted_score >= (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY weighted_score) FROM aggregated) THEN 'moderate_demand'
+                        ELSE 'low_demand'
+                    END as demand_tier,
+                    CASE
+                        WHEN weighted_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY weighted_score) FROM aggregated) THEN 'master_this'
+                        WHEN weighted_score >= (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY weighted_score) FROM aggregated) THEN 'strengthen'
+                        ELSE 'maintain'
+                    END as learning_priority
+                FROM aggregated
+                WHERE weighted_score > 0
+            )
+            SELECT skill_name, total_interactions, total_unique_users,
+                   demand_rank::int, demand_percentile, demand_tier, learning_priority
+            FROM ranked ORDER BY demand_rank
+        """, (start, end)),
         "domain_rankings": ("""
+            WITH aggregated AS (
+                SELECT
+                    domain,
+                    SUM(COALESCE(explicit_interest_signals, 0)) as total_explicit_interest,
+                    SUM(COALESCE(implicit_interest_from_views, 0)) as total_implicit_interest,
+                    SUM(COALESCE(total_domain_interactions, 0)) as total_interactions,
+                    SUM(COALESCE(unique_interested_users, 0)) as total_unique_users,
+                    SUM(COALESCE(domain_interest_score, 0)) as total_interest_score
+                FROM domain_daily_stats
+                WHERE event_date BETWEEN %s AND %s
+                GROUP BY domain
+            ),
+            ranked AS (
+                SELECT *,
+                    ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) as interest_rank,
+                    ROUND(PERCENT_RANK() OVER (ORDER BY total_interest_score) * 100, 1) as interest_percentile,
+                    CASE
+                        WHEN total_interest_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY total_interest_score) FROM aggregated) THEN 'high_demand'
+                        WHEN total_interest_score >= (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY total_interest_score) FROM aggregated) THEN 'moderate_demand'
+                        ELSE 'low_demand'
+                    END as demand_tier,
+                    CASE
+                        WHEN total_interest_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY total_interest_score) FROM aggregated) THEN 'primary_strength'
+                        WHEN total_interest_score >= (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_interest_score) FROM aggregated) THEN 'secondary_strength'
+                        ELSE 'explore_opportunities'
+                    END as portfolio_recommendation
+                FROM aggregated
+                WHERE total_interactions > 0
+            )
             SELECT domain, total_explicit_interest, total_implicit_interest, total_interactions,
-                   total_unique_users, total_interest_score, interest_rank, interest_percentile,
+                   total_unique_users, total_interest_score, interest_rank::int, interest_percentile,
                    demand_tier, portfolio_recommendation
-            FROM domain_rankings ORDER BY interest_rank
-        """, None),
+            FROM ranked ORDER BY interest_rank
+        """, (start, end)),
         "experience_rankings": ("""
+            WITH aggregated AS (
+                SELECT
+                    experience_id,
+                    MAX(experience_title) as experience_title,
+                    MAX(company) as company,
+                    SUM(COALESCE(total_interactions, 0)) as total_interactions,
+                    SUM(COALESCE(unique_interested_users, 0)) as total_unique_users,
+                    SUM(COALESCE(unique_sessions, 0)) as total_sessions
+                FROM experience_daily_stats
+                WHERE event_date BETWEEN %s AND %s
+                GROUP BY experience_id
+            ),
+            ranked AS (
+                SELECT *,
+                    ROW_NUMBER() OVER (ORDER BY total_interactions DESC) as interest_rank,
+                    ROUND(PERCENT_RANK() OVER (ORDER BY total_interactions) * 100, 1) as interest_percentile,
+                    CASE
+                        WHEN total_interactions >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY total_interactions) FROM aggregated) THEN 'most_attractive_role'
+                        WHEN total_interactions >= (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY total_interactions) FROM aggregated) THEN 'moderately_attractive'
+                        ELSE 'needs_highlighting'
+                    END as role_attractiveness,
+                    CASE
+                        WHEN total_interactions >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY total_interactions) FROM aggregated) THEN 'lead_with_this'
+                        WHEN total_interactions >= (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_interactions) FROM aggregated) THEN 'feature_prominently'
+                        ELSE 'include_for_completeness'
+                    END as positioning_suggestion
+                FROM aggregated
+                WHERE total_interactions > 0
+            )
             SELECT experience_id, experience_title, company, total_interactions, total_unique_users,
-                   total_sessions, interest_rank, interest_percentile, role_attractiveness, positioning_suggestion
-            FROM experience_rankings ORDER BY interest_rank
-        """, None),
+                   total_sessions, interest_rank::int, interest_percentile, role_attractiveness, positioning_suggestion
+            FROM ranked ORDER BY interest_rank
+        """, (start, end)),
         "recommendation_performance": ("""
             SELECT * FROM recommendation_performance LIMIT 1
         """, None),

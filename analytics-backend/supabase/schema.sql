@@ -138,6 +138,125 @@ CREATE TABLE IF NOT EXISTS conversion_funnel (
 CREATE INDEX IF NOT EXISTS idx_conversion_date ON conversion_funnel(event_date);
 
 -- ============================================================================
+-- LAYER 2: Project Daily Stats (for date-filtered rankings)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS project_daily_stats (
+    id SERIAL PRIMARY KEY,
+    event_date DATE,
+    project_id TEXT,
+    project_title TEXT,
+    project_category TEXT,
+    views INT,
+    unique_viewers INT,
+    unique_sessions INT,
+    clicks INT,
+    expands INT,
+    link_clicks INT,
+    github_clicks INT,
+    demo_clicks INT,
+    external_clicks INT,
+    avg_view_duration_ms FLOAT,
+    click_through_rate FLOAT,
+    desktop_interactions INT,
+    mobile_interactions INT,
+    materialized_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_project_daily_date ON project_daily_stats(event_date);
+CREATE INDEX IF NOT EXISTS idx_project_daily_project ON project_daily_stats(project_id);
+
+-- ============================================================================
+-- LAYER 2: Section Daily Stats (for date-filtered rankings)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS section_daily_stats (
+    id SERIAL PRIMARY KEY,
+    event_date DATE,
+    section_id TEXT,
+    unique_views INT,
+    unique_exits INT,
+    unique_viewers INT,
+    unique_sessions INT,
+    unique_exit_rate FLOAT,
+    total_views INT,
+    total_exits INT,
+    total_exit_rate FLOAT,
+    avg_revisits_per_session FLOAT,
+    engaged_sessions INT,
+    engagement_rate FLOAT,
+    avg_time_spent_seconds FLOAT,
+    avg_scroll_depth_percent FLOAT,
+    max_scroll_milestone INT,
+    desktop_views INT,
+    mobile_views INT,
+    continue_rate FLOAT,
+    materialized_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_section_daily_date ON section_daily_stats(event_date);
+CREATE INDEX IF NOT EXISTS idx_section_daily_section ON section_daily_stats(section_id);
+
+-- ============================================================================
+-- LAYER 2: Skill Daily Stats (for date-filtered tech demand)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS skill_daily_stats (
+    id SERIAL PRIMARY KEY,
+    event_date DATE,
+    skill_name TEXT,
+    skill_category TEXT,
+    clicks INT,
+    hovers INT,
+    unique_users INT,
+    unique_sessions INT,
+    weighted_interest_score INT,
+    avg_position FLOAT,
+    materialized_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_skill_daily_date ON skill_daily_stats(event_date);
+CREATE INDEX IF NOT EXISTS idx_skill_daily_skill ON skill_daily_stats(skill_name);
+
+-- ============================================================================
+-- LAYER 2: Domain Daily Stats (for date-filtered domain rankings)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS domain_daily_stats (
+    id SERIAL PRIMARY KEY,
+    event_date DATE,
+    domain TEXT,
+    explicit_interest_signals INT,
+    implicit_interest_from_views INT,
+    total_domain_interactions INT,
+    unique_interested_users INT,
+    unique_sessions INT,
+    domain_interest_score INT,
+    desktop_interactions INT,
+    mobile_interactions INT,
+    materialized_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_domain_daily_date ON domain_daily_stats(event_date);
+CREATE INDEX IF NOT EXISTS idx_domain_daily_domain ON domain_daily_stats(domain);
+
+-- ============================================================================
+-- LAYER 2: Experience Daily Stats (for date-filtered experience rankings)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS experience_daily_stats (
+    id SERIAL PRIMARY KEY,
+    event_date DATE,
+    experience_id TEXT,
+    experience_title TEXT,
+    company TEXT,
+    total_interactions INT,
+    unique_interested_users INT,
+    unique_sessions INT,
+    desktop_views INT,
+    mobile_views INT,
+    materialized_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_experience_daily_date ON experience_daily_stats(event_date);
+CREATE INDEX IF NOT EXISTS idx_experience_daily_exp ON experience_daily_stats(experience_id);
+
+-- ============================================================================
 -- LAYER 3: Project Rankings
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS project_rankings (
@@ -184,7 +303,7 @@ CREATE TABLE IF NOT EXISTS section_rankings (
     avg_total_exit_rate FLOAT,
     avg_revisits_per_session FLOAT,
     -- Engagement metrics
-    total_engaged_views INT,
+    total_engaged_sessions INT,
     avg_engagement_rate FLOAT,
     avg_time_spent_seconds FLOAT,
     avg_scroll_depth_percent FLOAT,

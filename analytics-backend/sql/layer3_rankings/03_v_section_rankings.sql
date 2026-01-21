@@ -21,7 +21,7 @@ WITH section_7day AS (
 
     -- Other aggregated metrics
     SUM(unique_viewers) AS total_unique_viewers,
-    SUM(engaged_views) AS total_engaged_views,
+    SUM(engaged_sessions) AS total_engaged_sessions,
     AVG(engagement_rate) AS avg_engagement_rate,
     AVG(avg_time_spent_seconds) AS avg_time_spent_seconds,
     AVG(avg_scroll_depth_percent) AS avg_scroll_depth_percent,
@@ -62,7 +62,7 @@ SELECT
   ROUND(avg_revisits, 2) AS avg_revisits_per_session,
 
   -- Engagement metrics
-  total_engaged_views,
+  total_engaged_sessions,
   ROUND(avg_engagement_rate, 2) AS avg_engagement_rate,
   ROUND(avg_time_spent_seconds, 2) AS avg_time_spent_seconds,
   ROUND(avg_scroll_depth_percent, 2) AS avg_scroll_depth_percent,

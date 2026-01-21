@@ -38,3 +38,5 @@ analytics-backend/credentials/
 
 analytics-backend/functions/__pycache__
 analytics-backend/.venv
+
+analytics-backend/DATA_ISSUES_REPORT.md

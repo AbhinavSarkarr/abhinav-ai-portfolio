@@ -11,7 +11,8 @@ WITH visitor_sessions AS (
     MAX(session_end) AS last_visit,
     SUM(page_views) AS total_page_views,
     AVG(session_duration_seconds) AS avg_session_duration,
-    COUNTIF(is_engaged) AS engaged_sessions,
+    -- FIX: Count distinct engaged sessions, not rows (prevents >100% engagement rate)
+    COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END) AS engaged_sessions,
     ANY_VALUE(device_category) AS primary_device,
     ANY_VALUE(country) AS primary_country,
     ANY_VALUE(traffic_source) AS primary_traffic_source,

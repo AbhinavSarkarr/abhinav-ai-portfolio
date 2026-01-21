@@ -74,10 +74,11 @@ SELECT
   ) AS pct_legacy_adjusted,
 
   -- Engagement metrics
-  COUNTIF(e.event_name = 'section_engagement') AS engaged_views,
+  -- FIX: Count unique sessions with engagement, not total engagement events (prevents >100% rate)
+  COUNT(DISTINCT CASE WHEN e.event_name = 'section_engagement' THEN e.session_id END) AS engaged_sessions,
   ROUND(
-    COUNTIF(e.event_name = 'section_engagement') * 100.0 /
-    NULLIF(COUNTIF(e.event_name = 'section_view'), 0),
+    COUNT(DISTINCT CASE WHEN e.event_name = 'section_engagement' THEN e.session_id END) * 100.0 /
+    NULLIF(COUNT(DISTINCT CASE WHEN e.event_name = 'section_view' THEN e.session_id END), 0),
     2
   ) AS engagement_rate,
 

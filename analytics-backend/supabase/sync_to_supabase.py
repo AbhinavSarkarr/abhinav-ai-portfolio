@@ -113,6 +113,78 @@ TABLES_TO_SYNC = {
             avg_conversion_score, materialized_at
         """
     },
+    "project_daily_stats": {
+        "bq_columns": """
+            event_date, project_id, project_title, project_category,
+            views, unique_viewers, unique_sessions, clicks, expands, link_clicks,
+            github_clicks, demo_clicks, external_clicks,
+            avg_view_duration_ms, click_through_rate,
+            desktop_interactions, mobile_interactions, materialized_at
+        """,
+        "pg_columns": """
+            event_date, project_id, project_title, project_category,
+            views, unique_viewers, unique_sessions, clicks, expands, link_clicks,
+            github_clicks, demo_clicks, external_clicks,
+            avg_view_duration_ms, click_through_rate,
+            desktop_interactions, mobile_interactions, materialized_at
+        """
+    },
+    "section_daily_stats": {
+        "bq_columns": """
+            event_date, section_id,
+            unique_views, unique_exits, unique_viewers, unique_sessions, unique_exit_rate,
+            total_views, total_exits, total_exit_rate, avg_revisits_per_session,
+            engaged_sessions, engagement_rate, avg_time_spent_seconds,
+            avg_scroll_depth_percent, max_scroll_milestone,
+            desktop_views, mobile_views, continue_rate, materialized_at
+        """,
+        "pg_columns": """
+            event_date, section_id,
+            unique_views, unique_exits, unique_viewers, unique_sessions, unique_exit_rate,
+            total_views, total_exits, total_exit_rate, avg_revisits_per_session,
+            engaged_sessions, engagement_rate, avg_time_spent_seconds,
+            avg_scroll_depth_percent, max_scroll_milestone,
+            desktop_views, mobile_views, continue_rate, materialized_at
+        """
+    },
+    "skill_daily_stats": {
+        "bq_columns": """
+            event_date, skill_name, skill_category,
+            clicks, hovers, unique_users, unique_sessions,
+            weighted_interest_score, avg_position, materialized_at
+        """,
+        "pg_columns": """
+            event_date, skill_name, skill_category,
+            clicks, hovers, unique_users, unique_sessions,
+            weighted_interest_score, avg_position, materialized_at
+        """
+    },
+    "domain_daily_stats": {
+        "bq_columns": """
+            event_date, domain,
+            explicit_interest_signals, implicit_interest_from_views,
+            total_domain_interactions, unique_interested_users, unique_sessions,
+            domain_interest_score, desktop_interactions, mobile_interactions, materialized_at
+        """,
+        "pg_columns": """
+            event_date, domain,
+            explicit_interest_signals, implicit_interest_from_views,
+            total_domain_interactions, unique_interested_users, unique_sessions,
+            domain_interest_score, desktop_interactions, mobile_interactions, materialized_at
+        """
+    },
+    "experience_daily_stats": {
+        "bq_columns": """
+            event_date, experience_id, experience_title, company,
+            total_interactions, unique_interested_users, unique_sessions,
+            desktop_views, mobile_views, materialized_at
+        """,
+        "pg_columns": """
+            event_date, experience_id, experience_title, company,
+            total_interactions, unique_interested_users, unique_sessions,
+            desktop_views, mobile_views, materialized_at
+        """
+    },
     "project_rankings": {
         "bq_columns": """
             project_id, project_title, project_category,
