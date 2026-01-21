@@ -199,18 +199,18 @@ function DateRangeSelector({
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setShowCustomPicker(false); }} />
-          <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 bottom-2 sm:bottom-auto sm:top-full sm:mt-2 z-50 bg-background/95 backdrop-blur-xl border border-tech-accent/20 rounded-lg shadow-lg p-2 sm:p-2 sm:min-w-[220px] max-h-[70vh] overflow-y-auto">
+          <div className="fixed inset-0 z-[60]" onClick={() => { setIsOpen(false); setShowCustomPicker(false); }} />
+          <div className="absolute top-full right-0 mt-2 z-[70] bg-background border border-tech-accent/30 rounded-xl shadow-2xl p-2 min-w-[180px] sm:min-w-[220px]">
             {!showCustomPicker ? (
-              <div className="grid grid-cols-2 sm:grid-cols-1 gap-1 sm:gap-0">
+              <div className="flex flex-col">
                 {DATE_PRESET_OPTIONS.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handlePresetSelect(option.value)}
-                    className={`w-full text-left px-3 py-2.5 sm:py-2 text-sm rounded-md transition-colors border border-transparent min-h-[44px] sm:min-h-0 ${
+                    className={`w-full text-left px-3 py-2.5 text-sm rounded-md transition-colors ${
                       currentPreset === option.value
-                        ? 'bg-tech-accent/20 border-tech-accent/40 text-tech-neon'
-                        : 'hover:bg-tech-accent/10 hover:border-tech-accent/20 active:bg-tech-accent/20'
+                        ? 'bg-tech-accent/20 text-tech-neon'
+                        : 'hover:bg-tech-accent/10 active:bg-tech-accent/20'
                     }`}
                   >
                     {option.label}

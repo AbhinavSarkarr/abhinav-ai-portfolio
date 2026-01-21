@@ -58,10 +58,12 @@ function formatDuration(seconds: number): string {
   return `${mins}m ${secs}s`;
 }
 
-// Anonymize visitor ID
-function anonymizeId(id: string): string {
-  if (!id || id.length < 8) return 'Visitor';
-  return `Visitor ${id.slice(-4).toUpperCase()}`;
+// Generate visitor name from country
+function getVisitorName(country: string): string {
+  if (!country || country === 'Unknown' || country === '(not set)') {
+    return 'Visitor';
+  }
+  return `Visitor from ${country}`;
 }
 
 export function TopVisitors({ data }: TopVisitorsProps) {
@@ -109,7 +111,7 @@ export function TopVisitors({ data }: TopVisitorsProps) {
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1 md:gap-2">
                     <span className="text-xs md:text-sm font-semibold text-foreground">
-                      {anonymizeId(visitor.user_pseudo_id)}
+                      {getVisitorName(visitor.primary_country)}
                     </span>
                     <span
                       className="px-1.5 md:px-2 py-0.5 rounded text-[10px] md:text-xs font-medium"
