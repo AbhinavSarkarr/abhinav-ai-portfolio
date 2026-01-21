@@ -102,35 +102,139 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
     """, (start_date, end_date))
     conv_row = cursor.fetchone() or {}
 
-    # Project rankings (not date-filtered - all time)
+    # Project rankings (date-filtered from daily stats)
     cursor.execute("""
+        WITH aggregated AS (
+            SELECT
+                project_id,
+                MAX(project_title) as project_title,
+                MAX(project_category) as project_category,
+                SUM(COALESCE(views, 0)) as total_views,
+                SUM(COALESCE(unique_viewers, 0)) as total_unique_viewers,
+                SUM(COALESCE(clicks, 0)) as total_clicks,
+                SUM(COALESCE(expands, 0)) as total_expands,
+                SUM(COALESCE(link_clicks, 0)) as total_link_clicks,
+                SUM(COALESCE(github_clicks, 0)) as total_github_clicks,
+                SUM(COALESCE(demo_clicks, 0)) as total_demo_clicks,
+                (SUM(COALESCE(clicks, 0)) * 5 + SUM(COALESCE(expands, 0)) * 3 +
+                 SUM(COALESCE(link_clicks, 0)) * 4 + SUM(COALESCE(views, 0)) * 1) as engagement_score
+            FROM project_daily_stats
+            WHERE event_date BETWEEN %s AND %s
+            GROUP BY project_id
+        ),
+        ranked AS (
+            SELECT *,
+                ROW_NUMBER() OVER (ORDER BY engagement_score DESC) as overall_rank,
+                CASE
+                    WHEN engagement_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY engagement_score) FROM aggregated) THEN 'top_performer'
+                    WHEN engagement_score >= (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY engagement_score) FROM aggregated) THEN 'above_average'
+                    ELSE 'below_average'
+                END as performance_tier,
+                ROUND(PERCENT_RANK() OVER (ORDER BY engagement_score) * 100, 1) as engagement_percentile
+            FROM aggregated
+        )
         SELECT project_id, project_title, project_category, total_views, total_unique_viewers,
                total_clicks, total_expands, total_link_clicks, total_github_clicks, total_demo_clicks,
-               engagement_score, overall_rank, performance_tier, recommended_position, engagement_percentile
-        FROM project_rankings ORDER BY overall_rank LIMIT 10
-    """)
+               engagement_score, overall_rank::int, performance_tier,
+               CASE WHEN overall_rank <= 3 THEN 'featured' ELSE 'standard' END as recommended_position,
+               engagement_percentile
+        FROM ranked ORDER BY overall_rank LIMIT 10
+    """, (start_date, end_date))
     project_rankings = [dict(row) for row in cursor.fetchall()]
 
-    # Section rankings (not date-filtered)
+    # Section rankings (date-filtered from daily stats)
     cursor.execute("""
+        WITH aggregated AS (
+            SELECT
+                section_id,
+                SUM(COALESCE(unique_views, 0)) as total_unique_views,
+                SUM(COALESCE(unique_exits, 0)) as total_unique_exits,
+                SUM(COALESCE(unique_viewers, 0)) as total_unique_viewers,
+                ROUND(AVG(unique_exit_rate)::numeric, 2) as avg_exit_rate,
+                SUM(COALESCE(total_views, 0)) as total_views,
+                SUM(COALESCE(total_exits, 0)) as total_exits,
+                ROUND(AVG(total_exit_rate)::numeric, 2) as avg_total_exit_rate,
+                ROUND(AVG(avg_revisits_per_session)::numeric, 2) as avg_revisits_per_session,
+                SUM(COALESCE(engaged_sessions, 0)) as total_engaged_sessions,
+                ROUND(AVG(engagement_rate)::numeric, 2) as avg_engagement_rate,
+                ROUND(AVG(avg_time_spent_seconds)::numeric, 2) as avg_time_spent_seconds,
+                ROUND(AVG(avg_scroll_depth_percent)::numeric, 2) as avg_scroll_depth_percent,
+                MAX(max_scroll_milestone) as max_scroll_milestone
+            FROM section_daily_stats
+            WHERE event_date BETWEEN %s AND %s
+            GROUP BY section_id
+        ),
+        scored AS (
+            SELECT *,
+                ROUND((
+                    (1 - COALESCE(avg_exit_rate, 0) / 100.0) * 30 +
+                    LEAST(COALESCE(avg_time_spent_seconds, 0) / 10.0, 1) * 25 +
+                    COALESCE(avg_engagement_rate, 0) / 100.0 * 25 +
+                    COALESCE(avg_scroll_depth_percent, 0) / 100.0 * 20
+                )::numeric, 2) as health_score
+            FROM aggregated
+        ),
+        ranked AS (
+            SELECT *,
+                ROW_NUMBER() OVER (ORDER BY avg_engagement_rate DESC NULLS LAST) as engagement_rank,
+                ROW_NUMBER() OVER (ORDER BY total_views DESC) as view_rank,
+                ROW_NUMBER() OVER (ORDER BY avg_exit_rate ASC NULLS LAST) as retention_rank,
+                CASE
+                    WHEN health_score >= 60 THEN 'healthy'
+                    WHEN health_score >= 40 THEN 'needs_attention'
+                    ELSE 'critical'
+                END as health_tier,
+                CASE WHEN avg_exit_rate > 50 THEN 'high_dropoff' ELSE 'normal' END as dropoff_indicator,
+                CASE
+                    WHEN avg_exit_rate > 70 THEN 'add_cta_or_navigation'
+                    WHEN avg_time_spent_seconds < 3 THEN 'improve_content'
+                    WHEN avg_scroll_depth_percent < 50 THEN 'optimize_layout'
+                    ELSE 'maintain'
+                END as optimization_hint
+            FROM scored
+        )
         SELECT section_id, total_unique_views, total_unique_exits, total_unique_viewers,
                avg_exit_rate, total_views, total_exits, avg_total_exit_rate,
-               avg_revisits_per_session, total_engaged_views, avg_engagement_rate,
+               avg_revisits_per_session, total_engaged_sessions, avg_engagement_rate,
                avg_time_spent_seconds, avg_scroll_depth_percent, max_scroll_milestone,
-               health_score, engagement_rank, view_rank, retention_rank,
+               health_score, engagement_rank::int, view_rank::int, retention_rank::int,
                health_tier, dropoff_indicator, optimization_hint
-        FROM section_rankings ORDER BY health_score DESC
-    """)
+        FROM ranked ORDER BY health_score DESC
+    """, (start_date, end_date))
     section_rankings = [dict(row) for row in cursor.fetchall()]
 
-    # Visitor segments (not date-filtered)
+    # Visitor segments (date-filtered from sessions)
     cursor.execute("""
+        WITH visitor_stats AS (
+            SELECT
+                user_pseudo_id,
+                COUNT(*) as total_sessions,
+                SUM(page_views) as total_page_views,
+                AVG(session_duration_seconds) as avg_duration,
+                AVG(engagement_score) as avg_engagement,
+                SUM(conversions_count) as total_conversions,
+                MAX(device_category) as primary_device
+            FROM sessions
+            WHERE session_date BETWEEN %s AND %s
+            GROUP BY user_pseudo_id
+        ),
+        segmented AS (
+            SELECT *,
+                CASE
+                    WHEN total_conversions > 0 THEN 'converter'
+                    WHEN total_sessions >= 3 AND avg_engagement > 50 THEN 'power_user'
+                    WHEN total_sessions >= 2 THEN 'returning'
+                    WHEN avg_engagement > 30 THEN 'engaged_new'
+                    ELSE 'casual'
+                END as visitor_segment
+            FROM visitor_stats
+        )
         SELECT visitor_segment, COUNT(*) as count,
-               ROUND(AVG(visitor_value_score)::numeric, 2) as avg_value_score,
+               ROUND(AVG(avg_engagement)::numeric, 2) as avg_value_score,
                ROUND(AVG(total_sessions)::numeric, 2) as avg_sessions,
-               ROUND(AVG(engagement_rate)::numeric, 2) as avg_engagement_rate
-        FROM visitor_insights GROUP BY visitor_segment ORDER BY count DESC
-    """)
+               ROUND(AVG(avg_engagement)::numeric, 2) as avg_engagement_rate
+        FROM segmented GROUP BY visitor_segment ORDER BY count DESC
+    """, (start_date, end_date))
     visitor_segments_raw = cursor.fetchall()
     visitor_segments = {}
     for seg in visitor_segments_raw:
@@ -141,39 +245,153 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
             "avg_engagement_rate": float(seg["avg_engagement_rate"] or 0)
         }
 
-    # Top visitors (not date-filtered)
+    # Top visitors (date-filtered from sessions)
     cursor.execute("""
+        WITH visitor_stats AS (
+            SELECT
+                user_pseudo_id,
+                COUNT(*) as total_sessions,
+                MIN(session_date) as first_visit,
+                MAX(session_date) as last_visit,
+                (MAX(session_date) - MIN(session_date)) as visitor_tenure_days,
+                SUM(page_views) as total_page_views,
+                ROUND(AVG(session_duration_seconds)::numeric, 0) as avg_session_duration_sec,
+                ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+                MODE() WITHIN GROUP (ORDER BY device_category) as primary_device,
+                MODE() WITHIN GROUP (ORDER BY country) as primary_country,
+                MODE() WITHIN GROUP (ORDER BY traffic_source) as primary_traffic_source,
+                SUM(projects_clicked_count) as projects_viewed,
+                SUM(conversions_count) as cta_clicks,
+                0 as form_submissions,
+                0 as social_clicks,
+                0 as resume_downloads,
+                (COUNT(*) * 10 + SUM(page_views) * 2 + SUM(conversions_count) * 20 +
+                 ROUND(AVG(engagement_score)::numeric, 0)) as visitor_value_score
+            FROM sessions
+            WHERE session_date BETWEEN %s AND %s
+            GROUP BY user_pseudo_id
+        ),
+        segmented AS (
+            SELECT *,
+                CASE
+                    WHEN cta_clicks > 0 THEN 'converter'
+                    WHEN total_sessions >= 3 THEN 'power_user'
+                    WHEN total_sessions >= 2 THEN 'returning'
+                    ELSE 'new'
+                END as visitor_segment,
+                'general_visitor' as interest_profile
+            FROM visitor_stats
+        )
         SELECT user_pseudo_id, total_sessions, visitor_tenure_days, total_page_views,
                avg_session_duration_sec, engagement_rate, primary_device, primary_country,
                primary_traffic_source, projects_viewed, cta_clicks, form_submissions,
                social_clicks, resume_downloads, visitor_value_score, visitor_segment, interest_profile
-        FROM visitor_insights ORDER BY visitor_value_score DESC LIMIT 15
-    """)
+        FROM segmented ORDER BY visitor_value_score DESC LIMIT 15
+    """, (start_date, end_date))
     top_visitors = [dict(row) for row in cursor.fetchall()]
 
-    # Tech demand (not date-filtered)
+    # Tech demand (date-filtered from skill daily stats)
     cursor.execute("""
-        SELECT technology as skill_name, total_interactions, total_unique_users,
-               demand_rank, demand_percentile, demand_tier, learning_priority
-        FROM tech_demand_insights ORDER BY demand_rank
-    """)
+        WITH aggregated AS (
+            SELECT
+                skill_name,
+                SUM(COALESCE(clicks, 0) + COALESCE(hovers, 0)) as total_interactions,
+                SUM(COALESCE(unique_users, 0)) as total_unique_users,
+                SUM(COALESCE(weighted_interest_score, 0)) as interest_score
+            FROM skill_daily_stats
+            WHERE event_date BETWEEN %s AND %s
+            GROUP BY skill_name
+        ),
+        ranked AS (
+            SELECT *,
+                ROW_NUMBER() OVER (ORDER BY interest_score DESC) as demand_rank,
+                ROUND(PERCENT_RANK() OVER (ORDER BY interest_score) * 100, 1) as demand_percentile,
+                CASE
+                    WHEN ROW_NUMBER() OVER (ORDER BY interest_score DESC) <= 5 THEN 'high_demand'
+                    WHEN ROW_NUMBER() OVER (ORDER BY interest_score DESC) <= 15 THEN 'moderate_demand'
+                    ELSE 'niche'
+                END as demand_tier,
+                CASE
+                    WHEN ROW_NUMBER() OVER (ORDER BY interest_score DESC) <= 5 THEN 'maintain_expertise'
+                    WHEN ROW_NUMBER() OVER (ORDER BY interest_score DESC) <= 10 THEN 'showcase_more'
+                    ELSE 'consider_highlighting'
+                END as learning_priority
+            FROM aggregated
+        )
+        SELECT skill_name, total_interactions, total_unique_users,
+               demand_rank::int, demand_percentile, demand_tier, learning_priority
+        FROM ranked ORDER BY demand_rank
+    """, (start_date, end_date))
     tech_demand = [dict(row) for row in cursor.fetchall()]
 
-    # Domain rankings (not date-filtered)
+    # Domain rankings (date-filtered from domain daily stats)
     cursor.execute("""
+        WITH aggregated AS (
+            SELECT
+                domain,
+                SUM(COALESCE(explicit_interest_signals, 0)) as total_explicit_interest,
+                SUM(COALESCE(implicit_interest_from_views, 0)) as total_implicit_interest,
+                SUM(COALESCE(total_domain_interactions, 0)) as total_interactions,
+                SUM(COALESCE(unique_interested_users, 0)) as total_unique_users,
+                SUM(COALESCE(domain_interest_score, 0)) as total_interest_score
+            FROM domain_daily_stats
+            WHERE event_date BETWEEN %s AND %s
+            GROUP BY domain
+        ),
+        ranked AS (
+            SELECT *,
+                ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) as interest_rank,
+                ROUND(PERCENT_RANK() OVER (ORDER BY total_interest_score) * 100, 1) as interest_percentile,
+                CASE
+                    WHEN ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) <= 3 THEN 'high_demand'
+                    WHEN ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) <= 7 THEN 'moderate_demand'
+                    ELSE 'niche'
+                END as demand_tier,
+                CASE
+                    WHEN ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) <= 3 THEN 'feature_prominently'
+                    ELSE 'maintain_presence'
+                END as portfolio_recommendation
+            FROM aggregated
+        )
         SELECT domain, total_explicit_interest, total_implicit_interest, total_interactions,
-               total_unique_users, total_interest_score, interest_rank, interest_percentile,
+               total_unique_users, total_interest_score, interest_rank::int, interest_percentile,
                demand_tier, portfolio_recommendation
-        FROM domain_rankings ORDER BY interest_rank
-    """)
+        FROM ranked ORDER BY interest_rank
+    """, (start_date, end_date))
     domain_rankings = [dict(row) for row in cursor.fetchall()]
 
-    # Experience rankings (not date-filtered)
+    # Experience rankings (date-filtered from experience daily stats)
     cursor.execute("""
+        WITH aggregated AS (
+            SELECT
+                experience_id,
+                MAX(experience_title) as experience_title,
+                MAX(company) as company,
+                SUM(COALESCE(total_interactions, 0)) as total_interactions,
+                SUM(COALESCE(unique_interested_users, 0)) as total_unique_users,
+                SUM(COALESCE(unique_sessions, 0)) as total_sessions
+            FROM experience_daily_stats
+            WHERE event_date BETWEEN %s AND %s
+            GROUP BY experience_id
+        ),
+        ranked AS (
+            SELECT *,
+                ROW_NUMBER() OVER (ORDER BY total_interactions DESC) as interest_rank,
+                ROUND(PERCENT_RANK() OVER (ORDER BY total_interactions) * 100, 1) as interest_percentile,
+                CASE
+                    WHEN ROW_NUMBER() OVER (ORDER BY total_interactions DESC) <= 2 THEN 'highly_attractive'
+                    ELSE 'moderately_attractive'
+                END as role_attractiveness,
+                CASE
+                    WHEN ROW_NUMBER() OVER (ORDER BY total_interactions DESC) <= 2 THEN 'feature_at_top'
+                    ELSE 'maintain_position'
+                END as positioning_suggestion
+            FROM aggregated
+        )
         SELECT experience_id, experience_title, company, total_interactions, total_unique_users,
-               total_sessions, interest_rank, interest_percentile, role_attractiveness, positioning_suggestion
-        FROM experience_rankings ORDER BY interest_rank
-    """)
+               total_sessions, interest_rank::int, interest_percentile, role_attractiveness, positioning_suggestion
+        FROM ranked ORDER BY interest_rank
+    """, (start_date, end_date))
     experience_rankings = [dict(row) for row in cursor.fetchall()]
 
     # Recommendation performance
