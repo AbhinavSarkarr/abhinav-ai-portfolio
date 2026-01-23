@@ -329,13 +329,13 @@ export default function Dashboard3() {
 
   if (!data) return null;
 
-  // Prepare visitor segment data
+  // Prepare visitor segment data (handle both API key formats)
   const visitorSegmentData = {
-    converters: data.visitorSegments?.converter?.count || 0,
+    converters: data.visitorSegments?.converter?.count || data.visitorSegments?.converters?.count || 0,
     high_intent: data.visitorSegments?.high_intent?.count || 0,
-    engaged_explorers: data.visitorSegments?.engaged_explorer?.count || 0,
-    returning_visitors: data.visitorSegments?.returning_visitor?.count || 0,
-    casual_browsers: (data.visitorSegments?.casual_browser?.count || 0) + (data.visitorSegments?.engaged_new?.count || 0),
+    engaged_explorers: data.visitorSegments?.engaged_explorer?.count || data.visitorSegments?.engaged?.count || 0,
+    returning_visitors: data.visitorSegments?.returning_visitor?.count || data.visitorSegments?.returning?.count || 0,
+    casual_browsers: (data.visitorSegments?.casual_browser?.count || data.visitorSegments?.casual?.count || 0) + (data.visitorSegments?.engaged_new?.count || 0),
   };
 
   // Prepare traffic source pie chart data
