@@ -355,6 +355,23 @@ def main():
     ))
 
     # ========================================================================
+    # DAILY STATS TABLES (Full Refresh - needed by dashboard gist)
+    # ========================================================================
+    print("\nSyncing daily stats tables (full refresh):")
+
+    results.append(sync_rankings_full_refresh(
+        bq_client, pg_conn,
+        "project_daily_stats",
+        f"""SELECT event_date, project_id, project_title, project_category,
+                   views, unique_viewers, unique_sessions, clicks, expands, link_clicks,
+                   github_clicks, demo_clicks, external_clicks,
+                   avg_view_duration_ms, click_through_rate,
+                   desktop_interactions, mobile_interactions, materialized_at
+            FROM `{PROJECT_ID}.{BQ_DATASET}.project_daily_stats`""",
+        "event_date,project_id,project_title,project_category,views,unique_viewers,unique_sessions,clicks,expands,link_clicks,github_clicks,demo_clicks,external_clicks,avg_view_duration_ms,click_through_rate,desktop_interactions,mobile_interactions,materialized_at"
+    ))
+
+    # ========================================================================
     # RANKING TABLES (Full Refresh - aggregated data)
     # ========================================================================
     print("\nSyncing ranking tables (full refresh):")
