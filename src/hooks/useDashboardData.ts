@@ -673,7 +673,7 @@ export function useDashboardData(options: UseDashboardDataOptions = {}): Dashboa
   const [source, setSource] = useState<'gist' | 'backend' | 'error' | null>(null);
   const [metadata, setMetadata] = useState<{ dataStartDate: string; dataEndDate: string; updatedAt: string } | null>(null);
 
-  const [currentPreset, setCurrentPreset] = useState<DateRangePreset>(options.preset || 'last_7_days');
+  const [currentPreset, setCurrentPreset] = useState<DateRangePreset>(options.preset || 'all_time');
   const [customStartDate, setCustomStartDate] = useState<string | null>(options.customStartDate || null);
   const [customEndDate, setCustomEndDate] = useState<string | null>(options.customEndDate || null);
 

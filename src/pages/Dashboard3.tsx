@@ -358,6 +358,37 @@ export default function Dashboard3() {
       color: [chartColors.primary, chartColors.accent, chartColors.highlight, chartColors.success, chartColors.warning, chartColors.muted][index],
     }));
 
+  // Aggregate traffic sources with all metrics for Source Quality card
+  const aggregatedSourcesWithMetrics = data.trafficSources.reduce((acc, source) => {
+    const formattedName = formatTrafficSource(source.traffic_source);
+    if (acc[formattedName]) {
+      acc[formattedName].sessions += source.sessions;
+      acc[formattedName].unique_visitors += source.unique_visitors;
+      acc[formattedName].conversions += source.conversions || 0;
+      acc[formattedName].resume_downloads += source.resume_downloads || 0;
+      // Weighted average for engagement rate
+      acc[formattedName].totalEngaged += (source.engagement_rate || 0) * source.sessions;
+    } else {
+      acc[formattedName] = {
+        traffic_source: formattedName,
+        sessions: source.sessions,
+        unique_visitors: source.unique_visitors,
+        conversions: source.conversions || 0,
+        resume_downloads: source.resume_downloads || 0,
+        totalEngaged: (source.engagement_rate || 0) * source.sessions,
+      };
+    }
+    return acc;
+  }, {} as Record<string, { traffic_source: string; sessions: number; unique_visitors: number; conversions: number; resume_downloads: number; totalEngaged: number }>);
+
+  const aggregatedSourcesList = Object.values(aggregatedSourcesWithMetrics)
+    .map(s => ({
+      ...s,
+      engagement_rate: s.sessions > 0 ? s.totalEngaged / s.sessions : 0,
+    }))
+    .sort((a, b) => b.sessions - a.sessions)
+    .slice(0, 5);
+
   return (
     <div className="min-h-screen bg-background relative">
       {/* Animated Background */}
@@ -659,10 +690,10 @@ export default function Dashboard3() {
             {/* Source Quality Comparison */}
             <GlassCard title="Source Quality" subtitle="Engagement & conversions by source">
               <div className="mt-3 space-y-3">
-                {data.trafficSources.slice(0, 5).map((source, index) => {
-                  const maxSessions = data.trafficSources[0]?.sessions || 1;
+                {aggregatedSourcesList.map((source, index) => {
+                  const maxSessions = aggregatedSourcesList[0]?.sessions || 1;
                   const width = (source.sessions / maxSessions) * 100;
-                  const totalConversions = (source.conversions || 0) + (source.resume_downloads || 0);
+                  const totalConversions = source.conversions + source.resume_downloads;
                   const conversionRate = source.unique_visitors > 0
                     ? ((totalConversions / source.unique_visitors) * 100).toFixed(1)
                     : '0';
@@ -676,7 +707,7 @@ export default function Dashboard3() {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-foreground">
-                          {formatTrafficSource(source.traffic_source)}
+                          {source.traffic_source}
                         </span>
                         <div className="flex items-center gap-2 sm:gap-3">
                           <span className="text-[10px] text-muted-foreground">

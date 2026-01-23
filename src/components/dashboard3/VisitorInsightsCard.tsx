@@ -362,25 +362,31 @@ function FunnelView({ segments }: { segments: VisitorSegments }) {
     },
   ];
 
+  // Visual funnel widths (stepped reduction for visual effect)
+  const funnelWidths = [100, 82, 64, 46, 28];
+
   return (
-    <div className="space-y-1">
+    <div className="space-y-0">
       {funnelStages.map((stage, index) => {
         const Icon = stage.icon;
-        const widthPercent = (stage.value / total) * 100;
         const prevStage = index > 0 ? funnelStages[index - 1] : null;
-        const conversionRate = prevStage ? ((stage.value / prevStage.value) * 100).toFixed(0) : null;
+        const conversionRate = prevStage && prevStage.value > 0
+          ? ((stage.value / prevStage.value) * 100).toFixed(0)
+          : null;
+        const visualWidth = funnelWidths[index] || 28;
 
         return (
           <motion.div
             key={stage.key}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
+            className="flex flex-col items-center"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.08 }}
           >
             {/* Conversion arrow between stages */}
             {index > 0 && (
-              <div className="flex items-center justify-center py-0.5">
-                <div className="flex items-center gap-1 text-[9px] sm:text-[10px] text-muted-foreground">
+              <div className="flex items-center justify-center py-1">
+                <div className="flex items-center gap-1 text-[9px] sm:text-[10px]">
                   <ArrowDown size={10} className="text-muted-foreground/50" />
                   <span className="font-medium" style={{ color: stage.color }}>
                     {conversionRate}% converted
@@ -389,13 +395,10 @@ function FunnelView({ segments }: { segments: VisitorSegments }) {
               </div>
             )}
 
-            {/* Funnel bar */}
+            {/* Funnel bar - centered */}
             <div
-              className="relative mx-auto rounded-lg overflow-hidden transition-all duration-300"
-              style={{
-                width: `${Math.max(widthPercent, 30)}%`,
-                minWidth: '120px'
-              }}
+              className="rounded-lg overflow-hidden transition-all duration-300"
+              style={{ width: `${visualWidth}%` }}
             >
               <div
                 className="flex items-center justify-between p-2 sm:p-2.5"
