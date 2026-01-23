@@ -273,7 +273,7 @@ export default function Dashboard3() {
     currentPreset,
     customStartDate,
     customEndDate,
-  } = useDashboardData({ preset: 'last_7_days' });
+  } = useDashboardData({ preset: 'all_time' });
 
   useEffect(() => {
     warmUpBackendAPI();
