@@ -9,10 +9,13 @@ SELECT
   project_title,
   project_category,
 
-  -- View metrics
-  COUNTIF(event_name = 'project_view') AS views,
-  COUNT(DISTINCT CASE WHEN event_name = 'project_view' THEN user_pseudo_id END) AS unique_viewers,
-  COUNT(DISTINCT CASE WHEN event_name = 'project_view' THEN session_id END) AS unique_sessions,
+  -- View metrics (use clicks as fallback for historical data where views weren't tracked)
+  GREATEST(
+    COUNTIF(event_name = 'project_view'),
+    COUNTIF(event_name = 'project_click')
+  ) AS views,
+  COUNT(DISTINCT CASE WHEN event_name IN ('project_view', 'project_click') THEN user_pseudo_id END) AS unique_viewers,
+  COUNT(DISTINCT CASE WHEN event_name IN ('project_view', 'project_click') THEN session_id END) AS unique_sessions,
 
   -- Click metrics
   COUNTIF(event_name = 'project_click') AS clicks,
