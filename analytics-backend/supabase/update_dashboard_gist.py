@@ -51,15 +51,15 @@ def get_data_date_range(cursor) -> tuple[date, date]:
 def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
     """Fetch all dashboard data for a given date range using a single connection"""
 
-    # Overview
+    # Overview - use COUNT(DISTINCT session_id) to avoid counting duplicate rows
     cursor.execute("""
         SELECT
-            COUNT(*) as total_sessions,
+            COUNT(DISTINCT session_id) as total_sessions,
             COUNT(DISTINCT user_pseudo_id) as unique_visitors,
             ROUND(AVG(session_duration_seconds)::numeric, 0) as avg_session_duration,
             ROUND(AVG(page_views)::numeric, 1) as avg_pages_per_session,
-            ROUND(COUNT(*) FILTER (WHERE is_bounce)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as bounce_rate,
-            ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+            ROUND(COUNT(DISTINCT CASE WHEN is_bounce THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as bounce_rate,
+            ROUND(COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as engagement_rate,
             ROUND(AVG(engagement_score)::numeric, 2) as avg_engagement_score
         FROM sessions WHERE session_date BETWEEN %s AND %s
     """, (start_date, end_date))
@@ -208,7 +208,7 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
         WITH visitor_stats AS (
             SELECT
                 user_pseudo_id,
-                COUNT(*) as total_sessions,
+                COUNT(DISTINCT session_id) as total_sessions,
                 SUM(page_views) as total_page_views,
                 AVG(session_duration_seconds) as avg_duration,
                 AVG(engagement_score) as avg_engagement,
@@ -250,13 +250,13 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
         WITH visitor_stats AS (
             SELECT
                 user_pseudo_id,
-                COUNT(*) as total_sessions,
+                COUNT(DISTINCT session_id) as total_sessions,
                 MIN(session_date) as first_visit,
                 MAX(session_date) as last_visit,
                 (MAX(session_date) - MIN(session_date)) as visitor_tenure_days,
                 SUM(page_views) as total_page_views,
                 ROUND(AVG(session_duration_seconds)::numeric, 0) as avg_session_duration_sec,
-                ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+                ROUND(COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as engagement_rate,
                 MODE() WITHIN GROUP (ORDER BY device_category) as primary_device,
                 MODE() WITHIN GROUP (ORDER BY country) as primary_country,
                 MODE() WITHIN GROUP (ORDER BY traffic_source) as primary_traffic_source,
@@ -265,7 +265,7 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
                 0 as form_submissions,
                 0 as social_clicks,
                 0 as resume_downloads,
-                (COUNT(*) * 10 + SUM(page_views) * 2 + SUM(conversions_count) * 20 +
+                (COUNT(DISTINCT session_id) * 10 + SUM(page_views) * 2 + SUM(conversions_count) * 20 +
                  ROUND(AVG(engagement_score)::numeric, 0)) as visitor_value_score
             FROM sessions
             WHERE session_date BETWEEN %s AND %s

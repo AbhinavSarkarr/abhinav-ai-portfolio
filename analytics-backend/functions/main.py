@@ -102,12 +102,12 @@ async def get_dashboard3_data(
     queries = {
         "overview": ("""
             SELECT
-                COUNT(*) as total_sessions,
+                COUNT(DISTINCT session_id) as total_sessions,
                 COUNT(DISTINCT user_pseudo_id) as unique_visitors,
                 ROUND(AVG(session_duration_seconds)::numeric, 0) as avg_session_duration,
                 ROUND(AVG(page_views)::numeric, 1) as avg_pages_per_session,
-                ROUND(COUNT(*) FILTER (WHERE is_bounce)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as bounce_rate,
-                ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+                ROUND(COUNT(DISTINCT CASE WHEN is_bounce THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as bounce_rate,
+                ROUND(COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as engagement_rate,
                 ROUND(AVG(engagement_score)::numeric, 2) as avg_engagement_score
             FROM sessions WHERE session_date BETWEEN %s AND %s
         """, (start, end)),
@@ -241,14 +241,14 @@ async def get_dashboard3_data(
             WITH visitor_stats AS (
                 SELECT
                     user_pseudo_id,
-                    COUNT(*) as total_sessions,
+                    COUNT(DISTINCT session_id) as total_sessions,
                     SUM(page_views) as total_page_views,
                     ROUND(AVG(session_duration_seconds)::numeric, 2) as avg_duration,
-                    ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+                    ROUND(COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as engagement_rate,
                     SUM(conversions_count) as total_conversions,
                     MAX(session_date) - MIN(session_date) as tenure_days,
                     -- Value score: sessions*2 + page_views + conversions*20 + (engagement_rate/10)
-                    (COUNT(*) * 2 + SUM(page_views) + SUM(conversions_count) * 20) as value_score
+                    (COUNT(DISTINCT session_id) * 2 + SUM(page_views) + SUM(conversions_count) * 20) as value_score
                 FROM sessions
                 WHERE session_date BETWEEN %s AND %s
                 GROUP BY user_pseudo_id
@@ -274,11 +274,11 @@ async def get_dashboard3_data(
             WITH visitor_stats AS (
                 SELECT
                     user_pseudo_id,
-                    COUNT(*) as total_sessions,
+                    COUNT(DISTINCT session_id) as total_sessions,
                     MAX(session_date) - MIN(session_date) as visitor_tenure_days,
                     SUM(page_views) as total_page_views,
                     ROUND(AVG(session_duration_seconds)::numeric, 2) as avg_session_duration_sec,
-                    ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
+                    ROUND(COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as engagement_rate,
                     MODE() WITHIN GROUP (ORDER BY device_category) as primary_device,
                     MODE() WITHIN GROUP (ORDER BY country) as primary_country,
                     MODE() WITHIN GROUP (ORDER BY traffic_source) as primary_traffic_source,
@@ -288,12 +288,12 @@ async def get_dashboard3_data(
                     0 as social_clicks,
                     0 as resume_downloads,
                     -- Value score
-                    (COUNT(*) * 2 + SUM(page_views) + SUM(conversions_count) * 20) as visitor_value_score,
+                    (COUNT(DISTINCT session_id) * 2 + SUM(page_views) + SUM(conversions_count) * 20) as visitor_value_score,
                     CASE
                         WHEN SUM(conversions_count) > 0 THEN 'converter'
-                        WHEN COUNT(*) >= 3 AND COUNT(*) FILTER (WHERE is_engaged) * 100.0 / COUNT(*) >= 80 THEN 'engaged_explorer'
-                        WHEN COUNT(*) >= 2 THEN 'returning_visitor'
-                        WHEN COUNT(*) FILTER (WHERE is_engaged) * 100.0 / COUNT(*) >= 50 THEN 'engaged_new'
+                        WHEN COUNT(DISTINCT session_id) >= 3 AND COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END) * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0) >= 80 THEN 'engaged_explorer'
+                        WHEN COUNT(DISTINCT session_id) >= 2 THEN 'returning_visitor'
+                        WHEN COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END) * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0) >= 50 THEN 'engaged_new'
                         ELSE 'casual_browser'
                     END as visitor_segment,
                     'general_visitor' as interest_profile
