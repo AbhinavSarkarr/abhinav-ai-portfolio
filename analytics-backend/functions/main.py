@@ -169,7 +169,7 @@ async def get_dashboard3_data(
                         WHEN engagement_score >= (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY engagement_score) FROM aggregated) THEN 'above_average'
                         ELSE 'below_average'
                     END as performance_tier,
-                    ROUND(PERCENT_RANK() OVER (ORDER BY engagement_score) * 100, 1) as engagement_percentile
+                    ROUND((PERCENT_RANK() OVER (ORDER BY engagement_score) * 100)::numeric, 1) as engagement_percentile
                 FROM aggregated
             )
             SELECT project_id, project_title, project_category, total_views, total_unique_viewers,
@@ -321,7 +321,7 @@ async def get_dashboard3_data(
             ranked AS (
                 SELECT *,
                     ROW_NUMBER() OVER (ORDER BY weighted_score DESC) as demand_rank,
-                    ROUND(PERCENT_RANK() OVER (ORDER BY weighted_score) * 100, 1) as demand_percentile,
+                    ROUND((PERCENT_RANK() OVER (ORDER BY weighted_score) * 100)::numeric, 1) as demand_percentile,
                     CASE
                         WHEN weighted_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY weighted_score) FROM aggregated) THEN 'high_demand'
                         WHEN weighted_score >= (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY weighted_score) FROM aggregated) THEN 'moderate_demand'
@@ -355,7 +355,7 @@ async def get_dashboard3_data(
             ranked AS (
                 SELECT *,
                     ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) as interest_rank,
-                    ROUND(PERCENT_RANK() OVER (ORDER BY total_interest_score) * 100, 1) as interest_percentile,
+                    ROUND((PERCENT_RANK() OVER (ORDER BY total_interest_score) * 100)::numeric, 1) as interest_percentile,
                     CASE
                         WHEN total_interest_score >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY total_interest_score) FROM aggregated) THEN 'high_demand'
                         WHEN total_interest_score >= (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY total_interest_score) FROM aggregated) THEN 'moderate_demand'
@@ -390,7 +390,7 @@ async def get_dashboard3_data(
             ranked AS (
                 SELECT *,
                     ROW_NUMBER() OVER (ORDER BY total_interactions DESC) as interest_rank,
-                    ROUND(PERCENT_RANK() OVER (ORDER BY total_interactions) * 100, 1) as interest_percentile,
+                    ROUND((PERCENT_RANK() OVER (ORDER BY total_interactions) * 100)::numeric, 1) as interest_percentile,
                     CASE
                         WHEN total_interactions >= (SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY total_interactions) FROM aggregated) THEN 'most_attractive_role'
                         WHEN total_interactions >= (SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY total_interactions) FROM aggregated) THEN 'moderately_attractive'

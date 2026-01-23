@@ -130,7 +130,7 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
                     WHEN engagement_score >= (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY engagement_score) FROM aggregated) THEN 'above_average'
                     ELSE 'below_average'
                 END as performance_tier,
-                ROUND(PERCENT_RANK() OVER (ORDER BY engagement_score) * 100, 1) as engagement_percentile
+                ROUND((PERCENT_RANK() OVER (ORDER BY engagement_score) * 100)::numeric, 1) as engagement_percentile
             FROM aggregated
         )
         SELECT project_id, project_title, project_category, total_views, total_unique_viewers,
@@ -305,7 +305,7 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
         ranked AS (
             SELECT *,
                 ROW_NUMBER() OVER (ORDER BY interest_score DESC) as demand_rank,
-                ROUND(PERCENT_RANK() OVER (ORDER BY interest_score) * 100, 1) as demand_percentile,
+                ROUND((PERCENT_RANK() OVER (ORDER BY interest_score) * 100)::numeric, 1) as demand_percentile,
                 CASE
                     WHEN ROW_NUMBER() OVER (ORDER BY interest_score DESC) <= 5 THEN 'high_demand'
                     WHEN ROW_NUMBER() OVER (ORDER BY interest_score DESC) <= 15 THEN 'moderate_demand'
@@ -341,7 +341,7 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
         ranked AS (
             SELECT *,
                 ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) as interest_rank,
-                ROUND(PERCENT_RANK() OVER (ORDER BY total_interest_score) * 100, 1) as interest_percentile,
+                ROUND((PERCENT_RANK() OVER (ORDER BY total_interest_score) * 100)::numeric, 1) as interest_percentile,
                 CASE
                     WHEN ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) <= 3 THEN 'high_demand'
                     WHEN ROW_NUMBER() OVER (ORDER BY total_interest_score DESC) <= 7 THEN 'moderate_demand'
@@ -377,7 +377,7 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
         ranked AS (
             SELECT *,
                 ROW_NUMBER() OVER (ORDER BY total_interactions DESC) as interest_rank,
-                ROUND(PERCENT_RANK() OVER (ORDER BY total_interactions) * 100, 1) as interest_percentile,
+                ROUND((PERCENT_RANK() OVER (ORDER BY total_interactions) * 100)::numeric, 1) as interest_percentile,
                 CASE
                     WHEN ROW_NUMBER() OVER (ORDER BY total_interactions DESC) <= 2 THEN 'highly_attractive'
                     ELSE 'moderately_attractive'
