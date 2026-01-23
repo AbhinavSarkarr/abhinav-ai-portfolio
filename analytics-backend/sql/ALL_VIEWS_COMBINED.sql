@@ -14,11 +14,19 @@ WITH session_data AS (
     -- Device info (GA4 built-in)
     device.category AS device_category,
     device.operating_system AS os,
-    device.browser AS browser,
+    device.browser AS ga4_browser,
     device.is_limited_ad_tracking AS limited_ad_tracking,
     device.mobile_brand_name AS mobile_brand,
     device.mobile_model_name AS mobile_model,
     device.language AS device_language,
+
+    -- Custom browser/OS from session_start event (fallback for GA4)
+    MAX(CASE WHEN event_name = 'session_start'
+        THEN (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'browser')
+        END) AS custom_browser,
+    MAX(CASE WHEN event_name = 'session_start'
+        THEN (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'operating_system')
+        END) AS custom_os,
 
     -- Geo info (GA4 built-in)
     geo.country AS country,
@@ -153,8 +161,8 @@ SELECT
 
   -- Device
   device_category,
-  os,
-  browser,
+  COALESCE(NULLIF(custom_os, ''), os) AS os,
+  COALESCE(NULLIF(ga4_browser, ''), NULLIF(custom_browser, ''), 'Unknown') AS browser,
   limited_ad_tracking,
   mobile_brand,
   mobile_model,
@@ -788,8 +796,8 @@ SELECT
 
   -- View metrics
   COUNTIF(event_name = 'project_view') AS views,
-  COUNT(DISTINCT user_pseudo_id) AS unique_viewers,
-  COUNT(DISTINCT session_id) AS unique_sessions,
+  COUNT(DISTINCT CASE WHEN event_name = 'project_view' THEN user_pseudo_id END) AS unique_viewers,
+  COUNT(DISTINCT CASE WHEN event_name = 'project_view' THEN session_id END) AS unique_sessions,
 
   -- Click metrics
   COUNTIF(event_name = 'project_click') AS clicks,
@@ -2438,9 +2446,10 @@ SELECT
 
   -- System health
   CASE
-    WHEN r.total_clicks * 100.0 / NULLIF(r.total_impressions, 0) >= 10 THEN 'excellent'
-    WHEN r.total_clicks * 100.0 / NULLIF(r.total_impressions, 0) >= 5 THEN 'good'
-    WHEN r.total_clicks * 100.0 / NULLIF(r.total_impressions, 0) >= 2 THEN 'needs_improvement'
+    WHEN r.total_impressions IS NULL OR r.total_impressions = 0 THEN 'no_data'
+    WHEN r.total_clicks * 100.0 / r.total_impressions >= 10 THEN 'excellent'
+    WHEN r.total_clicks * 100.0 / r.total_impressions >= 5 THEN 'good'
+    WHEN r.total_clicks * 100.0 / r.total_impressions >= 2 THEN 'needs_improvement'
     ELSE 'underperforming'
   END AS system_health,
 

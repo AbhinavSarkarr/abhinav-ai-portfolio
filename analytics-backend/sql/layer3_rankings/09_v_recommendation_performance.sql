@@ -86,9 +86,10 @@ SELECT
 
   -- System health
   CASE
-    WHEN r.total_clicks * 100.0 / NULLIF(r.total_impressions, 0) >= 10 THEN 'excellent'
-    WHEN r.total_clicks * 100.0 / NULLIF(r.total_impressions, 0) >= 5 THEN 'good'
-    WHEN r.total_clicks * 100.0 / NULLIF(r.total_impressions, 0) >= 2 THEN 'needs_improvement'
+    WHEN r.total_impressions IS NULL OR r.total_impressions = 0 THEN 'no_data'
+    WHEN r.total_clicks * 100.0 / r.total_impressions >= 10 THEN 'excellent'
+    WHEN r.total_clicks * 100.0 / r.total_impressions >= 5 THEN 'good'
+    WHEN r.total_clicks * 100.0 / r.total_impressions >= 2 THEN 'needs_improvement'
     ELSE 'underperforming'
   END AS system_health,
 

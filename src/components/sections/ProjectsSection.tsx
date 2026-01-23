@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { Github, Globe, ArrowUpRight, MessageSquare, TrendingUp, Eye } from 'lucide-react';
@@ -38,6 +38,52 @@ export function ProjectsSection() {
     once: true,
     margin: '-100px',
   });
+
+  // Track which projects have been viewed (to avoid duplicate tracking)
+  const viewedProjectsRef = useRef<Set<string>>(new Set());
+  const projectCardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  // Callback to set ref for each project card
+  const setProjectCardRef = useCallback((projectId: string, element: HTMLDivElement | null) => {
+    if (element) {
+      projectCardRefs.current.set(projectId, element);
+    } else {
+      projectCardRefs.current.delete(projectId);
+    }
+  }, []);
+
+  // IntersectionObserver to track project views
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const projectId = entry.target.getAttribute('data-project-id');
+            if (projectId && !viewedProjectsRef.current.has(projectId)) {
+              viewedProjectsRef.current.add(projectId);
+              const project = projects.find(p => p.id === projectId);
+              if (project) {
+                analytics.trackProjectView(project.id, project.title, project.category);
+              }
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.5, // Track when 50% of the card is visible
+        rootMargin: '0px',
+      }
+    );
+
+    // Observe all project cards
+    projectCardRefs.current.forEach((element) => {
+      observer.observe(element);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [sortedProjects, projects, analytics]);
 
   const handleProjectClick = (projectId: string) => {
     const project = projects.find(p => p.id === projectId);
@@ -129,6 +175,8 @@ export function ProjectsSection() {
             return (
             <motion.div
               key={project.id}
+              ref={(el) => setProjectCardRef(project.id, el)}
+              data-project-id={project.id}
               custom={index}
               variants={cardVariants}
               initial="hidden"

@@ -14,11 +14,19 @@ WITH session_data AS (
     -- Device info (GA4 built-in)
     device.category AS device_category,
     device.operating_system AS os,
-    device.browser AS browser,
+    device.browser AS ga4_browser,
     device.is_limited_ad_tracking AS limited_ad_tracking,
     device.mobile_brand_name AS mobile_brand,
     device.mobile_model_name AS mobile_model,
     device.language AS device_language,
+
+    -- Custom browser/OS from session_start event (fallback for GA4)
+    MAX(CASE WHEN event_name = 'session_start'
+        THEN (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'browser')
+        END) AS custom_browser,
+    MAX(CASE WHEN event_name = 'session_start'
+        THEN (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'operating_system')
+        END) AS custom_os,
 
     -- Geo info (GA4 built-in)
     geo.country AS country,
@@ -153,8 +161,8 @@ SELECT
 
   -- Device
   device_category,
-  os,
-  browser,
+  COALESCE(NULLIF(custom_os, ''), os) AS os,
+  COALESCE(NULLIF(ga4_browser, ''), NULLIF(custom_browser, ''), 'Unknown') AS browser,
   limited_ad_tracking,
   mobile_brand,
   mobile_model,

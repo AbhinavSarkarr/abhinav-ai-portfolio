@@ -1,16 +1,47 @@
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, ExternalLink, Github } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRecommender } from '@/context/RecommenderContext';
+import { useAnalyticsContext } from '@/context/AnalyticsContext';
 
 export const ProjectRecommendation = () => {
   const { recommendation, dismissRecommendation, markFromRecommendation } = useRecommender();
   const { show, project, sourceProject, type } = recommendation;
   const navigate = useNavigate();
+  const analytics = useAnalyticsContext();
+
+  // Track which recommendation has been shown (to avoid duplicate tracking)
+  const lastTrackedRecommendationRef = useRef<string | null>(null);
+
+  // Track when recommendation is shown
+  useEffect(() => {
+    if (show && project && sourceProject) {
+      const recommendationKey = `${sourceProject.id}-${project.id}`;
+      if (lastTrackedRecommendationRef.current !== recommendationKey) {
+        lastTrackedRecommendationRef.current = recommendationKey;
+        analytics.trackRecommendationShown(
+          project.id,
+          project.title,
+          sourceProject.id,
+          1 // position (single recommendation)
+        );
+      }
+    }
+  }, [show, project, sourceProject, analytics]);
 
   if (!project) return null;
 
   const handleProjectClick = () => {
+    // Track recommendation click
+    if (project && sourceProject) {
+      analytics.trackRecommendationClick(
+        project.id,
+        project.title,
+        sourceProject.id,
+        1 // position
+      );
+    }
     // Mark that user is navigating from a recommendation (40s timer next time)
     markFromRecommendation();
     dismissRecommendation();

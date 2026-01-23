@@ -11,8 +11,8 @@ SELECT
 
   -- View metrics
   COUNTIF(event_name = 'project_view') AS views,
-  COUNT(DISTINCT user_pseudo_id) AS unique_viewers,
-  COUNT(DISTINCT session_id) AS unique_sessions,
+  COUNT(DISTINCT CASE WHEN event_name = 'project_view' THEN user_pseudo_id END) AS unique_viewers,
+  COUNT(DISTINCT CASE WHEN event_name = 'project_view' THEN session_id END) AS unique_sessions,
 
   -- Click metrics
   COUNTIF(event_name = 'project_click') AS clicks,
