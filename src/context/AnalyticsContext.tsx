@@ -27,6 +27,8 @@ import {
   trackSocialClick,
   trackCertificationClick,
   trackPublicationClick,
+  trackOutboundLink,
+  trackContentCopy,
   // Client work tracking
   trackClientView,
   trackClientClick,
@@ -116,8 +118,55 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       trackSessionEnd(sessionDuration, pagesViewed.current);
     };
 
+    // Track content copy events
+    const handleCopy = () => {
+      const selectedText = window.getSelection()?.toString() || '';
+      if (selectedText.length > 0) {
+        // Determine content type based on selection context
+        const activeElement = document.activeElement;
+        let contentType = 'text';
+        if (activeElement?.closest('pre, code')) {
+          contentType = 'code';
+        } else if (activeElement?.closest('a[href^="mailto:"]') || selectedText.includes('@')) {
+          contentType = 'email';
+        } else if (activeElement?.closest('.contact, #contact')) {
+          contentType = 'contact_info';
+        }
+        trackContentCopy(contentType, selectedText.substring(0, 100));
+      }
+    };
+
+    // Track outbound link clicks
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a[href]') as HTMLAnchorElement | null;
+
+      if (link) {
+        const href = link.href;
+        const isExternal = href && (
+          href.startsWith('http') &&
+          !href.includes(window.location.hostname)
+        );
+
+        if (isExternal) {
+          const linkText = link.textContent?.trim() || link.getAttribute('aria-label') || 'Unknown';
+          const context = link.closest('section')?.id ||
+                         link.closest('[data-section]')?.getAttribute('data-section') ||
+                         'unknown';
+          trackOutboundLink(href, linkText, context);
+        }
+      }
+    };
+
     window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
+    document.addEventListener('copy', handleCopy);
+    document.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      document.removeEventListener('copy', handleCopy);
+      document.removeEventListener('click', handleClick);
+    };
   }, []);
 
   // Track page views on route change
