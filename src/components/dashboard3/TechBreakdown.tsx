@@ -21,22 +21,25 @@ interface TechBreakdownProps {
 
 const browserColors: Record<string, string> = {
   'chrome': '#4285F4',
-  'safari': '#000000',
+  'safari': '#FF9500',  // Safari orange (more visible)
   'firefox': '#FF7139',
   'edge': '#0078D7',
   'opera': '#FF1B2D',
   'samsung internet': '#1428A0',
+  'samsung browser': '#1428A0',  // Alternative name
   'android webview': '#3DDC84',
   'other': '#6B7280',
 };
 
 const osColors: Record<string, string> = {
   'windows': '#00A4EF',
-  'macos': '#A3AAAE',
-  'ios': '#000000',
+  'macos': '#A855F7',      // Purple (more visible than grey)
+  'macintosh': '#A855F7',  // Alternative name for macOS
+  'ios': '#FF9500',        // iOS orange (more visible than black)
   'android': '#3DDC84',
   'linux': '#FCC624',
   'chrome os': '#4285F4',
+  'unknown': '#6B7280',    // Grey for unknown
   'other': '#6B7280',
 };
 
@@ -259,20 +262,32 @@ export function TechStackedBar({ browsers, operatingSystems }: TechBreakdownProp
         </div>
       )}
 
-      {/* Combined legend */}
-      <div className="flex flex-wrap gap-3 pt-2">
-        {browsers?.slice(0, 3).map(b => (
-          <div key={b.browser} className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getBrowserColor(b.browser) }} />
-            <span className="text-sm text-muted-foreground">{b.browser}</span>
+      {/* Separate legends for clarity */}
+      <div className="space-y-2 pt-2">
+        {/* Browser legend */}
+        {hasBrowsers && (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span className="text-xs text-muted-foreground/70 w-16">Browsers:</span>
+            {browsers?.slice(0, 5).map(b => (
+              <div key={b.browser} className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getBrowserColor(b.browser) }} />
+                <span className="text-xs text-muted-foreground">{b.browser}</span>
+              </div>
+            ))}
           </div>
-        ))}
-        {operatingSystems?.slice(0, 3).map(os => (
-          <div key={os.operating_system} className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getOSColor(os.operating_system) }} />
-            <span className="text-sm text-muted-foreground">{os.operating_system}</span>
+        )}
+        {/* OS legend */}
+        {hasOS && (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span className="text-xs text-muted-foreground/70 w-16">OS:</span>
+            {operatingSystems?.slice(0, 5).map(os => (
+              <div key={os.operating_system} className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getOSColor(os.operating_system) }} />
+                <span className="text-xs text-muted-foreground">{os.operating_system}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
