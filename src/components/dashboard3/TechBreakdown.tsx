@@ -263,29 +263,35 @@ export function TechStackedBar({ browsers, operatingSystems }: TechBreakdownProp
       )}
 
       {/* Separate legends for clarity */}
-      <div className="space-y-1.5 sm:space-y-2 pt-2">
-        {/* Browser legend */}
+      <div className="space-y-2 sm:space-y-2 pt-2">
+        {/* Browser legend - grid on mobile, flex on desktop */}
         {hasBrowsers && (
-          <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-4 gap-y-1">
-            <span className="text-[10px] sm:text-xs text-muted-foreground/70 w-14 sm:w-16">Browsers:</span>
-            {browsers?.slice(0, 5).map(b => (
-              <div key={b.browser} className="flex items-center gap-1 sm:gap-1.5">
-                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: getBrowserColor(b.browser) }} />
-                <span className="text-[10px] sm:text-xs text-muted-foreground">{b.browser}</span>
-              </div>
-            ))}
+          <div>
+            <span className="text-[10px] sm:text-xs text-muted-foreground/70 block mb-1 sm:hidden">Browsers:</span>
+            <div className="grid grid-cols-3 gap-x-2 gap-y-1 sm:flex sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-1">
+              <span className="text-xs text-muted-foreground/70 hidden sm:block sm:w-16">Browsers:</span>
+              {browsers?.slice(0, 5).map(b => (
+                <div key={b.browser} className="flex items-center gap-1 sm:gap-1.5">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: getBrowserColor(b.browser) }} />
+                  <span className="text-[9px] sm:text-xs text-muted-foreground truncate">{b.browser}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
-        {/* OS legend */}
+        {/* OS legend - grid on mobile, flex on desktop */}
         {hasOS && (
-          <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-4 gap-y-1">
-            <span className="text-[10px] sm:text-xs text-muted-foreground/70 w-14 sm:w-16">OS:</span>
-            {operatingSystems?.slice(0, 5).map(os => (
-              <div key={os.operating_system} className="flex items-center gap-1 sm:gap-1.5">
-                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: getOSColor(os.operating_system) }} />
-                <span className="text-[10px] sm:text-xs text-muted-foreground">{os.operating_system}</span>
-              </div>
-            ))}
+          <div>
+            <span className="text-[10px] sm:text-xs text-muted-foreground/70 block mb-1 sm:hidden">OS:</span>
+            <div className="grid grid-cols-3 gap-x-2 gap-y-1 sm:flex sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-1">
+              <span className="text-xs text-muted-foreground/70 hidden sm:block sm:w-16">OS:</span>
+              {operatingSystems?.slice(0, 5).map(os => (
+                <div key={os.operating_system} className="flex items-center gap-1 sm:gap-1.5">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: getOSColor(os.operating_system) }} />
+                  <span className="text-[9px] sm:text-xs text-muted-foreground truncate">{os.operating_system}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
