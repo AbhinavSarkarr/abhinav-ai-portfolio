@@ -30,6 +30,8 @@ import {
   RefreshCw,
   ChevronRight,
   Chrome,
+  Filter,
+  ArrowDown,
 } from 'lucide-react';
 import { TechStackedBar } from './TechBreakdown';
 
@@ -145,7 +147,7 @@ function getSegmentConfig(segment: string) {
   return configs[segment] || configs['casual_browser'];
 }
 
-type TabType = 'segments' | 'visitors' | 'geo' | 'domains' | 'devices' | 'tech';
+type TabType = 'segments' | 'funnel' | 'visitors' | 'geo' | 'domains' | 'devices' | 'tech';
 
 export function VisitorInsightsCard({
   segments,
@@ -160,6 +162,7 @@ export function VisitorInsightsCard({
 
   const tabs: { id: TabType; label: string; icon: typeof Users }[] = [
     { id: 'segments', label: 'Segments', icon: Users },
+    { id: 'funnel', label: 'Funnel', icon: Filter },
     { id: 'visitors', label: 'Top Visitors', icon: Star },
     { id: 'geo', label: 'Geography', icon: Globe },
     { id: 'domains', label: 'Domains', icon: TrendingUp },
@@ -200,6 +203,9 @@ export function VisitorInsightsCard({
       <div className="p-3 sm:p-4">
         {activeTab === 'segments' && (
           <SegmentsView segments={segments} />
+        )}
+        {activeTab === 'funnel' && (
+          <FunnelView segments={segments} />
         )}
         {activeTab === 'visitors' && (
           <TopVisitorsView visitors={topVisitors} />
@@ -294,6 +300,159 @@ function SegmentsView({ segments }: { segments: VisitorSegments }) {
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// Funnel View - Visitor Progression
+function FunnelView({ segments }: { segments: VisitorSegments }) {
+  const total = segments.casual_browsers + segments.returning_visitors +
+                segments.engaged_explorers + segments.high_intent + segments.converters;
+
+  if (total === 0) {
+    return (
+      <div className="text-center text-muted-foreground py-8">
+        <p className="text-sm">No visitor data available yet</p>
+      </div>
+    );
+  }
+
+  // Funnel stages from widest to narrowest
+  const funnelStages = [
+    {
+      key: 'all',
+      label: 'All Visitors',
+      value: total,
+      color: '#6B7280',
+      icon: Users,
+      description: 'Total unique visitors'
+    },
+    {
+      key: 'returning',
+      label: 'Returning',
+      value: segments.returning_visitors + segments.engaged_explorers + segments.high_intent + segments.converters,
+      color: '#00E0FF',
+      icon: RefreshCw,
+      description: 'Came back again'
+    },
+    {
+      key: 'engaged',
+      label: 'Engaged',
+      value: segments.engaged_explorers + segments.high_intent + segments.converters,
+      color: '#7B42F6',
+      icon: Compass,
+      description: 'Explored deeply'
+    },
+    {
+      key: 'high_intent',
+      label: 'High Intent',
+      value: segments.high_intent + segments.converters,
+      color: '#F59E0B',
+      icon: Target,
+      description: 'Showed interest'
+    },
+    {
+      key: 'converters',
+      label: 'Converted',
+      value: segments.converters,
+      color: '#10B981',
+      icon: UserCheck,
+      description: 'Took action'
+    },
+  ];
+
+  return (
+    <div className="space-y-1">
+      {funnelStages.map((stage, index) => {
+        const Icon = stage.icon;
+        const widthPercent = (stage.value / total) * 100;
+        const prevStage = index > 0 ? funnelStages[index - 1] : null;
+        const conversionRate = prevStage ? ((stage.value / prevStage.value) * 100).toFixed(0) : null;
+
+        return (
+          <motion.div
+            key={stage.key}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            {/* Conversion arrow between stages */}
+            {index > 0 && (
+              <div className="flex items-center justify-center py-0.5">
+                <div className="flex items-center gap-1 text-[9px] sm:text-[10px] text-muted-foreground">
+                  <ArrowDown size={10} className="text-muted-foreground/50" />
+                  <span className="font-medium" style={{ color: stage.color }}>
+                    {conversionRate}% converted
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Funnel bar */}
+            <div
+              className="relative mx-auto rounded-lg overflow-hidden transition-all duration-300"
+              style={{
+                width: `${Math.max(widthPercent, 30)}%`,
+                minWidth: '120px'
+              }}
+            >
+              <div
+                className="flex items-center justify-between p-2 sm:p-2.5"
+                style={{ backgroundColor: `${stage.color}20` }}
+              >
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${stage.color}30` }}
+                  >
+                    <Icon size={10} className="sm:hidden" style={{ color: stage.color }} />
+                    <Icon size={12} className="hidden sm:block" style={{ color: stage.color }} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] sm:text-xs font-semibold text-foreground truncate">
+                      {stage.label}
+                    </div>
+                    <div className="text-[8px] sm:text-[9px] text-muted-foreground truncate">
+                      {stage.description}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0 ml-2">
+                  <div className="text-xs sm:text-sm font-bold" style={{ color: stage.color }}>
+                    {stage.value}
+                  </div>
+                  <div className="text-[8px] sm:text-[9px] text-muted-foreground">
+                    {((stage.value / total) * 100).toFixed(0)}%
+                  </div>
+                </div>
+              </div>
+              {/* Bottom border accent */}
+              <div
+                className="h-0.5 w-full"
+                style={{ backgroundColor: stage.color }}
+              />
+            </div>
+          </motion.div>
+        );
+      })}
+
+      {/* Summary insight */}
+      <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <div className="flex items-start gap-2">
+          <UserCheck size={14} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <div className="text-[10px] sm:text-xs font-semibold text-emerald-400">
+              Overall Conversion Rate
+            </div>
+            <div className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5">
+              <span className="font-bold text-emerald-400">
+                {((segments.converters / total) * 100).toFixed(1)}%
+              </span>
+              {' '}of visitors took action (form submission or resume download)
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

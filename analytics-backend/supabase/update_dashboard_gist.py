@@ -74,15 +74,20 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
     """, (start_date, end_date))
     daily_metrics = [dict(row) for row in cursor.fetchall()]
 
-    # Traffic sources
+    # Traffic sources (with conversion data)
     cursor.execute("""
-        SELECT traffic_source, traffic_medium, COUNT(*) as sessions,
-               COUNT(DISTINCT user_pseudo_id) as unique_visitors,
-               ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
-               ROUND(COUNT(*) FILTER (WHERE is_bounce)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as bounce_rate,
-               ROUND(AVG(session_duration_seconds)::numeric, 0) as avg_duration
-        FROM sessions WHERE session_date BETWEEN %s AND %s
-        GROUP BY traffic_source, traffic_medium ORDER BY sessions DESC LIMIT 10
+        SELECT s.traffic_source, s.traffic_medium,
+               COUNT(DISTINCT s.session_id) as sessions,
+               COUNT(DISTINCT s.user_pseudo_id) as unique_visitors,
+               ROUND(COUNT(DISTINCT CASE WHEN s.is_engaged THEN s.session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0), 2) as engagement_rate,
+               ROUND(COUNT(DISTINCT CASE WHEN s.is_bounce THEN s.session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0), 2) as bounce_rate,
+               ROUND(AVG(s.session_duration_seconds)::numeric, 0) as avg_duration,
+               COUNT(DISTINCT CASE WHEN vi.form_submissions > 0 THEN s.user_pseudo_id END) as conversions,
+               COUNT(DISTINCT CASE WHEN vi.resume_downloads > 0 THEN s.user_pseudo_id END) as resume_downloads
+        FROM sessions s
+        LEFT JOIN visitor_insights vi ON s.user_pseudo_id = vi.user_pseudo_id
+        WHERE s.session_date BETWEEN %s AND %s
+        GROUP BY s.traffic_source, s.traffic_medium ORDER BY sessions DESC LIMIT 10
     """, (start_date, end_date))
     traffic_sources = [dict(row) for row in cursor.fetchall()]
 
@@ -245,36 +250,37 @@ def fetch_dashboard_data(cursor, start_date: date, end_date: date) -> dict:
             "avg_engagement_rate": float(seg["avg_engagement_rate"] or 0)
         }
 
-    # Top visitors (date-filtered from sessions)
+    # Top visitors (date-filtered from sessions, with conversion details from visitor_insights)
     cursor.execute("""
         WITH visitor_stats AS (
             SELECT
-                user_pseudo_id,
-                COUNT(DISTINCT session_id) as total_sessions,
-                MIN(session_date) as first_visit,
-                MAX(session_date) as last_visit,
-                (MAX(session_date) - MIN(session_date)) as visitor_tenure_days,
-                SUM(page_views) as total_page_views,
-                ROUND(AVG(session_duration_seconds)::numeric, 0) as avg_session_duration_sec,
-                ROUND(COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as engagement_rate,
-                MODE() WITHIN GROUP (ORDER BY device_category) as primary_device,
-                MODE() WITHIN GROUP (ORDER BY country) as primary_country,
-                MODE() WITHIN GROUP (ORDER BY traffic_source) as primary_traffic_source,
-                SUM(projects_clicked_count) as projects_viewed,
-                SUM(conversions_count) as cta_clicks,
-                0 as form_submissions,
-                0 as social_clicks,
-                0 as resume_downloads,
-                (COUNT(DISTINCT session_id) * 10 + SUM(page_views) * 2 + SUM(conversions_count) * 20 +
-                 ROUND(AVG(engagement_score)::numeric, 0)) as visitor_value_score
-            FROM sessions
-            WHERE session_date BETWEEN %s AND %s
-            GROUP BY user_pseudo_id
+                s.user_pseudo_id,
+                COUNT(DISTINCT s.session_id) as total_sessions,
+                MIN(s.session_date) as first_visit,
+                MAX(s.session_date) as last_visit,
+                (MAX(s.session_date) - MIN(s.session_date)) as visitor_tenure_days,
+                SUM(s.page_views) as total_page_views,
+                ROUND(AVG(s.session_duration_seconds)::numeric, 0) as avg_session_duration_sec,
+                ROUND(COUNT(DISTINCT CASE WHEN s.is_engaged THEN s.session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0), 2) as engagement_rate,
+                MODE() WITHIN GROUP (ORDER BY s.device_category) as primary_device,
+                MODE() WITHIN GROUP (ORDER BY s.country) as primary_country,
+                MODE() WITHIN GROUP (ORDER BY s.traffic_source) as primary_traffic_source,
+                SUM(s.projects_clicked_count) as projects_viewed,
+                SUM(s.conversions_count) as cta_clicks,
+                COALESCE(MAX(vi.form_submissions), 0) as form_submissions,
+                COALESCE(MAX(vi.social_clicks), 0) as social_clicks,
+                COALESCE(MAX(vi.resume_downloads), 0) as resume_downloads,
+                (COUNT(DISTINCT s.session_id) * 10 + SUM(s.page_views) * 2 + SUM(s.conversions_count) * 20 +
+                 ROUND(AVG(s.engagement_score)::numeric, 0)) as visitor_value_score
+            FROM sessions s
+            LEFT JOIN visitor_insights vi ON s.user_pseudo_id = vi.user_pseudo_id
+            WHERE s.session_date BETWEEN %s AND %s
+            GROUP BY s.user_pseudo_id
         ),
         segmented AS (
             SELECT *,
                 CASE
-                    WHEN cta_clicks > 0 THEN 'converter'
+                    WHEN form_submissions > 0 OR resume_downloads > 0 THEN 'converter'
                     WHEN total_sessions >= 3 THEN 'power_user'
                     WHEN total_sessions >= 2 THEN 'returning'
                     ELSE 'new'

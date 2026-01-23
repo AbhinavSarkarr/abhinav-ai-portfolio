@@ -24,6 +24,8 @@ export type TrafficSource = {
   engagement_rate: number;
   bounce_rate: number;
   avg_duration: number;
+  conversions: number;
+  resume_downloads: number;
 };
 
 export type GeographicData = {
@@ -300,6 +302,8 @@ function normalizeDashboardData(raw: Record<string, unknown>): DashboardData {
     engagement_rate: toNumber(d.engagement_rate),
     bounce_rate: toNumber(d.bounce_rate),
     avg_duration: toNumber(d.avg_duration),
+    conversions: toNumber(d.conversions),
+    resume_downloads: toNumber(d.resume_downloads),
   }));
 
   // Normalize conversionSummary

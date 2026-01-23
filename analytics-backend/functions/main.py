@@ -273,33 +273,34 @@ async def get_dashboard3_data(
         "top_visitors": ("""
             WITH visitor_stats AS (
                 SELECT
-                    user_pseudo_id,
-                    COUNT(DISTINCT session_id) as total_sessions,
-                    MAX(session_date) - MIN(session_date) as visitor_tenure_days,
-                    SUM(page_views) as total_page_views,
-                    ROUND(AVG(session_duration_seconds)::numeric, 2) as avg_session_duration_sec,
-                    ROUND(COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0), 2) as engagement_rate,
-                    MODE() WITHIN GROUP (ORDER BY device_category) as primary_device,
-                    MODE() WITHIN GROUP (ORDER BY country) as primary_country,
-                    MODE() WITHIN GROUP (ORDER BY traffic_source) as primary_traffic_source,
-                    SUM(projects_clicked_count) as projects_viewed,
-                    0 as cta_clicks,
-                    SUM(CASE WHEN has_conversion THEN 1 ELSE 0 END) as form_submissions,
-                    0 as social_clicks,
-                    0 as resume_downloads,
+                    s.user_pseudo_id,
+                    COUNT(DISTINCT s.session_id) as total_sessions,
+                    MAX(s.session_date) - MIN(s.session_date) as visitor_tenure_days,
+                    SUM(s.page_views) as total_page_views,
+                    ROUND(AVG(s.session_duration_seconds)::numeric, 2) as avg_session_duration_sec,
+                    ROUND(COUNT(DISTINCT CASE WHEN s.is_engaged THEN s.session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0), 2) as engagement_rate,
+                    MODE() WITHIN GROUP (ORDER BY s.device_category) as primary_device,
+                    MODE() WITHIN GROUP (ORDER BY s.country) as primary_country,
+                    MODE() WITHIN GROUP (ORDER BY s.traffic_source) as primary_traffic_source,
+                    SUM(s.projects_clicked_count) as projects_viewed,
+                    COALESCE(MAX(vi.cta_clicks), 0) as cta_clicks,
+                    COALESCE(MAX(vi.form_submissions), 0) as form_submissions,
+                    COALESCE(MAX(vi.social_clicks), 0) as social_clicks,
+                    COALESCE(MAX(vi.resume_downloads), 0) as resume_downloads,
                     -- Value score
-                    (COUNT(DISTINCT session_id) * 2 + SUM(page_views) + SUM(conversions_count) * 20) as visitor_value_score,
+                    (COUNT(DISTINCT s.session_id) * 2 + SUM(s.page_views) + SUM(s.conversions_count) * 20) as visitor_value_score,
                     CASE
-                        WHEN SUM(conversions_count) > 0 THEN 'converter'
-                        WHEN COUNT(DISTINCT session_id) >= 3 AND COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END) * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0) >= 80 THEN 'engaged_explorer'
-                        WHEN COUNT(DISTINCT session_id) >= 2 THEN 'returning_visitor'
-                        WHEN COUNT(DISTINCT CASE WHEN is_engaged THEN session_id END) * 100.0 / NULLIF(COUNT(DISTINCT session_id), 0) >= 50 THEN 'engaged_new'
+                        WHEN COALESCE(MAX(vi.form_submissions), 0) > 0 OR COALESCE(MAX(vi.resume_downloads), 0) > 0 THEN 'converter'
+                        WHEN COUNT(DISTINCT s.session_id) >= 3 AND COUNT(DISTINCT CASE WHEN s.is_engaged THEN s.session_id END) * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0) >= 80 THEN 'engaged_explorer'
+                        WHEN COUNT(DISTINCT s.session_id) >= 2 THEN 'returning_visitor'
+                        WHEN COUNT(DISTINCT CASE WHEN s.is_engaged THEN s.session_id END) * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0) >= 50 THEN 'engaged_new'
                         ELSE 'casual_browser'
                     END as visitor_segment,
                     'general_visitor' as interest_profile
-                FROM sessions
-                WHERE session_date BETWEEN %s AND %s
-                GROUP BY user_pseudo_id
+                FROM sessions s
+                LEFT JOIN visitor_insights vi ON s.user_pseudo_id = vi.user_pseudo_id
+                WHERE s.session_date BETWEEN %s AND %s
+                GROUP BY s.user_pseudo_id
             )
             SELECT user_pseudo_id, total_sessions, visitor_tenure_days, total_page_views,
                    avg_session_duration_sec, engagement_rate, primary_device, primary_country,
@@ -459,13 +460,18 @@ async def get_dashboard3_data(
             FROM sessions WHERE session_date BETWEEN %s AND %s GROUP BY country, city ORDER BY sessions DESC LIMIT 20
         """, (start, end)),
         "traffic_sources_summary": ("""
-            SELECT traffic_source, traffic_medium, COUNT(*) as sessions,
-                   COUNT(DISTINCT user_pseudo_id) as unique_visitors,
-                   ROUND(COUNT(*) FILTER (WHERE is_engaged)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as engagement_rate,
-                   ROUND(COUNT(*) FILTER (WHERE is_bounce)::numeric * 100.0 / NULLIF(COUNT(*), 0), 2) as bounce_rate,
-                   ROUND(AVG(session_duration_seconds)::numeric, 0) as avg_duration
-            FROM sessions WHERE session_date BETWEEN %s AND %s
-            GROUP BY traffic_source, traffic_medium ORDER BY sessions DESC LIMIT 10
+            SELECT s.traffic_source, s.traffic_medium,
+                   COUNT(DISTINCT s.session_id) as sessions,
+                   COUNT(DISTINCT s.user_pseudo_id) as unique_visitors,
+                   ROUND(COUNT(DISTINCT CASE WHEN s.is_engaged THEN s.session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0), 2) as engagement_rate,
+                   ROUND(COUNT(DISTINCT CASE WHEN s.is_bounce THEN s.session_id END)::numeric * 100.0 / NULLIF(COUNT(DISTINCT s.session_id), 0), 2) as bounce_rate,
+                   ROUND(AVG(s.session_duration_seconds)::numeric, 0) as avg_duration,
+                   COUNT(DISTINCT CASE WHEN vi.form_submissions > 0 THEN s.user_pseudo_id END) as conversions,
+                   COUNT(DISTINCT CASE WHEN vi.resume_downloads > 0 THEN s.user_pseudo_id END) as resume_downloads
+            FROM sessions s
+            LEFT JOIN visitor_insights vi ON s.user_pseudo_id = vi.user_pseudo_id
+            WHERE s.session_date BETWEEN %s AND %s
+            GROUP BY s.traffic_source, s.traffic_medium ORDER BY sessions DESC LIMIT 10
         """, (start, end)),
     }
 

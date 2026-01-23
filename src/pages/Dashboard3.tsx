@@ -657,11 +657,15 @@ export default function Dashboard3() {
             </GlassCard>
 
             {/* Source Quality Comparison */}
-            <GlassCard title="Source Quality" subtitle="Engagement by source">
+            <GlassCard title="Source Quality" subtitle="Engagement & conversions by source">
               <div className="mt-3 space-y-3">
                 {data.trafficSources.slice(0, 5).map((source, index) => {
                   const maxSessions = data.trafficSources[0]?.sessions || 1;
                   const width = (source.sessions / maxSessions) * 100;
+                  const totalConversions = (source.conversions || 0) + (source.resume_downloads || 0);
+                  const conversionRate = source.unique_visitors > 0
+                    ? ((totalConversions / source.unique_visitors) * 100).toFixed(1)
+                    : '0';
                   return (
                     <motion.div
                       key={source.traffic_source}
@@ -674,10 +678,16 @@ export default function Dashboard3() {
                         <span className="text-xs font-medium text-foreground">
                           {formatTrafficSource(source.traffic_source)}
                         </span>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <span className="text-[10px] text-muted-foreground">
                             {source.engagement_rate?.toFixed(0) || 0}% engaged
                           </span>
+                          {totalConversions > 0 && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-emerald-400">
+                              <Target size={10} />
+                              {totalConversions}
+                            </span>
+                          )}
                           <span className="text-xs font-bold text-tech-accent">{source.sessions}</span>
                         </div>
                       </div>
@@ -689,6 +699,26 @@ export default function Dashboard3() {
                           transition={{ duration: 0.5, delay: index * 0.1 }}
                         />
                       </div>
+                      {/* Show conversion breakdown if any conversions */}
+                      {totalConversions > 0 && (
+                        <div className="flex items-center gap-3 text-[9px] text-muted-foreground pl-1">
+                          {source.conversions > 0 && (
+                            <span className="flex items-center gap-0.5">
+                              <MessageSquare size={8} className="text-blue-400" />
+                              {source.conversions} form{source.conversions !== 1 ? 's' : ''}
+                            </span>
+                          )}
+                          {source.resume_downloads > 0 && (
+                            <span className="flex items-center gap-0.5">
+                              <Download size={8} className="text-emerald-400" />
+                              {source.resume_downloads} resume{source.resume_downloads !== 1 ? 's' : ''}
+                            </span>
+                          )}
+                          <span className="text-emerald-400/70">
+                            ({conversionRate}% CVR)
+                          </span>
+                        </div>
+                      )}
                     </motion.div>
                   );
                 })}
