@@ -25,6 +25,7 @@ import { SectionFunnel, SectionStickinessSummary } from './SectionFunnel';
 interface ProjectRanking {
   project_id: string;
   project_title: string;
+  total_views: number;
   total_unique_viewers: number;
   total_clicks: number;
   total_github_clicks: number;
@@ -191,7 +192,7 @@ function ProjectsView({ projects }: { projects: ProjectRanking[] }) {
   const ctrData = projects
     .map(p => ({
       ...p,
-      ctr: p.total_unique_viewers > 0 ? (p.total_clicks / p.total_unique_viewers) * 100 : 0,
+      ctr: p.total_views > 0 ? (p.total_clicks / p.total_views) * 100 : 0,
     }))
     .sort((a, b) => b.ctr - a.ctr);
 
@@ -314,7 +315,7 @@ function ProjectsView({ projects }: { projects: ProjectRanking[] }) {
                 </div>
                 <div className="flex justify-between mt-0.5 sm:mt-1">
                   <span className="text-[9px] sm:text-[10px] text-muted-foreground">
-                    {project.total_clicks} clicks / {project.total_unique_viewers} views
+                    {project.total_clicks} clicks / {project.total_views} views
                   </span>
                 </div>
               </motion.div>
