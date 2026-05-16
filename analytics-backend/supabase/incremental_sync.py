@@ -18,6 +18,7 @@ from pathlib import Path
 import psycopg2
 from psycopg2.extras import RealDictCursor, execute_values
 from google.cloud import bigquery
+from google.api_core.exceptions import NotFound
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -190,6 +191,10 @@ def sync_sessions_incremental(bq_client, pg_conn, start_date: date) -> dict:
 
         return {"table": table_name, "rows": len(data), "duration": duration, "status": "success"}
 
+    except NotFound as e:
+        print(f"    Skipped: BigQuery source missing ({e.message if hasattr(e, 'message') else e})")
+        pg_conn.rollback()
+        return {"table": table_name, "rows": 0, "status": "skipped", "error": str(e)}
     except Exception as e:
         print(f"    Error: {e}")
         pg_conn.rollback()
@@ -254,6 +259,10 @@ def sync_daily_metrics_incremental(bq_client, pg_conn, start_date: date) -> dict
 
         return {"table": table_name, "rows": len(data), "duration": duration, "status": "success"}
 
+    except NotFound as e:
+        print(f"    Skipped: BigQuery source missing ({e.message if hasattr(e, 'message') else e})")
+        pg_conn.rollback()
+        return {"table": table_name, "rows": 0, "status": "skipped", "error": str(e)}
     except Exception as e:
         print(f"    Error: {e}")
         pg_conn.rollback()
@@ -288,6 +297,10 @@ def sync_rankings_full_refresh(bq_client, pg_conn, table_name: str, query: str, 
 
         return {"table": table_name, "rows": len(data), "duration": duration, "status": "success"}
 
+    except NotFound as e:
+        print(f"    Skipped: BigQuery source missing ({e.message if hasattr(e, 'message') else e})")
+        pg_conn.rollback()
+        return {"table": table_name, "rows": 0, "status": "skipped", "error": str(e)}
     except Exception as e:
         print(f"    Error: {e}")
         pg_conn.rollback()
@@ -466,11 +479,17 @@ def main():
     print("=" * 60)
 
     total_rows = sum(r.get("rows", 0) for r in results)
-    successful = sum(1 for r in results if r["status"] in ["success", "no_new_data"])
+    successful = sum(1 for r in results if r["status"] in ["success", "no_new_data", "empty"])
+    skipped = sum(1 for r in results if r["status"] == "skipped")
     failed = sum(1 for r in results if r["status"] == "error")
 
     print(f"  Tables synced: {successful}/{len(results)}")
     print(f"  Total rows: {total_rows}")
+    if skipped > 0:
+        print(f"  Skipped (BigQuery source missing): {skipped}")
+        for r in results:
+            if r["status"] == "skipped":
+                print(f"    - {r['table']}")
     if failed > 0:
         print(f"  Failed: {failed}")
         for r in results:
@@ -482,7 +501,8 @@ def main():
     # Close connection
     pg_conn.close()
 
-    # Exit with error if any failures
+    # Exit non-zero ONLY on real errors. A missing BigQuery source table is
+    # treated as a soft skip so the downstream Gist update step still runs.
     if failed > 0:
         sys.exit(1)
 
