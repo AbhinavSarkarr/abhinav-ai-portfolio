@@ -1,11 +1,11 @@
 resources:
   jobs:
     bronze_ga4_daily_sync:
-      name: "[${bundle.target}] bronze · ga4 daily sync"
-      description: "Mirrors yesterday's GA4 events_* table from BigQuery into Bronze Delta."
+      name: "[${bundle.target}] daily · bronze → silver"
+      description: "Mirrors yesterday's GA4 events_* table into Bronze Delta, then refreshes the Silver pipeline."
       tags:
         project: portfolio
-        layer: bronze
+        layer: bronze_silver
         owner: abhinav
       schedule:
         # 02:00 UTC daily — GA4 free-tier export usually finishes within ~12h of midnight UTC.
@@ -30,6 +30,15 @@ resources:
               # Empty = "yesterday in UTC"; override via run-now for ad-hoc dates.
               event_date: ""
           # Serverless compute (Free Edition compatible).
+
+        # Silver runs as soon as Bronze finishes (on-success).
+        # `depends_on` makes it skip if Bronze failed/skipped.
+        - task_key: refresh_silver
+          depends_on:
+            - task_key: sync_ga4_to_bronze
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.silver_pipeline.id}
+            full_refresh: false
 
     bronze_ga4_backfill:
       name: "[${bundle.target}] bronze · ga4 backfill (manual)"
@@ -61,3 +70,11 @@ resources:
               gcp_secret_key: ${var.gcp_secret_key}
               start_date: "{{job.parameters.start_date}}"
               end_date: "{{job.parameters.end_date}}"
+
+        # Refresh Silver against the freshly backfilled Bronze.
+        - task_key: refresh_silver
+          depends_on:
+            - task_key: backfill_ga4_to_bronze
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.silver_pipeline.id}
+            full_refresh: false

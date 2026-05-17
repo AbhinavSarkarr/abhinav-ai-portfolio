@@ -1,0 +1,21 @@
+resources:
+  pipelines:
+    silver_pipeline:
+      name: "[${bundle.target}] silver pipeline"
+      catalog: ${var.catalog_name}
+      target: ${var.silver_schema}
+      serverless: true
+      photon: true
+      development: false   # production semantics: full refresh per run, retries, etc.
+      channel: CURRENT
+      edition: ADVANCED    # required for expectations
+      libraries:
+        - notebook:
+            path: ../src/silver/silver_pipeline.py
+      configuration:
+        bronze_table_fqn: ${var.catalog_name}.${var.bronze_schema}.ga4_events_raw
+      # Cost tagging (one of our KEEP items)
+      tags:
+        project: portfolio
+        layer: silver
+        owner: abhinav
