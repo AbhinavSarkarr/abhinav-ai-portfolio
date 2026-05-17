@@ -11,6 +11,9 @@ variables:
   silver_schema:
     description: Schema name for the Silver layer (typed event tables).
     default: silver
+  gold_schema:
+    description: Schema name for the Gold layer (daily aggregates + rankings/insights).
+    default: gold
   ga4_bq_project:
     description: GCP project hosting the GA4 export.
     default: portfolio-483605

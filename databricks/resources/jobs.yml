@@ -1,11 +1,11 @@
 resources:
   jobs:
     bronze_ga4_daily_sync:
-      name: "[${bundle.target}] daily · bronze → silver"
-      description: "Mirrors yesterday's GA4 events_* table into Bronze Delta, then refreshes the Silver pipeline."
+      name: "[${bundle.target}] daily · bronze → silver → gold"
+      description: "Mirrors yesterday's GA4 events_* into Bronze Delta, refreshes Silver, then refreshes Gold."
       tags:
         project: portfolio
-        layer: bronze_silver
+        layer: bronze_silver_gold
         owner: abhinav
       schedule:
         # 02:00 UTC daily — GA4 free-tier export usually finishes within ~12h of midnight UTC.
@@ -38,6 +38,14 @@ resources:
             - task_key: sync_ga4_to_bronze
           pipeline_task:
             pipeline_id: ${resources.pipelines.silver_pipeline.id}
+            full_refresh: false
+
+        # Gold runs after Silver succeeds — produces dashboard-ready aggregates + rankings.
+        - task_key: refresh_gold
+          depends_on:
+            - task_key: refresh_silver
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.gold_pipeline.id}
             full_refresh: false
 
     bronze_ga4_backfill:
@@ -77,4 +85,12 @@ resources:
             - task_key: backfill_ga4_to_bronze
           pipeline_task:
             pipeline_id: ${resources.pipelines.silver_pipeline.id}
+            full_refresh: false
+
+        # Refresh Gold after Silver completes.
+        - task_key: refresh_gold
+          depends_on:
+            - task_key: refresh_silver
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.gold_pipeline.id}
             full_refresh: false

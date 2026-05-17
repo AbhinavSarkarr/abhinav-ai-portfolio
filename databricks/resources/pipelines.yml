@@ -14,8 +14,29 @@ resources:
             path: ../src/silver/silver_pipeline.py
       configuration:
         bronze_table_fqn: ${var.catalog_name}.${var.bronze_schema}.ga4_events_raw
-      # Cost tagging (one of our KEEP items)
       tags:
         project: portfolio
         layer: silver
+        owner: abhinav
+
+    gold_pipeline:
+      name: "[${bundle.target}] gold pipeline"
+      catalog: ${var.catalog_name}
+      target: ${var.gold_schema}
+      serverless: true
+      photon: true
+      development: false
+      channel: CURRENT
+      edition: ADVANCED
+      libraries:
+        - notebook:
+            path: ../src/gold/layer2_aggregates.py
+        - notebook:
+            path: ../src/gold/layer3_rankings.py
+      configuration:
+        silver_catalog: ${var.catalog_name}
+        silver_schema: ${var.silver_schema}
+      tags:
+        project: portfolio
+        layer: gold
         owner: abhinav
