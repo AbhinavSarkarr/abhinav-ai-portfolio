@@ -1,0 +1,15 @@
+# Unity Catalog objects.
+#
+# Catalogs themselves are NOT defined here because:
+#   - On Free Edition they often need to be created via the UI / SQL once.
+#   - The deploy.sh script handles `CREATE CATALOG IF NOT EXISTS` before
+#     `databricks bundle deploy`.
+#
+# Schemas are bundle-managed so they are reproducible across workspaces.
+
+resources:
+  schemas:
+    bronze:
+      name: ${var.bronze_schema}
+      catalog_name: ${var.catalog_name}
+      comment: "Raw, append-only mirror of source systems (GA4, voice agent, contact form)."

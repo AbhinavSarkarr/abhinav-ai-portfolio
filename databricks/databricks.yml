@@ -1,0 +1,55 @@
+bundle:
+  name: portfolio_analytics
+
+variables:
+  catalog_name:
+    description: Unity Catalog catalog for this environment.
+    default: portfolio_dev
+  bronze_schema:
+    description: Schema name for the Bronze layer.
+    default: bronze
+  ga4_bq_project:
+    description: GCP project hosting the GA4 export.
+    default: portfolio-483605
+  ga4_bq_dataset:
+    description: BigQuery dataset that GA4 exports into.
+    default: analytics_518701756
+  gcp_secret_scope:
+    description: Databricks secret scope holding the GCP service account JSON.
+    default: portfolio
+  gcp_secret_key:
+    description: Secret key inside the scope that stores the GCP SA JSON.
+    default: gcp_sa_json
+  notifications_email:
+    description: Email for job failure alerts.
+    default: abhinavsarkar53@gmail.com
+  sql_warehouse_id:
+    description: ID of an existing SQL warehouse to reuse (Free Edition can't delete the starter one).
+    default: ""
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    # No `mode: development` on purpose. That mode force-prepends
+    # "dev_<user>_" / "[dev <user>] " to every resource name and re-applies
+    # those presets *after* any override, which we don't want for a solo
+    # project. We set the few useful dev-mode behaviors (paused schedules,
+    # tags) explicitly in the resource files instead.
+    default: true
+    workspace:
+      host: https://dbc-7de4dd77-18aa.cloud.databricks.com
+    variables:
+      catalog_name: portfolio_dev
+      sql_warehouse_id: 13c9f508d69108bf  # Serverless Starter Warehouse on this workspace
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-7de4dd77-18aa.cloud.databricks.com
+    variables:
+      catalog_name: portfolio_prod
+      sql_warehouse_id: 13c9f508d69108bf
+    run_as:
+      user_name: abhinavsarkar53@gmail.com

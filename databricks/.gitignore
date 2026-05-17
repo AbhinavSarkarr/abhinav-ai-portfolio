@@ -1,0 +1,21 @@
+# Databricks Asset Bundles build artifacts.
+.databricks/
+*.tfstate
+*.tfstate.backup
+
+# Local environment overrides.
+.env
+.env.local
+*.local.yml
+
+# Secrets — credentials must NEVER be committed.
+# Real keys live in Databricks Secret Scopes (encrypted) or on your local
+# filesystem; the bundle only references them by name.
+credentials/
+secrets/
+*-credentials.json
+*-service-account.json
+gcp-sa*.json
+sa-key*.json
+*.pem
+*.p12

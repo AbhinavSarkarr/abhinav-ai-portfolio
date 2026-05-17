@@ -1,0 +1,63 @@
+resources:
+  jobs:
+    bronze_ga4_daily_sync:
+      name: "[${bundle.target}] bronze · ga4 daily sync"
+      description: "Mirrors yesterday's GA4 events_* table from BigQuery into Bronze Delta."
+      tags:
+        project: portfolio
+        layer: bronze
+        owner: abhinav
+      schedule:
+        # 02:00 UTC daily — GA4 free-tier export usually finishes within ~12h of midnight UTC.
+        quartz_cron_expression: "0 0 2 * * ?"
+        timezone_id: UTC
+        pause_status: PAUSED  # unpause manually after the first successful manual run
+      email_notifications:
+        on_failure:
+          - ${var.notifications_email}
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: sync_ga4_to_bronze
+          notebook_task:
+            notebook_path: ../src/bronze/sync_ga4_events.py
+            base_parameters:
+              catalog: ${var.catalog_name}
+              schema: ${var.bronze_schema}
+              gcp_project: ${var.ga4_bq_project}
+              gcp_dataset: ${var.ga4_bq_dataset}
+              gcp_secret_scope: ${var.gcp_secret_scope}
+              gcp_secret_key: ${var.gcp_secret_key}
+              # Empty = "yesterday in UTC"; override via run-now for ad-hoc dates.
+              event_date: ""
+          # Serverless compute (Free Edition compatible).
+
+    bronze_ga4_backfill:
+      name: "[${bundle.target}] bronze · ga4 backfill (manual)"
+      description: "One-shot: pulls every still-alive events_* table from BigQuery into Bronze."
+      tags:
+        project: portfolio
+        layer: bronze
+        owner: abhinav
+      # No schedule — manual trigger only.
+      email_notifications:
+        on_failure:
+          - ${var.notifications_email}
+      max_concurrent_runs: 1
+      parameters:
+        - name: start_date
+          default: ""  # empty = scan everything in the dataset
+        - name: end_date
+          default: ""  # empty = today (UTC)
+      tasks:
+        - task_key: backfill_ga4_to_bronze
+          notebook_task:
+            notebook_path: ../src/bronze/backfill_ga4_events.py
+            base_parameters:
+              catalog: ${var.catalog_name}
+              schema: ${var.bronze_schema}
+              gcp_project: ${var.ga4_bq_project}
+              gcp_dataset: ${var.ga4_bq_dataset}
+              gcp_secret_scope: ${var.gcp_secret_scope}
+              gcp_secret_key: ${var.gcp_secret_key}
+              start_date: "{{job.parameters.start_date}}"
+              end_date: "{{job.parameters.end_date}}"
