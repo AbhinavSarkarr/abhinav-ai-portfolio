@@ -21,11 +21,17 @@ variables:
     description: BigQuery dataset that GA4 exports into.
     default: analytics_518701756
   gcp_secret_scope:
-    description: Databricks secret scope holding the GCP service account JSON.
+    description: Databricks secret scope holding the GCP service account JSON and GitHub Gist token.
     default: portfolio
   gcp_secret_key:
     description: Secret key inside the scope that stores the GCP SA JSON.
     default: gcp_sa_json
+  gist_token_key:
+    description: Secret key inside the scope that stores the GitHub PAT used to PATCH the dashboard Gist.
+    default: github_gist_token
+  dashboard_gist_id:
+    description: GitHub Gist ID hosting the dashboard JSON snapshot (read by useDashboardData.ts).
+    default: dedbbf6ebcb32542e7b724b86f2b214f
   notifications_email:
     description: Email for job failure alerts.
     default: abhinavsarkar53@gmail.com

@@ -1,11 +1,11 @@
 resources:
   jobs:
     bronze_ga4_daily_sync:
-      name: "[${bundle.target}] daily · bronze → silver → gold"
-      description: "Mirrors yesterday's GA4 events_* into Bronze Delta, refreshes Silver, then refreshes Gold."
+      name: "[${bundle.target}] daily · bronze → silver → gold → snapshot"
+      description: "Mirrors yesterday's GA4 events_* into Bronze, refreshes Silver, refreshes Gold, then publishes the dashboard snapshot to GitHub Gist."
       tags:
         project: portfolio
-        layer: bronze_silver_gold
+        layer: full_pipeline
         owner: abhinav
       schedule:
         # 02:00 UTC daily — GA4 free-tier export usually finishes within ~12h of midnight UTC.
@@ -47,6 +47,22 @@ resources:
           pipeline_task:
             pipeline_id: ${resources.pipelines.gold_pipeline.id}
             full_refresh: false
+
+        # Publish the dashboard JSON snapshot to GitHub Gist (the URL the
+        # React frontend already reads from). Replaces the old GitHub
+        # Action that ran update_dashboard_gist.py against Supabase.
+        - task_key: publish_snapshot
+          depends_on:
+            - task_key: refresh_gold
+          notebook_task:
+            notebook_path: ../src/serving/publish_snapshot.py
+            base_parameters:
+              catalog:        ${var.catalog_name}
+              silver_schema:  ${var.silver_schema}
+              gold_schema:    ${var.gold_schema}
+              gist_id:        ${var.dashboard_gist_id}
+              secret_scope:   ${var.gcp_secret_scope}
+              gist_token_key: ${var.gist_token_key}
 
     bronze_ga4_backfill:
       name: "[${bundle.target}] bronze · ga4 backfill (manual)"
@@ -94,3 +110,17 @@ resources:
           pipeline_task:
             pipeline_id: ${resources.pipelines.gold_pipeline.id}
             full_refresh: false
+
+        # Publish the dashboard JSON snapshot after a full backfill.
+        - task_key: publish_snapshot
+          depends_on:
+            - task_key: refresh_gold
+          notebook_task:
+            notebook_path: ../src/serving/publish_snapshot.py
+            base_parameters:
+              catalog:        ${var.catalog_name}
+              silver_schema:  ${var.silver_schema}
+              gold_schema:    ${var.gold_schema}
+              gist_id:        ${var.dashboard_gist_id}
+              secret_scope:   ${var.gcp_secret_scope}
+              gist_token_key: ${var.gist_token_key}
