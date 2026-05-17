@@ -1,0 +1,33 @@
+name: Keep Render Warm
+
+# Render free-tier services spin down after ~15 minutes of inactivity.
+# This workflow pings the /health endpoint every 14 minutes so the
+# FastAPI dashboard backend stays warm.
+#
+# Render's free tier allows 750 service-hours/month. 24/7 = ~720h,
+# so this fits with ~30h of margin. If you add a second Render service
+# this assumption changes.
+#
+# Note: This only keeps RENDER warm. The Databricks SQL Warehouse the
+# FastAPI queries has its own auto-stop and is intentionally NOT pinged
+# (would burn Free Edition credits). Custom-range queries may still hit
+# a 5-15s warehouse cold-start; that's an accepted trade-off documented
+# in databricks/docs/04-phase4b-fastapi-rewire.md.
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'   # every 14 minutes
+  workflow_dispatch: {}        # also allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping /health
+        run: |
+          # -f: fail on HTTP >= 400
+          # -s: silent
+          # --max-time 60: allow up to 60s for cold-starts (Render free
+          #   tier sometimes takes ~30-50s if it just spun down)
+          curl -fsS --max-time 60 https://portfolio-analytics-api.onrender.com/health
