@@ -39,6 +39,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv(Path(__file__).parent / ".env")
 
+# Voice agent (Aria) — Deepgram-backed WebSocket. Registered onto `app`
+# below so the same Render service hosts both analytics endpoints and
+# the voice agent.
+from voice_agent import register as register_voice_agent  # noqa: E402
+
 # ---------------------------------------------------------------------------
 # Databricks SQL Warehouse connection config
 # ---------------------------------------------------------------------------
@@ -126,6 +131,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount the /agent WebSocket (Deepgram voice agent — Aria).
+# Defined in voice_agent.py; reads DEEPGRAM_API_KEY from env at use-time.
+register_voice_agent(app)
 
 # 18 queries fan out in parallel. 10 concurrent connections is comfortable
 # on a 2X-Small Databricks Serverless Warehouse.
