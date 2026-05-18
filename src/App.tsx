@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import { RecommenderProvider } from "@/context/RecommenderContext";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
 import { ProjectRecommendation } from "@/components/ProjectRecommendation";
+import { VoiceAgent } from "@/components/VoiceAgent";
 import {
   // LinkedIn
   LinkedInProfileRedirect,
@@ -223,6 +224,7 @@ const App = () => (
             </Routes>
           )}
           {!isAnalyticsSubdomain && <ProjectRecommendation />}
+          {!isAnalyticsSubdomain && <VoiceAgent />}
         </RecommenderProvider>
       </AnalyticsProvider>
     </BrowserRouter>
